@@ -87,15 +87,21 @@ echo "formatting and mounting partitions..."
 # don't recreate an existing efi partition!
 if [[ "$DISKTABLE" =~ 'GPT' && -n "$efi_device" && ! -d "/dev/$efi_device" ]]; then
     mkfs.fat -F32 /dev/"$efi_device"
+    sleep 3
     mkdir /mnt/boot && mkdir /mnt/boot/efi
+    sleep 3
     mount /dev/"$efi_device" /mnt/boot/efi
-    echo 'mounted EFI new partition...'
+    sleep 3
+    echo 'mounting new EFI partition...'
+    echo && echo "Press any key to continue..."; read nuttin
 elif [[ "$DISKTABLE" =~ 'GPT' && -d /dev/"$efi_device" ]]; then
     mkdir /mnt/boot && mkdir /mnt/boot/efi
     mount /dev/"$efi_device" /mnt/boot/efi
-    echo 'mounted existing EFI partition...'
+    echo 'mounting existing EFI partition...'
+    echo && echo "Press any key to continue..."; read nuttin
 else
     echo "Not mounting an EFI device..."
+    echo && echo "Press any key to continue..."; read nuttin
 fi
 
 mkfs.ext4 /dev/"$root_device" && mount /dev/"$root_device" /mnt
@@ -110,6 +116,12 @@ fi
 # SHOW RESULTS AGAIN
 echo "Latest changes to disk..."
 lsblk -f
+if [[ -d /mnt/boot/efi ]]; then
+    echo && echo "EFI part is mounted!"
+else
+    echo && echo "EFI part is NOT mounted!"
+    exit 1
+fi
 
 echo "Press any key to continue to install BASE SYSTEM..."; read empty
 
