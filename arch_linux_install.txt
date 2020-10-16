@@ -21,3 +21,12 @@ pamac-tray, etc
 18. install xorg and desktops and basic software
 19. install desktop added software
 20. reboot system
+
+########  AFTER INSTALL ###########
+1. copy dotfiles and vim subdirs
+2. scp -r Music, public_html, sounds, .gkrellm2, wallpaper, wallpaper1,
+bin, .ssh, .gnupg
+3. make tmp repos adm build 
+4. install yay, gnome-terminal-transparency, chrome-stable, libdvd
+libcss libdvdread gkrellm mlocate
+5. install nodejs gvim powerline powerline-fonts nvm

@@ -20,7 +20,7 @@ install_gr_drv(){
 }
 
 # CONNTECTED??
-$(ping -c 3 archlinux.org 2>/dev/null) || (echo "Not Connected to Network!!!" && exit 1)
+$(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && exit 1)
 
 
 # UPDATE SYSTEM CLOCK
@@ -89,7 +89,12 @@ reflector --country US --latest 25 --age 24 --protocol https --completion-percen
 
 # INSTALL ESSENTIAL PACKAGES
 echo "pacstrap system with base base-devel linux linux-firmware vim..."
-pacstrap /mnt base base-devel linux linux-firmware vim 
+pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
+
+## I have numerous Broadcom BCM4360 chipset PCI cards...
+## Might need to install broadcom-wl (or broadcom-wl-dkms) for wifi card
+## if so, rmmod b43, rmmod ssb, modprobe wl
+## if this doesn't work, run depmod -a
 
 # CONFIGURE FILESYSTEMS
 echo "Generating fstab..."
@@ -126,7 +131,7 @@ echo "Does locale setting look correct?"; read loc_yn
 
 # HOSTNAME
 echo "What is the hostname?"; read namevar
-echo "$hostname" > /mnt/etc/hostname
+echo "$namevar" > /mnt/etc/hostname
 
 cat > /mnt/etc/hosts <<HOSTS
 127.0.0.1      localhost
