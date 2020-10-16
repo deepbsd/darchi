@@ -6,7 +6,7 @@
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
-    $(ls /sys/firmware/efi/efivars) && return 0  || return 1
+    ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
 }
 
 # FIND GRAPHICS CARD
@@ -47,7 +47,7 @@ else
     echo "Formatting with BIOS/MBR"
 fi
 
-echo "Recommend efi (500MB), root (100G), home (remaining), swap (32G) partitions..."
+echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
 echo "Continue to cfdisk? "; read answer
 [[ "$answer" =~ [yY] ]] || exit 0
 
@@ -171,7 +171,7 @@ arch-chroot /mnt systemctl enable NetworkManager.service
 echo "Continue to add a user?"; read myanswer
 [[ "$myanswer" =~ [yY] ]] || exit 0
 
-arch-chroot /mnt pacman -S sudo bash-completion
+arch-chroot /mnt pacman -S sudo bash-completion man-pages man-db
 arch-chroot /mnt sed -i 's/# %wheel/%wheel/g' /etc/sudoers
 arch-chroot /mnt sed -i 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
 echo "Please add a username (provide username): "; read sudo_user

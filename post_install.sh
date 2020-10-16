@@ -1,6 +1,12 @@
-$!/usr/bin/env bash
+#!/usr/bin/env bash
 
 # Run this script after system and desktop are already installed
+
+## PERSONAL DIRECTORIES AND RESOURCES
+echo "Making personal subdirectories..."
+mkdir tmp repos build
+echo "Download home directory files from what host on network?"; read whathost
+scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,Music,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg} .
 
 ## INSTALL YAY
 echo "Installing yay: "
@@ -11,27 +17,24 @@ makepkg -si
 cd
 sudo yay -Syyu
 
-## INSTALL DVD SUPPORT
-sudo pacman -S libdvdread libdvdcss libdvdnav
+## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
+sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
 
 ## REPLACE GNOME_TERMINAL WITH TRANSPARENCY VERSION (and mate-terminal)
-yay -S gnome-terminal-transparency mate-terminal
+yay -S gnome-terminal-transparency mate-terminal 
 
 ## INSTALL POWERLINE AND DEV STUFF 
 sudo pacman -S powerline powerline-fonts nodejs gvim mlocate gkrellm
 
 # NVM
-cd && git clone https://github.com/nvm-sh/nvm.git .nvm
-cd ~/.nvm && . nvm.sh
+mkdir .nvm
+cd && git clone https://github.com/nvm-sh/nvm.git .nvm/.
+cd ~/.nvm && . nvm.sh && cd
+
 
 ## INSTALL CHROME and ORANCHELO ICONS AND BREEZE CURSOR
 yay -S google-chrome oranchelo-icon-theme xcursor-breeze
 
-## PERSONAL DIRECTORIES AND RESOURCES
-echo "Making personal subdirectories..."
-mkdir tmp repos build
-echo "Download home directory files from what host on network?"; read whathost
-scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,Music,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg} .
 
 ## DOTFILES
 cp ~/.bashrc ~/.bashrc.orig
