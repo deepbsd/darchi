@@ -15,12 +15,16 @@ find_card(){
     echo "$card"
 }
 
-install_gr_drv(){
-    pacman -S "$1"
+# IF NOT CONNTECTED
+not_connected(){
+    clear
+    echo "No network connection!!!  Perhaps your wifi card is not supported?"
+    exit 1
 }
 
 # CONNTECTED??
-$(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && exit 1)
+echo "Trying to ping google.com..."
+$(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && not_connected)
 
 
 # UPDATE SYSTEM CLOCK
@@ -65,7 +69,9 @@ echo "Continue to formatting and mounting partitions?"; read format_mount
 [[ "$format_mount" =~ [yY] ]] || exit 0
 echo "formatting and mounting partitions..."
 # don't recreate an existing efi partition!
-[[ -n "$efi_device" && ! -d "/dev/$efi_device" ]] && mkfs.fat -F32 /dev/"$efi_device" && mkdir /boot/efi && mount /dev/"$efi_device" /boot/efi
+
+[[ -n "$efi_device" && ! -d "/dev/$efi_device" ]] && mkfs.fat -F32 /dev/"$efi_device" && mkdir /mnt/boot/efi && mount /dev/"$efi_device" /mnt/boot/efi
+
 mkfs.ext4 /dev/"$root_device" && mount /dev/"$root_device" /mnt
 mkswap /dev/"$swap_device"
 swapon /dev/"$swap_device"
@@ -185,7 +191,7 @@ if $(efi_boot_mode); then
     arch-chroot /mnt pacman -S efibootmgr
     # /boot/efi should aready be mounted
     #mount /dev/"$efi_device" /boot/efi
-    arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+    arch-chroot /mnt grub-install /dev/sda --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
     echo "efi grub bootloader installed..."
 else
     arch-chroot /mnt grub-install /dev/"$device"
