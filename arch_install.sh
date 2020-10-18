@@ -29,6 +29,7 @@ find_card(){
 not_connected(){
     clear
     echo "No network connection!!!  Perhaps your wifi card is not supported?"
+    echo "Is your network cable plugged in?"
     exit 1
 }
 
@@ -48,29 +49,6 @@ time_date(){
     sleep 4
 }
 
-# FORMAT DEVICE
-format_disk(){
-    slice=$1; fstype=$2; part=$3
-    clear
-    echo "Formatting $IN_DRIVE/$slice with $fstype . . ."
-    case $fstype in 
-        fat32 ) mkfs.fat -F32 /dev/"$device"/"$slice"  
-            mount_part /dev/"$device"/"$slice" /mnt/boot/efi
-            ;;
-        ext4  ) mkfs.ext4 /dev/"$device"/"$slice"  
-            if [[ "$part" -eq 'home' ]]; then
-                mount_part /dev/"$device"/"$slice" /mnt/
-            else
-                mount_part /dev/"$device"/"$slice" /mnt/home
-            fi
-            ;;
-        swap  ) mkswap  /dev/"$device"/"$slice" 
-                swapon /dev/"$device"/"$slice"  
-            ;;
-        * ) echo "Cannot make that type of device" && exit 1 ;;
-    esac
-}
-
 # MOUNT PARTION
 mount_part(){
     device=$1; mt_pt=$2
@@ -85,6 +63,29 @@ mount_part(){
     return 0
 }
 
+# FORMAT DEVICE
+format_disk(){
+    device=$1; slice=$2
+    clear
+    echo "Formatting $device with $fstype . . ."
+    case $slice in 
+        efi ) mkfs.fat -F32 "$device"
+            mount_part "$device" /mnt/boot/efi
+            ;;
+        home  ) mkfs.ext4 "$device"
+            mount_part "$device" /mnt/home
+            ;;
+        root  ) mkfs.ext4 "$device"
+            mount_part "$device" /mnt
+            ;;
+        swap  ) mkswap "$device"
+                swapon "$device"
+                echo && echo "Swap space should be turned on now..."
+            ;;
+        * ) echo "Cannot make that type of device" && exit 1 ;;
+    esac
+}
+
 # PARTITION DISK
 part_disk(){
     device=$1
@@ -93,27 +94,33 @@ part_disk(){
     [[ "$answer" =~ [yY] ]] || exit 0
     IN_DEVICE=/dev/"$device"
 
-    cfdisk /dev/"$device"
+    cfdisk "$IN_DEVICE"
 
     # SHOW RESULTS:
     clear
     echo && echo "Results of cfdisk: "
-    fdisk -l /dev/"$device"
-    lsblk -f /dev/"$device"
+    fdisk -l "$IN_DEVICE"
+    lsblk -f "$IN_DEVICE"
 
     echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
-    [[ -n "$efi_device" ]] && format_disk "$device" "fat32"
+    EFI_SLICE="$IN_DEVICE/$efi_device"
+    [[ -n "$efi_device" ]] && format_disk "$EFI_SLICE" efi
 
     echo "Root device name?"; read root_device
-    [[ -n "$root_device" ]] && format_disk "$device" "$root_device"
+    ROOT_SLICE="$IN_DEVICE/$root_device"
+    [[ -n "$root_device" ]] && format_disk "$ROOT_SLICE" root
 
     echo "Swap device name? (leave empty if no swap device)"; read swap_device
-    [[ -n "$swap_device" ]] && format_disk "$device" "$swap_device"
+    SWAP_SLICE="$IN_DEVICE/$swap_device"
+    [[ -n "$swap_device" ]] && format_disk "$SWAP_SLICE" swap
 
     echo "Home device name? (leave empty if no swap device)"; read home_device
-    [[ -n "$home_device" ]] && format_disk "$device" "$home_device"
+    HOME_SLICE="$IN_DEVICE/$home_device"
+    [[ -n "$home_device" ]] && format_disk "$HOME_SLICE" home
 
-    echo && echo "Continue?"; read more
+    lsblk -f "$IN_DEVICE"
+    echo && echo "Disks should be partioned and mounted.  Continue?"; read more
+    [[ ! "$more" =~ [yY] ]] && exit 1
 }
 
 # INSTALL TO WHAT DEVICE?
@@ -135,8 +142,170 @@ get_install_device(){
     part_disk "$device"
 }
 
+# INSTALL ESSENTIAL PACKAGES
+install_base(){
+    clear
+    echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
+    echo && echo "pacstrap system with base base-devel linux linux-firmware vim..."
+    pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
+    echo && echo "Base system installed.  Press any key to continue..."; read empty
 
-####  START SCRIPT
+    # For future consideration...
+
+    ## I have numerous Broadcom BCM4360 chipset PCI cards...
+    ## Might need to install broadcom-wl (or broadcom-wl-dkms) for wifi card
+    ## if so, rmmod b43, rmmod ssb, modprobe wl
+    ## if this doesn't work, run depmod -a
+}
+
+# GENERATE FSTAB
+gen_fstab(){
+    clear
+    echo "Generating fstab..."
+    genfstab -U /mnt >> /mnt/etc/fstab
+    sleep 5
+
+    # EDIT FSTAB IF NECESSARY
+    clear
+    echo && echo "Here's the new /etc/fstab..."; cat /mnt/etc/fstab
+    echo && echo "Edit /etc/fstab?"; read edit_fstab
+    [[ "$edit_fstab" =~ [yY] ]] && vim /mnt/etc/fstab
+}
+
+# TIMEZONE
+set_tz(){
+    clear
+    echo && echo "Continue on to setting timezone with CHROOT?"; read tz_yn
+    [[ "$tz_yn" =~ [yY] ]] || exit 0
+
+    echo && echo "setting timezone to America/New_York..."
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+    arch-chroot /mnt hwclock --systohc --utc
+    arch-chroot /mnt date
+    echo && echo "Does date look correct?"; read td_yn
+    [[ "$td_yn" =~ [yY] ]] || exit 0
+
+}
+
+# LOCALE
+set_locale(){
+    clear
+    echo && echo "setting locale to en_US.UTF-8..."
+    arch-chroot /mnt sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
+    arch-chroot /mnt locale-gen
+    echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+    export LANG=en_US.UTF-8
+    cat /mnt/etc/locale.conf
+    echo && echo "Does locale setting look correct?"; read loc_yn
+    [[ "$loc_yn" =~ [yY] ]] || exit 0
+}
+
+# HOSTNAME
+set_hostname(){
+    clear
+    echo && echo "What is the hostname?"; read namevar
+    echo "$namevar" > /mnt/etc/hostname
+
+cat > /mnt/etc/hosts <<HOSTS
+127.0.0.1      localhost
+::1            localhost
+127.0.1.1      $namevar.localdomain     $namevar
+HOSTS
+
+    echo && echo "/etc/hostname and /etc/hosts files configured..."
+    cat /mnt/etc/hostname 
+    cat /mnt/etc/hosts
+    echo && echo "Do /etc/hostname and /etc/hosts look correct?"; read etchosts_yn
+    [[ "$etchosts_yn" =~ [yY] ]] || exit 0
+}
+
+# SOME MORE ESSENTIAL NETWORK STUFF
+install_essential(){
+    clear
+    echo && echo "Enabling dhcpcd, sshd and NetworkManager services..."
+    echo
+    arch-chroot /mnt pacman -S git openssh networkmanager dhcpcd man-db man-pages
+    arch-chroot /mnt systemctl enable dhcpcd.service
+    arch-chroot /mnt systemctl enable sshd.service
+    arch-chroot /mnt systemctl enable NetworkManager.service
+
+
+    echo && echo "Press any key to continue..."; read empty
+}
+
+# ADD A USER ACCT
+add_user_acct(){
+    clear
+    echo && echo "Adding sudo + user acct..."
+    sleep 4
+    arch-chroot /mnt pacman -S sudo bash-completion
+    arch-chroot /mnt sed -i 's/# %wheel/%wheel/g' /etc/sudoers
+    arch-chroot /mnt sed -i 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
+    echo && echo "Please provide a username: "; read sudo_user
+    echo && echo "Creating $sudo_user and adding $sudo_user to sudoers..."
+    arch-chroot /mnt useradd -m -G wheel "$sudo_user"
+    echo && echo "Password for $sudo_user?"
+    arch-chroot /mnt passwd "$sudo_user"
+}
+
+# INSTALL BOOTLOADER
+install_grub(){
+    clear
+    echo && echo "Continue to install GRUB?"; read myanswer
+    [[ "$myanswer" =~ [yY] ]] || exit 0
+
+    arch-chroot /mnt pacman -S grub 
+
+    if $(efi_boot_mode); then
+        arch-chroot /mnt pacman -S efibootmgr
+        # /boot/efi should aready be mounted
+        [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
+        arch-chroot /mnt grub-install /dev/sda --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+        echo "efi grub bootloader installed..."
+    else
+        arch-chroot /mnt grub-install /dev/"$device"
+        echo "mbr bootloader installed..."
+    fi
+
+    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+    echo "/boot/grub/grub.cfg configured..."
+        
+    echo "Press any key to continue..."; read empty
+}
+
+install_desktop(){
+    clear
+    echo && echo "Would you like to install Xorg and desktop? (y or n)"; read xorg_yes
+    [[ "$xorg_yes" =~ [yY] ]] || exit 0
+
+    # XORG AND DESKTOP
+    clear
+    echo "Installing Xorg and Desktop..."
+
+    basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch )
+
+    pacman -S "${basicx[@]}"
+
+    extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme moka-icon-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+
+    ## Also, install fonts and icon and cursor themes
+    pacman -S "${extra_x[@]}"
+
+    # INSTALL DRIVER FOR YOUR GRAPHICS CARD
+    find_card
+    arch-chroot /mnt pacman -Ss | grep 'xf86-video' | less
+    echo "Which driver is yours?"; read driver
+    arch-chroot /mnt pacman -S "$driver"
+
+    echo "Enabling lightdm service..."
+    arch-chroot /mnt systemctl enable lightdm.service
+    echo && echo "Cinnamon and lightdm should now be installed..."
+    sleep 5
+}
+
+#############################################################
+###################  START SCRIPT
+#############################################################
 start(){
     clear
     echo && echo "WELCOME TO DARCHI!  The easy Arch Install Script!"
@@ -150,211 +319,68 @@ start(){
     check_connect
     time_date
     get_install_device  # this func calls partition func
+    #update_mirrorlist # done already in archiso img
+    install_base
+    gen_fstab
+    set_tz
+    set_locale
+    set_hostname
 
-
+    # SET ROOT PASSWORD
+    echo "Setting ROOT password..."
+    arch-chroot /mnt passwd
+    install_essential
+    add_user_acct
+    install_grub
+    install_desktop
+    echo "Type 'shutdown -r now' to reboot..."
 }
 
+start
 
+## FORMAT AND MOUNT PARTITIONS 
+#echo && echo "Continue to formatting and mounting partitions?"; read format_mount
+#[[ "$format_mount" =~ [yY] ]] || exit 0
+#
+#clear
+#echo "formatting and mounting partitions..."
+## don't recreate an existing efi partition!
+#if [[ "$DISKTABLE" =~ 'GPT' && -n "$efi_device" && ! -d "/dev/$efi_device" ]]; then
+#    mkfs.fat -F32 /dev/"$efi_device"
+#    sleep 3
+#    mkdir /mnt/boot && mkdir /mnt/boot/efi
+#    sleep 3
+#    mount /dev/"$efi_device" /mnt/boot/efi
+#    sleep 3
+#    echo 'mounting new EFI partition...'
+#    echo && echo "Press any key to continue..."; read nuttin
+#elif [[ "$DISKTABLE" =~ 'GPT' && -d /dev/"$efi_device" ]]; then
+#    mkdir /mnt/boot && mkdir /mnt/boot/efi
+#    mount /dev/"$efi_device" /mnt/boot/efi
+#    echo 'mounting existing EFI partition...'
+#    echo && echo "Press any key to continue..."; read nuttin
+#else
+#    echo "Not mounting an EFI device..."
+#    echo && echo "Press any key to continue..."; read nuttin
+#fi
+#
+#mkfs.ext4 /dev/"$root_device" && mount /dev/"$root_device" /mnt
+#mkswap /dev/"$swap_device"
+#swapon /dev/"$swap_device"
+#
+#if [[ -n "$home_device" ]]; then
+#    [[ ! -d /mnt/home ]] && mkdir /mnt/home
+#    mkfs.ext4 /dev/"$home_device" && mount /dev/"$home_device" /mnt/home
+#fi
+#
+## SHOW RESULTS AGAIN
+#echo "Latest changes to disk..."
+#lsblk -f
+#if [[ -d /mnt/boot/efi ]]; then
+#    echo && echo "EFI part is mounted!"
+#else
+#    echo && echo "EFI part is NOT mounted!"
+#    exit 1
+#fi
 
-
-
-# FORMAT AND MOUNT PARTITIONS 
-echo && echo "Continue to formatting and mounting partitions?"; read format_mount
-[[ "$format_mount" =~ [yY] ]] || exit 0
-
-clear
-echo "formatting and mounting partitions..."
-# don't recreate an existing efi partition!
-if [[ "$DISKTABLE" =~ 'GPT' && -n "$efi_device" && ! -d "/dev/$efi_device" ]]; then
-    mkfs.fat -F32 /dev/"$efi_device"
-    sleep 3
-    mkdir /mnt/boot && mkdir /mnt/boot/efi
-    sleep 3
-    mount /dev/"$efi_device" /mnt/boot/efi
-    sleep 3
-    echo 'mounting new EFI partition...'
-    echo && echo "Press any key to continue..."; read nuttin
-elif [[ "$DISKTABLE" =~ 'GPT' && -d /dev/"$efi_device" ]]; then
-    mkdir /mnt/boot && mkdir /mnt/boot/efi
-    mount /dev/"$efi_device" /mnt/boot/efi
-    echo 'mounting existing EFI partition...'
-    echo && echo "Press any key to continue..."; read nuttin
-else
-    echo "Not mounting an EFI device..."
-    echo && echo "Press any key to continue..."; read nuttin
-fi
-
-mkfs.ext4 /dev/"$root_device" && mount /dev/"$root_device" /mnt
-mkswap /dev/"$swap_device"
-swapon /dev/"$swap_device"
-
-if [[ -n "$home_device" ]]; then
-    [[ ! -d /mnt/home ]] && mkdir /mnt/home
-    mkfs.ext4 /dev/"$home_device" && mount /dev/"$home_device" /mnt/home
-fi
-
-# SHOW RESULTS AGAIN
-echo "Latest changes to disk..."
-lsblk -f
-if [[ -d /mnt/boot/efi ]]; then
-    echo && echo "EFI part is mounted!"
-else
-    echo && echo "EFI part is NOT mounted!"
-    exit 1
-fi
-
-echo "Press any key to continue to install BASE SYSTEM..."; read empty
-
-## UPDATE MIRRORLIST  # happens automatically now in archiso
-
-# INSTALL ESSENTIAL PACKAGES
-echo && echo "pacstrap system with base base-devel linux linux-firmware vim..."
-pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
-
-## I have numerous Broadcom BCM4360 chipset PCI cards...
-## Might need to install broadcom-wl (or broadcom-wl-dkms) for wifi card
-## if so, rmmod b43, rmmod ssb, modprobe wl
-## if this doesn't work, run depmod -a
-
-echo && echo "Base system installed.  Press any key to continue..."; read empty
-
-# CONFIGURE FILESYSTEMS
-clear
-echo "Generating fstab..."
-genfstab -U /mnt >> /mnt/etc/fstab
-
-# EDIT FSTAB IF NECESSARY
-clear
-echo && echo "Here's /etc/fstab..."; cat /mnt/etc/fstab
-echo && echo "Press any key to continue..."; read empty
-echo && echo "Edit /etc/fstab?"; read edit_fstab
-[[ "$edit_fstab" =~ [yY] ]] && vim /mnt/etc/fstab
-
-# CHROOT
-clear
-echo && echo "Starting CHROOT operations..."
-echo && echo "Continue on to setting timezone?"; read tz_yn
-[[ "$tz_yn" =~ [yY] ]] || exit 0
-
-# TIMEZONE
-echo && echo "setting timezone to America/New_York..."
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
-arch-chroot /mnt hwclock --systohc --utc
-arch-chroot /mnt date
-echo && echo "Does date look correct?"; read td_yn
-[[ "$td_yn" =~ [yY] ]] || exit 0
-
-# LOCALE
-echo && echo "setting locale to en_US.UTF-8..."
-arch-chroot /mnt sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
-arch-chroot /mnt locale-gen
-echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
-export LANG=en_US.UTF-8
-cat /mnt/etc/locale.conf
-echo && echo "Does locale setting look correct?"; read loc_yn
-[[ "$loc_yn" =~ [yY] ]] || exit 0
-
-# HOSTNAME
-clear
-echo && echo "What is the hostname?"; read namevar
-echo "$namevar" > /mnt/etc/hostname
-
-cat > /mnt/etc/hosts <<HOSTS
-127.0.0.1      localhost
-::1            localhost
-127.0.1.1      $namevar.localdomain     $namevar
-HOSTS
-
-echo && echo "/etc/hostname and /etc/hosts files configured..."
-cat /mnt/etc/hostname 
-cat /mnt/etc/hosts
-echo && echo "Do /etc/hostname and /etc/hosts look correct?"; read etchosts_yn
-[[ "$etchosts_yn" =~ [yY] ]] || exit 0
-echo && echo "Continue to set ROOT password and enable sshd and NetworkManager?" 
-read myanswer
-[[ "$myanswer" =~ [yY] ]] || exit 0
-
-
-# SET ROOT PASSWORD
-clear
-echo "Setting ROOT password..."
-arch-chroot /mnt passwd
-
-# MORE ESSENTIAL SOFTWARE
-echo && echo "Enabling dhcpcd, sshd and NetworkManager services..."
-echo
-arch-chroot /mnt pacman -S git openssh networkmanager dhcpcd
-arch-chroot /mnt systemctl enable dhcpcd.service
-arch-chroot /mnt systemctl enable sshd.service
-arch-chroot /mnt systemctl enable NetworkManager.service
-
-
-echo && echo "Press any key to continue..."; read empty
-
-# ADD A USER
-clear
-echo "Continue to add a user?"; read myanswer
-[[ "$myanswer" =~ [yY] ]] || exit 0
-
-arch-chroot /mnt pacman -S sudo bash-completion man-pages man-db
-arch-chroot /mnt sed -i 's/# %wheel/%wheel/g' /etc/sudoers
-arch-chroot /mnt sed -i 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
-echo && echo "Please provide a username: "; read sudo_user
-echo && echo "Creating $sudo_user and adding $sudo_user to sudoers..."
-arch-chroot /mnt useradd -m -G wheel "$sudo_user"
-echo && echo "Password for $sudo_user?"
-arch-chroot /mnt passwd "$sudo_user"
-
-echo && echo "Continue to install GRUB?"; read myanswer
-[[ "$myanswer" =~ [yY] ]] || exit 0
-
-
-# INSTALL BOOTLOADER
-clear
-arch-chroot /mnt pacman -S grub 
-
-if $(efi_boot_mode); then
-    arch-chroot /mnt pacman -S efibootmgr
-    # /boot/efi should aready be mounted
-    [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
-    arch-chroot /mnt grub-install /dev/sda --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
-    echo "efi grub bootloader installed..."
-else
-    arch-chroot /mnt grub-install /dev/"$device"
-    echo "mbr bootloader installed..."
-fi
-
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-echo "/boot/grub/grub.cfg configured..."
-    
-echo "Press any key to continue..."; read empty
-
-echo "Would you like to install Xorg and desktop? (y or n)"; read xorg_yes
-[[ "$xorg_yes" =~ [yY] ]] || exit 0
-
-# XORG AND DESKTOP
-clear
-echo "Installing Xorg and Desktop..."
-
-basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gonome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch )
-
-pacman -S "${basicx[@]}"
-
-extrax=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme moka-icon-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
-
-## Also, install fonts and icon and cursor themes
-pacman -S "${extrax[@]}"
-
-# INSTALL DRIVER FOR YOUR GRAPHICS CARD
-find_card
-arch-chroot /mnt pacman -Ss | grep 'xf86-video' | less
-echo "Which driver is yours?"; read driver
-arch-chroot /mnt pacman -S "$driver"
-
-echo "Enabling lightdm service..."
-arch-chroot /mnt systemctl enable lightdm.service
-
-
-echo "Type 'shutdown -r now' to reboot..."
-# END OF SCRIPT
 
