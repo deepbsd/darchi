@@ -45,14 +45,31 @@ time_date(){
 
 # FORMAT DEVICE
 format_disk(){
-    device=$1; fstype=$2
+    device=$1; slice=$2 fstype=$3
     echo "Formatting $device with $fstype . . ."
     case $fstype in 
-        fat32 ) mkfs.fat -F32 "$device"  ;;
-        ext4  ) mkfs.ext4 "$device"  ;;
-        swap  ) mkswap  "$device" ;;
+        fat32 ) mkfs.fat -F32 /dev/"$device"/"$slice"  
+            mount_part /dev/"$device"/"$slice" /mnt/boot/efi
+            ;;
+        ext4  ) mkfs.ext4 /dev/"$device"/"$slice"  
+            mount_part /dev/"$device"/"$slice" /mnt/
+            ;;
+        swap  ) mkswap  /dev/"$device"/"$slice" ;;
         * ) echo "Cannot make that type of device" && exit 1 ;;
     esac
+}
+
+mount_part(){
+    device=$1; mt_pt=$2
+    [[ ! -d "$mt_pt" ]] && mkdir "$mt_pt" 
+    mount "$device" "$mt_pt"
+    if [[ "$?" -eq 0 ]] ;then
+        echo "/mnt/$mt_pt mounted."
+    else
+        echo "Error!!  /mnt/$mt_pt not mounted!"
+        exit 1
+    fi
+    return 0
 }
 
 # PARTITION DISK
@@ -70,9 +87,16 @@ part_disk(){
     fdisk -l /dev/"$device"
 
     echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
+    [[ -n "$efi_device" ]] && format_disk "$device" "fat32"
+
     echo "Root device name?"; read root_device
+    [[ -n "$root_device" ]] && format_disk "$device" "$root_device"
+
     echo "Swap device name? (leave empty if no swap device)"; read swap_device
+    [[ -n "$swap_device" ]] && format_disk "$device" "$swap_device"
+
     echo "Home device name? (leave empty if no swap device)"; read home_device
+    [[ -n "$home_device" ]] && format_disk "$device" "$home_device"
 
     echo && echo "Continue?"; read more
 }
