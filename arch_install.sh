@@ -4,6 +4,11 @@
 
 # KEYBOARD: default console keymap is US so no need to change
 
+### VARIABLES
+DISKTABLE=''
+
+###########  FUNCTIONS ###################
+
 # VERIFY BOOT MODE
 efi_boot_mode(){
     ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
@@ -22,61 +27,97 @@ not_connected(){
     exit 1
 }
 
-####  START SCRIPT
-DISKTABLE=''
-clear
-echo && echo "WELCOME TO DARCHI!  The easy Arch Install Script!"
-echo && echo -n "waiting for reflector to update mirrors"
-while true; do
-    pgrep -x reflector &>/dev/null || break
-    echo -n '.'
-    sleep 3
-done
-
 # CONNTECTED??
-clear
-echo "Trying to ping google.com..."
-$(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && not_connected)
-
+check_connect(){
+    clear
+    echo "Trying to ping google.com..."
+    $(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && not_connected)
+    echo "Good!  We're connected!!!" && sleep 4
+}
 
 # UPDATE SYSTEM CLOCK
-timedatectl set-ntp true
-echo && echo "Date/Time service Status is . . . "
-timedatectl status
+time_date(){
+    timedatectl set-ntp true
+    echo && echo "Date/Time service Status is . . . "
+    timedatectl status
+    sleep 4
+}
 
-# INSTALL TO WHAT DEVICE?
-clear
-echo "Available installation media: "  && echo
-fdisk -l
-
-echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
-read device
-if $(efi_boot_mode); then 
-    echo && echo "Formatting with EFI/GPT"
-    DISKTABLE='GPT'
-else
-    echo && echo "Formatting with BIOS/MBR"
-    DISKTABLE='MBR'
-fi
-
-echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
-echo && echo "Continue to cfdisk? "; read answer
-[[ "$answer" =~ [yY] ]] || exit 0
+# FORMAT DEVICE
+format_disk(){
+    device=$1; fstype=$2
+    echo "Formatting $device with $fstype . . ."
+    case $fstype in 
+        fat32 ) mkfs.fat -F32 "$device"  ;;
+        ext4  ) mkfs.ext4 "$device"  ;;
+        swap  ) mkswap  "$device" ;;
+        * ) echo "Cannot make that type of device" && exit 1 ;;
+    esac
+}
 
 # PARTITION DISK
-cfdisk /dev/"$device"
+part_disk(){
+    device=$1
+    echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
+    echo && echo "Continue to cfdisk? "; read answer
+    [[ "$answer" =~ [yY] ]] || exit 0
 
-# SHOW RESULTS:
-clear
-echo && echo "Results of cfdisk: "
-fdisk -l /dev/"$device"
+    cfdisk /dev/"$device"
 
-echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
-echo "Root device name?"; read root_device
-echo "Swap device name?"; read swap_device
-echo "Home device name?"; read home_device
+    # SHOW RESULTS:
+    clear
+    echo && echo "Results of cfdisk: "
+    fdisk -l /dev/"$device"
 
-echo && echo "Continue?"; read more
+    echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
+    echo "Root device name?"; read root_device
+    echo "Swap device name? (leave empty if no swap device)"; read swap_device
+    echo "Home device name? (leave empty if no swap device)"; read home_device
+
+    echo && echo "Continue?"; read more
+}
+
+# INSTALL TO WHAT DEVICE?
+get_install_device(){
+    clear
+    echo "Available installation media: "  && echo
+    fdisk -l
+
+    echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
+    read device
+    if $(efi_boot_mode); then 
+        echo && echo "Formatting with EFI/GPT"
+        DISKTABLE='GPT'
+    else
+        echo && echo "Formatting with BIOS/MBR"
+        DISKTABLE='MBR'
+    fi
+
+    part_disk "$device"
+}
+
+
+####  START SCRIPT
+start(){
+    clear
+    echo && echo "WELCOME TO DARCHI!  The easy Arch Install Script!"
+    echo && echo -n "waiting for reflector to update mirrors"
+    while true; do
+        pgrep -x reflector &>/dev/null || break
+        echo -n '.'
+        sleep 3
+    done
+
+    check_connect
+    time_date
+    get_install_device  # this func calls partition func
+
+
+}
+
+
+
+
 
 # FORMAT AND MOUNT PARTITIONS 
 echo && echo "Continue to formatting and mounting partitions?"; read format_mount
