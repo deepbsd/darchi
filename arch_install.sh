@@ -4,8 +4,13 @@
 
 # KEYBOARD: default console keymap is US so no need to change
 
-### VARIABLES
+### GLOBAL VARIABLES
 DISKTABLE=''
+IN_DRIVE=''
+EFI_SLICE=''
+ROOT_SLICE=''
+HOME_SLICE=''
+SWAP_SLICE=''
 
 ###########  FUNCTIONS ###################
 
@@ -45,25 +50,33 @@ time_date(){
 
 # FORMAT DEVICE
 format_disk(){
-    device=$1; slice=$2 fstype=$3
-    echo "Formatting $device with $fstype . . ."
+    slice=$1; fstype=$2; part=$3
+    clear
+    echo "Formatting $IN_DRIVE/$slice with $fstype . . ."
     case $fstype in 
         fat32 ) mkfs.fat -F32 /dev/"$device"/"$slice"  
             mount_part /dev/"$device"/"$slice" /mnt/boot/efi
             ;;
         ext4  ) mkfs.ext4 /dev/"$device"/"$slice"  
-            mount_part /dev/"$device"/"$slice" /mnt/
+            if [[ "$part" -eq 'home' ]]; then
+                mount_part /dev/"$device"/"$slice" /mnt/
+            else
+                mount_part /dev/"$device"/"$slice" /mnt/home
+            fi
             ;;
-        swap  ) mkswap  /dev/"$device"/"$slice" ;;
+        swap  ) mkswap  /dev/"$device"/"$slice" 
+                swapon /dev/"$device"/"$slice"  
+            ;;
         * ) echo "Cannot make that type of device" && exit 1 ;;
     esac
 }
 
+# MOUNT PARTION
 mount_part(){
     device=$1; mt_pt=$2
     [[ ! -d "$mt_pt" ]] && mkdir "$mt_pt" 
     mount "$device" "$mt_pt"
-    if [[ "$?" -eq 0 ]] ;then
+    if [[ "$?" -eq 0 ]]; then
         echo "/mnt/$mt_pt mounted."
     else
         echo "Error!!  /mnt/$mt_pt not mounted!"
@@ -78,6 +91,7 @@ part_disk(){
     echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
     echo && echo "Continue to cfdisk? "; read answer
     [[ "$answer" =~ [yY] ]] || exit 0
+    IN_DEVICE=/dev/"$device"
 
     cfdisk /dev/"$device"
 
@@ -85,6 +99,7 @@ part_disk(){
     clear
     echo && echo "Results of cfdisk: "
     fdisk -l /dev/"$device"
+    lsblk -f /dev/"$device"
 
     echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
     [[ -n "$efi_device" ]] && format_disk "$device" "fat32"
