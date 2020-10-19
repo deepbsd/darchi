@@ -106,12 +106,12 @@ part_disk(){
     fdisk -l "$IN_DEVICE"
     lsblk -f "$IN_DEVICE"
 
-    lsblk -f "$IN_DEVICE" && echo "Root device name?"; read root_device
+    echo "Root device name?"; read root_device
     ROOT_SLICE="/dev/$root_device"
     echo "Formatting $ROOT_SLICE" && sleep 2 
     [[ -n "$root_device" ]] && format_disk "$ROOT_SLICE" root
 
-    echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
+    lsblk -f "$IN_DEVICE" && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
     EFI_SLICE="/dev/$efi_device"
     echo "Formatting $EFI_SLICE" && sleep 2
     [[ -n "$efi_device" ]] && format_disk "$EFI_SLICE" efi
@@ -290,7 +290,7 @@ install_desktop(){
     clear
     echo "Installing Xorg and Desktop..."
 
-    basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch )
+    basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
 
     pacman -S "${basicx[@]}"
 
@@ -301,7 +301,7 @@ install_desktop(){
 
     # INSTALL DRIVER FOR YOUR GRAPHICS CARD
     find_card
-    arch-chroot /mnt pacman -Ss | grep 'xf86-video' | less
+    arch-chroot /mnt pacman -Ss | grep 'xf86-video' | more
     echo "Which driver is yours?"; read driver
     arch-chroot /mnt pacman -S "$driver"
 
