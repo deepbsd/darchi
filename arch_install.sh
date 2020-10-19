@@ -293,12 +293,12 @@ install_desktop(){
 
     basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
 
-    pacman -S "${basicx[@]}"
+    arch-chroot /mnt pacman -S "${basicx[@]}"
 
     extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
     ## Also, install fonts and icon and cursor themes
-    pacman -S "${extra_x[@]}"
+    arch-chroot /mnt pacman -S "${extra_x[@]}"
 
     # INSTALL DRIVER FOR YOUR GRAPHICS CARD
     find_card
