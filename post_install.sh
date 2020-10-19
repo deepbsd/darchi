@@ -29,7 +29,7 @@ sudo pacman -S powerline powerline-fonts nodejs gvim mlocate gkrellm
 # NVM
 mkdir .nvm
 cd && git clone https://github.com/nvm-sh/nvm.git .nvm/.
-cd ~/.nvm && . nvm.sh && cd
+cd ~/.nvm && . ./nvm.sh && cd
 
 
 ## INSTALL CHROME and ORANCHELO ICONS AND BREEZE CURSOR
