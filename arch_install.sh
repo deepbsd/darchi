@@ -281,6 +281,7 @@ install_grub(){
     echo "Press any key to continue..."; read empty
 }
 
+# INSTALL XORG AND DESKTOP
 install_desktop(){
     clear
     echo && echo "Would you like to install Xorg and desktop? (y or n)"; read xorg_yes
@@ -294,7 +295,7 @@ install_desktop(){
 
     pacman -S "${basicx[@]}"
 
-    extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme moka-icon-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+    extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
     ## Also, install fonts and icon and cursor themes
     pacman -S "${extra_x[@]}"
