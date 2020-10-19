@@ -1,4 +1,4 @@
-# DAVEARCH Arch Linux Installer
+# DARCHI    Dave's Arch Linux Installer
 
 This is just a personal script, very very simple, to install Arch Linux after
 booting the archiso ISO image.
