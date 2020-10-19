@@ -4,6 +4,7 @@ This is just a personal script, very very simple, to install Arch Linux after
 booting the archiso ISO image.
 
 You can download it to your booted archiso image like this:
+
 `curl -OL https://raw.githubusercontent.com/deepbsd/darchi/arch_install.sh`
 
 It depends on cfdisk for editing the partition table.  Cfdisk seems to
