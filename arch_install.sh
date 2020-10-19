@@ -52,12 +52,14 @@ time_date(){
 # MOUNT PARTION
 mount_part(){
     device=$1; mt_pt=$2
+    [[ ! -d /mnt/boot ]] && mkdir /mnt/boot
     [[ ! -d "$mt_pt" ]] && mkdir "$mt_pt" 
+    echo "Device: $device mount point: $mt_pt"
     mount "$device" "$mt_pt"
     if [[ "$?" -eq 0 ]]; then
-        echo "/mnt/$mt_pt mounted."
+        echo "$mt_pt mounted."
     else
-        echo "Error!!  /mnt/$mt_pt not mounted!"
+        echo "Error!!  $mt_pt not mounted!"
         exit 1
     fi
     return 0
@@ -67,7 +69,8 @@ mount_part(){
 format_disk(){
     device=$1; slice=$2
     clear
-    echo "Formatting $device with $fstype . . ."
+    echo "Formatting $device with $slice. . ."
+    sleep 3
     case $slice in 
         efi ) mkfs.fat -F32 "$device"
             mount_part "$device" /mnt/boot/efi
@@ -92,7 +95,7 @@ part_disk(){
     echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
     echo && echo "Continue to cfdisk? "; read answer
     [[ "$answer" =~ [yY] ]] || exit 0
-    IN_DEVICE=/dev/"$device"
+    IN_DEVICE="/dev/$device"
 
     cfdisk "$IN_DEVICE"
 
@@ -103,19 +106,23 @@ part_disk(){
     lsblk -f "$IN_DEVICE"
 
     echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
-    EFI_SLICE="$IN_DEVICE/$efi_device"
+    EFI_SLICE="/dev/$efi_device"
+    echo "Formatting $EFI_SLICE" && sleep 2
     [[ -n "$efi_device" ]] && format_disk "$EFI_SLICE" efi
 
-    echo "Root device name?"; read root_device
-    ROOT_SLICE="$IN_DEVICE/$root_device"
+    lsblk -f "$IN_DEVICE" && echo "Root device name?"; read root_device
+    ROOT_SLICE="/dev/$root_device"
+    echo "Formatting $ROOT_SLICE" && sleep 2 
     [[ -n "$root_device" ]] && format_disk "$ROOT_SLICE" root
 
-    echo "Swap device name? (leave empty if no swap device)"; read swap_device
-    SWAP_SLICE="$IN_DEVICE/$swap_device"
+    lsblk -f "$IN_DEVICE" && echo "Swap device name? (leave empty if no swap device)"; read swap_device
+    SWAP_SLICE="/dev/$swap_device"
+    echo "Formatting $SWAP_SLICE" && sleep 2
     [[ -n "$swap_device" ]] && format_disk "$SWAP_SLICE" swap
 
-    echo "Home device name? (leave empty if no swap device)"; read home_device
-    HOME_SLICE="$IN_DEVICE/$home_device"
+    lsblk -f "$IN_DEVICE" && echo "Home device name? (leave empty if no swap device)"; read home_device
+    HOME_SLICE="/dev/$home_device"
+    echo "Formatting $HOME_SLICE" && sleep 2
     [[ -n "$home_device" ]] && format_disk "$HOME_SLICE" home
 
     lsblk -f "$IN_DEVICE"
@@ -302,13 +309,13 @@ install_desktop(){
     echo && echo "Cinnamon and lightdm should now be installed..."
     sleep 5
 }
-
 #############################################################
 ###################  START SCRIPT
 #############################################################
 start(){
     clear
     echo && echo "WELCOME TO DARCHI!  The easy Arch Install Script!"
+    sleep 4
     echo && echo -n "waiting for reflector to update mirrors"
     while true; do
         pgrep -x reflector &>/dev/null || break
@@ -325,7 +332,6 @@ start(){
     set_tz
     set_locale
     set_hostname
-
     # SET ROOT PASSWORD
     echo "Setting ROOT password..."
     arch-chroot /mnt passwd
