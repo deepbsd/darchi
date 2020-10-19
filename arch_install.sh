@@ -53,11 +53,12 @@ time_date(){
 mount_part(){
     device=$1; mt_pt=$2
     [[ ! -d /mnt/boot ]] && mkdir /mnt/boot
+    [[ ! -d /mnt/boot/efi ]] && mkdir /mnt/boot/efi
     [[ ! -d "$mt_pt" ]] && mkdir "$mt_pt" 
     echo "Device: $device mount point: $mt_pt"
     mount "$device" "$mt_pt"
     if [[ "$?" -eq 0 ]]; then
-        echo "$mt_pt mounted."
+        echo "$device mounted on $mt_pt ..."
     else
         echo "Error!!  $mt_pt not mounted!"
         exit 1
@@ -105,15 +106,15 @@ part_disk(){
     fdisk -l "$IN_DEVICE"
     lsblk -f "$IN_DEVICE"
 
-    echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
-    EFI_SLICE="/dev/$efi_device"
-    echo "Formatting $EFI_SLICE" && sleep 2
-    [[ -n "$efi_device" ]] && format_disk "$EFI_SLICE" efi
-
     lsblk -f "$IN_DEVICE" && echo "Root device name?"; read root_device
     ROOT_SLICE="/dev/$root_device"
     echo "Formatting $ROOT_SLICE" && sleep 2 
     [[ -n "$root_device" ]] && format_disk "$ROOT_SLICE" root
+
+    echo && echo "EFI device name (leave empty if not EFI/GPT)?"; read efi_device
+    EFI_SLICE="/dev/$efi_device"
+    echo "Formatting $EFI_SLICE" && sleep 2
+    [[ -n "$efi_device" ]] && format_disk "$EFI_SLICE" efi
 
     lsblk -f "$IN_DEVICE" && echo "Swap device name? (leave empty if no swap device)"; read swap_device
     SWAP_SLICE="/dev/$swap_device"
@@ -316,7 +317,7 @@ start(){
     clear
     echo && echo "WELCOME TO DARCHI!  The easy Arch Install Script!"
     sleep 4
-    echo && echo -n "waiting for reflector to update mirrors"
+    echo && echo -n "waiting for reflector to update mirrorlist"
     while true; do
         pgrep -x reflector &>/dev/null || break
         echo -n '.'
