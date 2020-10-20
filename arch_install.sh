@@ -238,7 +238,7 @@ install_essential(){
 add_user_acct(){
     clear
     echo && echo "Adding sudo + user acct..."
-    sleep 4
+    sleep 2
     arch-chroot /mnt pacman -S sudo bash-completion
     arch-chroot /mnt sed -i 's/# %wheel/%wheel/g' /etc/sudoers
     arch-chroot /mnt sed -i 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
@@ -313,7 +313,7 @@ install_desktop(){
     sleep 5
 }
 #############################################################
-###################  START SCRIPT
+############         START SCRIPT
 #############################################################
 start(){
     clear
