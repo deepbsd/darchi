@@ -286,6 +286,7 @@ install_grub(){
 wl_wifi(){
     clear && echo "Installing broadcomm-wl-dkms..."
     arch-chroot /mnt pacman -S broadcomm-wl-dkms
+    [[ "$?" -eq 0 ]] && echo "Wifi Driver installed!"; sleep 3
 }
 
 # INSTALL XORG AND DESKTOP
