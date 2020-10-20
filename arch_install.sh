@@ -282,6 +282,12 @@ install_grub(){
     echo "Press any key to continue..."; read empty
 }
 
+# WIFI (BCM4360) IF NECESSARY
+wl_wifi(){
+    clear && echo "Installing broadcomm-wl-dkms..."
+    arch-chroot /mnt pacman -S broadcomm-wl-dkms
+}
+
 # INSTALL XORG AND DESKTOP
 install_desktop(){
     clear
@@ -340,6 +346,9 @@ start(){
     arch-chroot /mnt passwd
     install_essential
     add_user_acct
+    # OPTIONAL WIFI
+    echo && echo "Install drivers for BCM4360? " && read wifi
+    [[ "$wifi" =~ [yY] ]] && wl_wifi
     install_grub
     install_desktop
     echo "Type 'shutdown -r now' to reboot..."
