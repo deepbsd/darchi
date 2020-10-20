@@ -157,13 +157,6 @@ install_base(){
     echo && echo "pacstrap system with base base-devel linux linux-headers linux-firmware vim..."
     pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
     echo && echo "Base system installed.  Press any key to continue..."; read empty
-
-    # For future consideration...
-
-    ## I have numerous Broadcom BCM4360 chipset PCI cards...
-    ## Might need to install broadcom-wl (or broadcom-wl-dkms) for wifi card
-    ## if so, rmmod b43, rmmod ssb, modprobe wl
-    ## if this doesn't work, run depmod -a
 }
 
 # GENERATE FSTAB
