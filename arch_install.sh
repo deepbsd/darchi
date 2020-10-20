@@ -268,10 +268,11 @@ install_grub(){
         arch-chroot /mnt pacman -S efibootmgr
         # /boot/efi should aready be mounted
         [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
-        arch-chroot /mnt grub-install /dev/sda --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+        [[ -n "$IN_DEVICE" ]] && echo "Install device global variable undefined!" && exit 1
+        arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
         echo "efi grub bootloader installed..."
     else
-        arch-chroot /mnt grub-install /dev/"$device"
+        arch-chroot /mnt grub-install "$IN_DEVICE"
         echo "mbr bootloader installed..."
     fi
 
