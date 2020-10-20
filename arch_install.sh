@@ -154,7 +154,7 @@ get_install_device(){
 install_base(){
     clear
     echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
-    echo && echo "pacstrap system with base base-devel linux linux-firmware vim..."
+    echo && echo "pacstrap system with base base-devel linux linux-headers linux-firmware vim..."
     pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
     echo && echo "Base system installed.  Press any key to continue..."; read empty
 
