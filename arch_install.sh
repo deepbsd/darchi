@@ -317,7 +317,7 @@ install_desktop(){
 #############################################################
 start(){
     clear
-    echo && echo "WELCOME TO DARCHI!  The easy Arch Install Script!"
+    echo && echo "WELCOME TO DARCHI!  Dave's Arch Install Script!"
     sleep 4
     echo && echo -n "waiting for reflector to update mirrorlist"
     while true; do
