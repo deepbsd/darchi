@@ -18,8 +18,8 @@ sudo pacman -S yay-bin
 #cd
 #sudo yay -Syyu
 
-## INSTALL OS-PROBER
-sudo pacman -S os-prober
+## INSTALL OS-PROBER AND HTOP
+sudo pacman -S os-prober htop
 
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
