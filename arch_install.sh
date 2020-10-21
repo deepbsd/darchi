@@ -278,7 +278,7 @@ install_grub(){
 # WIFI (BCM4360) IF NECESSARY
 wl_wifi(){
     clear && echo "Installing broadcomm-wl-dkms..."
-    arch-chroot /mnt pacman -S broadcomm-wl-dkms
+    arch-chroot /mnt pacman -S broadcom-wl-dkms
     [[ "$?" -eq 0 ]] && echo "Wifi Driver installed!"; sleep 3
 }
 
