@@ -239,7 +239,7 @@ add_user_acct(){
     clear
     echo && echo "Adding sudo + user acct..."
     sleep 2
-    arch-chroot /mnt pacman -S sudo bash-completion
+    arch-chroot /mnt pacman -S sudo bash-completion sshpass
     arch-chroot /mnt sed -i 's/# %wheel/%wheel/g' /etc/sudoers
     arch-chroot /mnt sed -i 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
     echo && echo "Please provide a username: "; read sudo_user
