@@ -10,12 +10,16 @@ scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,Music,public_html,sounds,.gkrellm2
 
 ## INSTALL YAY
 echo "Installing yay: "
-cd ~/build
-git clone https://aur.archlinux.org/yay-git.git
-cd yay-git
-makepkg -si
-cd
-sudo yay -Syyu
+sudo pacman -S yay-bin
+#cd ~/build
+#git clone https://aur.archlinux.org/yay-git.git
+#cd yay-git
+#makepkg -si
+#cd
+#sudo yay -Syyu
+
+## INSTALL OS-PROBER
+sudo pacman -S os-prober
 
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
@@ -24,7 +28,7 @@ sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
 yay -S gnome-terminal-transparency mate-terminal 
 
 ## INSTALL POWERLINE AND DEV STUFF 
-sudo pacman -S powerline powerline-fonts nodejs gvim mlocate gkrellm
+sudo pacman -S powerline powerline-vim powerline-fonts nodejs gvim mlocate gkrellm
 
 # NVM
 mkdir .nvm
@@ -33,7 +37,7 @@ cd ~/.nvm && . ./nvm.sh && cd
 
 
 ## INSTALL CHROME and ORANCHELO ICONS AND BREEZE CURSOR
-yay -S google-chrome oranchelo-icon-theme xcursor-breeze
+yay -S google-chrome oranchelo-icon-theme-git xcursor-breeze
 
 
 ## DOTFILES
