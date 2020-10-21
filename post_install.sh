@@ -10,7 +10,11 @@ scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,Music,public_html,sounds,.gkrellm2
 
 ## INSTALL YAY
 echo "Installing yay: "
-sudo pacman -S yay-bin
+cd ~/build
+git clone https://aur.archlinux.org/yay-git.git
+cd yay-git
+makepkg -si
+cd
 
 ## INSTALL OS-PROBER AND HTOP
 sudo pacman -S os-prober htop
