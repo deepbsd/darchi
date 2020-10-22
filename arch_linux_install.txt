@@ -44,5 +44,7 @@ Try to give the user a choice between available drives
 
 Try creating partitions programatically instead of with cfdisk
 
+The script needs to be more resiliant to bad input from user.  Figure out
+how to do that better.
 
 
