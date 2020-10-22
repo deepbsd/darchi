@@ -53,7 +53,7 @@ time_date(){
 mount_part(){
     device=$1; mt_pt=$2
     [[ ! -d /mnt/boot ]] && mkdir /mnt/boot
-    [[ ! -d /mnt/boot/efi ]] && mkdir /mnt/boot/efi
+    [[ $(efi_boot_mode) && ! -d /mnt/boot/efi ]] && mkdir /mnt/boot/efi
     [[ ! -d "$mt_pt" ]] && mkdir "$mt_pt" 
     echo "Device: $device mount point: $mt_pt"
     mount "$device" "$mt_pt"
@@ -69,6 +69,8 @@ mount_part(){
 # FORMAT DEVICE
 format_disk(){
     device=$1; slice=$2
+    # only do efi slice if efi_boot_mode return 0; else return 0
+    [[ "$slice" =~ 'efi' && ! $(efi_boot_mode) ]] && return 0
     clear
     echo "Formatting $device with $slice. . ."
     sleep 3
