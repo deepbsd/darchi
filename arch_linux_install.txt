@@ -47,4 +47,6 @@ Try creating partitions programatically instead of with cfdisk
 The script needs to be more resiliant to bad input from user.  Figure out
 how to do that better.
 
+Find a way to implement the sshpass program with arch-chroot.  Possible?
+
 
