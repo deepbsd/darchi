@@ -30,3 +30,19 @@ bin, .ssh, .gnupg
 4. install yay, gnome-terminal-transparency, chrome-stable, libdvd
 libcss libdvdread gkrellm mlocate
 5. install nodejs gvim powerline powerline-fonts nvm
+
+##########################
+##    Ideas for Future
+##########################
+
+Decide whether to keep this curses based or turn it into a graphical app
+like the Zen Installer
+
+Investigate whether to use other disk partitioning methods besides cfdisk
+
+Try to give the user a choice between available drives
+
+Try creating partitions programatically instead of with cfdisk
+
+
+
