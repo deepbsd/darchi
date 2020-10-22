@@ -8,6 +8,7 @@ mkdir tmp repos build
 echo "Download home directory files from what host on network?"; read whathost
 scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,Music,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg} .
 
+
 ## INSTALL YAY
 echo "Installing yay: "
 cd ~/build
@@ -32,9 +33,9 @@ sudo pacman -S powerline powerline-vim powerline-fonts nodejs gvim mlocate gkrel
 yay -S google-chrome oranchelo-icon-theme-git xcursor-breeze
 
 # NVM
-mkdir .nvm
-cd && git clone https://github.com/nvm-sh/nvm.git .nvm/.
-cd ~/.nvm && . ./nvm.sh && cd
+mkdir $HOME/.nvm
+[[ -x $(which git &>/dev/null) ]] && cd && git clone https://github.com/nvm-sh/nvm.git .nvm/.
+[[ -d $HOME/.nvm ]] && cd ~/.nvm && source ./nvm.sh && cd
 
 
 ## DOTFILES
