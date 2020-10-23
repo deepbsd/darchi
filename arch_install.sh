@@ -96,16 +96,15 @@ format_disk(){
 # PARTITION DISK
 part_disk(){
     device=$1
+    IN_DEVICE="/dev/$device"
     echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
     echo && echo "Continue to cfdisk? "; read answer
-    [[ "$answer" =~ [yY] ]] || exit 0
-    IN_DEVICE="/dev/$device"
+    [[ "$answer" =~ [yY] ]] && cfdisk "$IN_DEVICE"
 
-    cfdisk "$IN_DEVICE"
 
     # SHOW RESULTS:
     clear
-    echo && echo "Results of cfdisk: "
+    echo && echo "Status of disk device: "
     fdisk -l "$IN_DEVICE"
     lsblk -f "$IN_DEVICE"
 
