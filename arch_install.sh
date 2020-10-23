@@ -5,6 +5,7 @@
 # KEYBOARD: default console keymap is US so no need to change
 
 ### GLOBAL VARIABLES
+##  ** Do NOT edit these! **
 DISKTABLE=''
 IN_DRIVE=''
 EFI_SLICE=''
@@ -350,5 +351,23 @@ start(){
     echo "Type 'shutdown -r now' to reboot..."
 }
 
-start
+startmenu(){
+    clear
+    echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
+    while true ; do
+        echo -e "\n\n\n What do you want to do?  \n\n"
+        echo -e "  1) check connection and date   2) Prepare Installation Disk"
+        echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
+        echo -e "\n  5) Set new hostname            6) Set new root password"
+        echo -e "\n  7) Install more essentials     8) Add user + sudo account"
+        echo -e "\n  9) Install BCM4360 drivers     10) Install grub"
+        echo -e "\n  11) Install Xorg + Desktop     12) Exit script"
+
+        echo -e "\n\n   Your choice?  "; read menupick
+    done
+
+}
+
+#start
+startmenu
 
