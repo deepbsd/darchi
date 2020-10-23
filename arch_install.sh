@@ -364,8 +364,24 @@ startmenu(){
         echo -e "\n  11) Install Xorg + Desktop     12) Exit script"
 
         echo -e "\n\n   Your choice?  "; read menupick
-    done
 
+    case $menupick in
+        1) check_connect; time_date ;;
+        2) get_install_device ;;
+        3) install_base ;;
+        4) get_fstab; set_tz; set_local ;;
+        5) set_hostname ;;
+        6) echo "Setting ROOT password..."; arch-chroot /mnt passwd ;;
+        7) install_essential ;;
+        8) add_user_acct ;;
+        9) wl_wifi ;;
+        10) install_grub ;;
+        11) install_desktop ;;
+        12) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+            exit 0 ;;
+        *) echo "Please make a valid pick from menu!" ;;
+    esac
+    done
 }
 
 #start
