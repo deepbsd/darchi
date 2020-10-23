@@ -54,7 +54,7 @@ time_date(){
 mount_part(){
     device=$1; mt_pt=$2
     [[ ! -d /mnt/boot ]] && mkdir /mnt/boot
-    [[ $(efi_boot_mode) && ! -d /mnt/boot/efi ]] && mkdir /mnt/boot/efi
+    $(efi_boot_mode) && ! [ -d /mnt/boot/efi ] && mkdir /mnt/boot/efi
     [[ ! -d "$mt_pt" ]] && mkdir "$mt_pt" 
     echo "Device: $device mount point: $mt_pt"
     mount "$device" "$mt_pt"
@@ -352,9 +352,9 @@ start(){
 }
 
 startmenu(){
+    while true ; do
     clear
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
-    while true ; do
         echo -e "\n\n\n What do you want to do?  \n\n"
         echo -e "  1) check connection and date   2) Prepare Installation Disk"
         echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
