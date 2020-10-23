@@ -314,6 +314,18 @@ install_desktop(){
     echo && echo "Cinnamon and lightdm should now be installed..."
     sleep 5
 }
+
+check_reflector(){
+    clear
+    echo "checking if reflector has finished updating mirrorlist yet..."
+    while true; do
+        pgrep -x reflector &>/dev/null || break
+        echo -n '.'
+        sleep 2
+    done
+}
+
+
 #############################################################
 ############         START SCRIPT
 #############################################################
@@ -321,13 +333,14 @@ start(){
     clear
     echo && echo "WELCOME TO DARCHI!  Dave's Arch Install Script!"
     sleep 4
-    echo && echo -n "waiting for reflector to update mirrorlist"
-    while true; do
-        pgrep -x reflector &>/dev/null || break
-        echo -n '.'
-        sleep 3
-    done
+    #echo && echo -n "waiting for reflector to update mirrorlist"
+    #while true; do
+    #    pgrep -x reflector &>/dev/null || break
+    #    echo -n '.'
+    #    sleep 3
+    #done
 
+    check_reflector
     check_connect
     time_date
     get_install_device  # this func calls partition func
@@ -351,6 +364,7 @@ start(){
 }
 
 startmenu(){
+    check_reflector
     while true ; do
     clear
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
