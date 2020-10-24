@@ -71,6 +71,7 @@ mount_part(){
 format_disk(){
     device=$1; slice=$2
     # only do efi slice if efi_boot_mode return 0; else return 0
+    ##  This is a problem!!  The efi slice is not getting formatted or mounted!!!
     [[ "$slice" =~ 'efi' && ! $(efi_boot_mode) ]] && return 0
     clear
     echo "Formatting $device with $slice. . ."
@@ -251,12 +252,31 @@ add_user_acct(){
     arch-chroot /mnt passwd "$sudo_user"
 }
 
+# THIS IS IF YOU HAVE TO RESTART THE SCRIPT AFTER PARTITIONING
+set_variables(){
+    clear && echo "Installation device?  (sda, nvme0n, sdb, etc)"; read inst_device
+    echo && echo "Install root to? (sda2? nvme0np2?)"; read root_slice
+    echo && echo "Install swap to? (leave emtpy if no swap part)"; read swap_slice
+    echo && echo "Install EFI to? (leave empty if MBR disk)"; read efi_slice
+    echo && echo "Install HOME slice to?  (leave empty if you don't want a separate home partition)"; read home_slice
+
+    if $(efi_boot_mode) ; then
+        DISKTABLE="GPT"
+    else
+        DISKTABLE="MBR"
+    fi
+    IN_DEVICE="$inst_device"
+    EFI_SLICE="$efi_slice"
+    SWAP_SLICE="$swap_slice"
+    ROOT_SLICE="$root_slice"
+    HOME_SLICE="$home_slice"
+}
+
+
 # INSTALL BOOTLOADER
 install_grub(){
     clear
-    echo && echo "Continue to install GRUB?"; read myanswer
-    [[ "$myanswer" =~ [yY] ]] || exit 0
-
+    echo "Installing grub..."
     arch-chroot /mnt pacman -S grub 
 
     if $(efi_boot_mode); then
@@ -271,8 +291,8 @@ install_grub(){
         echo "mbr bootloader installed..."
     fi
 
+    echo "configuring /boot/grub/grub.cfg..."
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-    echo "/boot/grub/grub.cfg configured..."
         
     echo "Press any key to continue..."; read empty
 }
@@ -374,7 +394,9 @@ startmenu(){
         echo -e "\n  5) Set new hostname            6) Set new root password"
         echo -e "\n  7) Install more essentials     8) Add user + sudo account"
         echo -e "\n  9) Install BCM4360 drivers     10) Install grub"
-        echo -e "\n  11) Install Xorg + Desktop     12) Exit script"
+        echo -e "\n  11) Install Xorg + Desktop     12) Repopulate Variables"
+        echo -e "\n  13) Exit script"
+
 
         echo -e "\n\n   Your choice?  "; read menupick
 
@@ -382,7 +404,7 @@ startmenu(){
         1) check_connect; time_date ;;
         2) get_install_device ;;
         3) install_base ;;
-        4) get_fstab; set_tz; set_local ;;
+        4) gen_fstab; set_tz; set_local ;;
         5) set_hostname ;;
         6) echo "Setting ROOT password..."; arch-chroot /mnt passwd ;;
         7) install_essential ;;
@@ -390,7 +412,8 @@ startmenu(){
         9) wl_wifi ;;
         10) install_grub ;;
         11) install_desktop ;;
-        12) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+        12) set_variables ;;
+        13) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
             exit 0 ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
