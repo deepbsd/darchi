@@ -349,12 +349,6 @@ start(){
     clear
     echo && echo "WELCOME TO DARCHI!  Dave's Arch Install Script!"
     sleep 4
-    #echo && echo -n "waiting for reflector to update mirrorlist"
-    #while true; do
-    #    pgrep -x reflector &>/dev/null || break
-    #    echo -n '.'
-    #    sleep 3
-    #done
 
     check_reflector
     check_connect
