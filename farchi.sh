@@ -174,7 +174,26 @@ arch-chroot /mnt systemctl enable lightdm.service
 echo && echo "Your desktop and display manager should now be installed..."
 sleep 5
 
+## INSTALL GRUB
+clear
+echo "Installing grub..." && sleep 4
+arch-chroot /mnt pacman -S grub 
 
+if [[ "$DISKTABLE" =~ 'GPT' ]]; then
+    arch-chroot /mnt pacman -S efibootmgr
+    # /boot/efi should aready be mounted
+    [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
+    arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+    echo "efi grub bootloader installed..."
+else
+    arch-chroot /mnt grub-install "$INSTALL_DEVICE"
+    echo "mbr bootloader installed..."
+fi
+echo "configuring /boot/grub/grub.cfg..."
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+    
+echo "System should now be installed and ready to boot!!!"
+echo && echo "Type shutdown -h now and remove Installation Media and then reboot"
 
 
 
