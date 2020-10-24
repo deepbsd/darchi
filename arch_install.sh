@@ -306,10 +306,6 @@ wl_wifi(){
 
 # INSTALL XORG AND DESKTOP
 install_desktop(){
-    clear
-    echo && echo "Would you like to install Xorg and desktop? (y or n)"; read xorg_yes
-    [[ "$xorg_yes" =~ [yY] ]] || exit 0
-
     # XORG AND DESKTOP
     clear
     echo "Installing Xorg and Desktop..."
