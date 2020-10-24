@@ -265,11 +265,11 @@ set_variables(){
     else
         DISKTABLE="MBR"
     fi
-    IN_DEVICE="$inst_device"
-    EFI_SLICE="$efi_slice"
-    SWAP_SLICE="$swap_slice"
-    ROOT_SLICE="$root_slice"
-    HOME_SLICE="$home_slice"
+    IN_DEVICE="/dev/$inst_device"
+    EFI_SLICE="/dev/$efi_slice"
+    SWAP_SLICE="/dev/$swap_slice"
+    ROOT_SLICE="/dev/$root_slice"
+    HOME_SLICE="/dev/$home_slice"
 }
 
 
