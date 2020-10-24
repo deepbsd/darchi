@@ -72,7 +72,7 @@ format_disk(){
     device=$1; slice=$2
     # only do efi slice if efi_boot_mode return 0; else return 0
     ##  This is a problem!!  The efi slice is not getting formatted or mounted!!!
-    [[ "$slice" =~ 'efi' && ! $(efi_boot_mode) ]] && return 0
+    [[ "$slice" =~ 'efi' && ! "$DISKTABLE" =~ 'GPT' ]] && return 0
     clear
     echo "Formatting $device with $slice. . ."
     sleep 3
@@ -283,7 +283,7 @@ install_grub(){
         arch-chroot /mnt pacman -S efibootmgr
         # /boot/efi should aready be mounted
         [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
-        [[ -n "$IN_DEVICE" ]] || echo "Install device global variable undefined!" && exit 1
+        #[[ -n "$IN_DEVICE" ]] || echo "Install device global variable undefined!" && exit 1
         arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
         echo "efi grub bootloader installed..."
     else
