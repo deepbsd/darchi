@@ -16,10 +16,16 @@ DESKTOP="cinnamon"
 WIRELESSDRIVERS="broadcom-wl-dkms"
 VIDEO_DRIVER="xf86-video-vmware"
 
+## These are packages required for a working Xorg desktop
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
 
+## These are your specific choices for fonts and wallpapers and X-related goodies
 EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
+
+##########################################
+## SCRIPT STARTS HERE
+##########################################
 
 ###  WELCOME
 while true; do
