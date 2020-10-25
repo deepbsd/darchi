@@ -12,9 +12,9 @@ TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 #$(ls /sys/firmware/efi/efivars &>/dev/null) && DISKTABLE='GPT' ) || DISKTABLE='MBR'
 ## Set this manually either to 'MBR' or 'GPT' for EFI systems
-DISKTABLE='GPT'
+DISKTABLE=GPT
 FILESYSTEM=ext4
-DESKTOP="cinnamon"
+DESKTOP=cinnamon
 WIRELESSDRIVERS="broadcom-wl-dkms"
 VIDEO_DRIVER="xf86-video-vmware"
 
@@ -30,13 +30,16 @@ EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts 
 ##########################################
 
 ###  WELCOME
+clear
+echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
+sleep 4
 clear && count=5
 while true; do
-    echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
-    sleep 1
-    echo "Launching install in $count seconds"
+    #echo -e '\e[1A\e[Knew line'
     [[ "$count" -lt 0 ]] && break
+    echo -e  "\e[1A\e[K Launching install in $count seconds"
     count=$(( count - 1 ))
+    sleep 1
 done
 
 ##  check if reflector update is done...
