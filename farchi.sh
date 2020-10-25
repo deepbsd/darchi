@@ -64,14 +64,14 @@ clear && echo "Partitioning Installation Drive..." && sleep 4
 cfdisk "$INSTALL_DEVICE"
 mkfs."$FILESYSTEM" "$ROOT_DEVICE"
 mount "$ROOT_DEVICE" /mnt
-if [[ "$EFI_DEVICE" -ne "" ]] ; then
+if [[ "$EFI_DEVICE" != "" ]] ; then
     mkfs.fat -F32 "$EFI_DEVICE" 
     mkdir /mnt/boot
     mkdir /mnt/boot/efi 
     ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
 fi
-if [[ "$SWAP_DEVICE" -ne "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
-if [[ "$HOME_DEVICE" -ne "" ]]; then
+if [[ "$SWAP_DEVICE" != "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
+if [[ "$HOME_DEVICE" != "" ]]; then
     mkfs."$FILESYSTEM" "$HOME_DEVICE"
     mkdir /mnt/home
     mount "$HOME_DEVICE" /mnt/home
