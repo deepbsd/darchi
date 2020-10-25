@@ -28,8 +28,8 @@ EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts 
 ##########################################
 
 ###  WELCOME
+count=5
 while true; do
-    count=5
     clear && echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
     sleep 1
     echo "Launching install in $count seconds"
@@ -76,6 +76,9 @@ if [[ "$HOME_DEVICE" -ne "" ]]; then
     mkdir /mnt/home
     mount "$HOME_DEVICE" /mnt/home
 fi
+
+lsblk "$INSTALL_DEVICE"
+echo "Type any key to continue..."; read empty
 
 ## INSTALL BASE SYSTEM
 clear
