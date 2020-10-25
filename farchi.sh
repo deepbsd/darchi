@@ -120,7 +120,7 @@ echo "LANG=$LOCALE" > /mnt/etc/locale.conf
 #export LANG=en_US.UTF-8
 export LANG="$LOCALE"
 cat /mnt/etc/locale.conf
-echo && echo "Here's your /mnt/etc/locale.conf ..."; read loc_yn
+echo && echo "Here's your /mnt/etc/locale.conf. Type any key to continue."; read loc_yn
 
 
 ## HOSTNAME
@@ -137,7 +137,7 @@ HOSTS
 echo && echo "/etc/hostname and /etc/hosts files configured..."
 cat /mnt/etc/hostname 
 cat /mnt/etc/hosts
-echo && echo "Here are /etc/hostname and /etc/hosts "; read etchosts_yn
+echo && echo "Here are /etc/hostname and /etc/hosts. Type any key to continue "; read etchosts_yn
 
 ## SET PASSWD
 clear
@@ -177,7 +177,7 @@ fi
 
 
 ## INSTALL X AND DESKTOP
-clear && echo "Installing X and X Extras and Video Driver..."; read empty
+clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
 arch-chroot /mnt pacman -S "${BASIC_X[@]}"
 arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
 arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
@@ -208,6 +208,7 @@ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
     
 echo "System should now be installed and ready to boot!!!"
 echo && echo "Type shutdown -h now and remove Installation Media and then reboot"
+echo && echo
 
 
 
