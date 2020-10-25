@@ -30,9 +30,9 @@ EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts 
 ##########################################
 
 ###  WELCOME
-count=5
+clear && count=5
 while true; do
-    clear && echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
+    echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
     sleep 1
     echo "Launching install in $count seconds"
     [[ "$count" -lt 0 ]] && break
@@ -168,10 +168,12 @@ echo && echo "Password for $sudo_user?"
 arch-chroot /mnt passwd "$sudo_user"
 
 ## INSTALL WIFI
-clear && echo "Installing $WIRELESSDRIVERS ..."
-#arch-chroot /mnt pacman -S broadcom-wl-dkms
-arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
-[[ "$?" -eq 0 ]] && echo "Wifi Driver installed!"; sleep 3
+clear && echo "Want to install $WIRELESSDRIVERS drivers?"; read wifi_yn
+if [[ "$wifi_yn" =~ [yY] ]]; then
+    #arch-chroot /mnt pacman -S broadcom-wl-dkms
+    arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
+    [[ "$?" -eq 0 ]] && echo "Wifi Driver successfully installed!"; sleep 5
+fi
 
 
 ## INSTALL X AND DESKTOP
