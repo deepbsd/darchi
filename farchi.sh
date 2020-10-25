@@ -77,6 +77,8 @@ if [[ "$HOME_DEVICE" -ne "" ]]; then
     mount "$HOME_DEVICE" /mnt/home
 fi
 
+####
+
 lsblk "$INSTALL_DEVICE"
 echo "Type any key to continue..."; read empty
 
