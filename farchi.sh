@@ -60,7 +60,7 @@ timedatectl status
 sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
-clear && echo "Partitioning Installation Drive..." && sleep 3
+clear && echo "Partitioning Installation Drive..." && sleep 4
 cfdisk "$INSTALL_DEVICE"
 mkfs."$FILESYSTEM" "$ROOT_DEVICE"
 mount "$ROOT_DEVICE" /mnt
@@ -68,7 +68,7 @@ if [[ "$EFI_DEVICE" -ne "" ]] ; then
     mkfs.fat -F32 "$EFI_DEVICE" 
     mkdir /mnt/boot
     mkdir /mnt/boot/efi 
-    ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && exit 1)
+    ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
 fi
 if [[ "$SWAP_DEVICE" -ne "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
 if [[ "$HOME_DEVICE" -ne "" ]]; then
