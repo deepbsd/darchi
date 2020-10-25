@@ -30,3 +30,13 @@ and so forth are already installed.
 
 Just fetch the script from my git page and run it after booting the archiso iso
 image.
+
+## The FARCHI script
+
+I also created a script called farchi.sh for "Fast ARCH Installer".
+
+With this script you type in the installation variables at the top of the script.
+You'll need to know things like the device names of your installation partitions and
+hostname, your video driver, timezone, and then edit the BASIC\_X and EXTRA\_X arrays in bash to
+include your desktop selections and preferences. Also, if you need wifi drivers, 
+you'll need to edit that variable.

@@ -10,7 +10,9 @@ SWAP_DEVICE=/dev/sda3
 HOME_DEVICE=/dev/sda4
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
-( $(ls /sys/firmware/efi/efivars &>/dev/null) && DISKTABLE='GPT' ) || DISKTABLE='MBR'
+#$(ls /sys/firmware/efi/efivars &>/dev/null) && DISKTABLE='GPT' ) || DISKTABLE='MBR'
+## Set this manually either to 'MBR' or 'GPT' for EFI systems
+DISKTABLE='GPT'
 FILESYSTEM=ext4
 DESKTOP="cinnamon"
 WIRELESSDRIVERS="broadcom-wl-dkms"
@@ -173,6 +175,7 @@ arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
 
 
 ## INSTALL X AND DESKTOP
+clear && echo "Installing X and X Extras and Video Driver..."; read empty
 arch-chroot /mnt pacman -S "${BASIC_X[@]}"
 arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
 arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
