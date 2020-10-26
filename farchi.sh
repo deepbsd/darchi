@@ -4,6 +4,9 @@
 HOSTNAME="effie3"
 INSTALL_DEVICE=/dev/sda
 EFI_DEVICE=/dev/sda1
+## If you change the EFI_MTPT You must change
+## it when making and mounting EFI dirs and also
+## when installing grub. Just search for efi
 EFI_MTPT=/mnt/boot/efi
 ROOT_DEVICE=/dev/sda2
 SWAP_DEVICE=/dev/sda3
@@ -17,6 +20,9 @@ FILESYSTEM=ext4
 DESKTOP=cinnamon
 WIRELESSDRIVERS="broadcom-wl-dkms"
 VIDEO_DRIVER="xf86-video-vmware"
+
+## If you change display manager, be sure to change when
+## we enable display manager service at end of script
 
 ## These are packages required for a working Xorg desktop
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
@@ -35,7 +41,6 @@ echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
 sleep 4
 clear && count=5
 while true; do
-    #echo -e '\e[1A\e[Knew line'
     [[ "$count" -lt 0 ]] && break
     echo -e  "\e[1A\e[K Launching install in $count seconds"
     count=$(( count - 1 ))
@@ -55,7 +60,7 @@ done
 clear
 echo "Testing internet connection..."
 $(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && exit 1)
-echo "Good!  We're connected!!!" && sleep 4
+echo "Good!  We're connected!!!" && sleep 3
 
 
 ## CHECK TIME AND DATE BEFORE INSTALLATION
@@ -65,12 +70,13 @@ timedatectl status
 sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
-clear && echo "Partitioning Installation Drive..." && sleep 4
+clear && echo "Partitioning Installation Drive..." && sleep 3
 cfdisk "$INSTALL_DEVICE"
 mkfs."$FILESYSTEM" "$ROOT_DEVICE"
 mount "$ROOT_DEVICE" /mnt
 if [[ "$EFI_DEVICE" != "" ]] ; then
     mkfs.fat -F32 "$EFI_DEVICE" 
+    ### script assumes efi mounted at /mnt/boot/efi for now
     mkdir /mnt/boot
     mkdir /mnt/boot/efi 
     ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
