@@ -101,7 +101,8 @@ part_disk(){
     echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
     #echo && echo "Continue to cfdisk? "; read answer
     echo && echo "Continue to sgdisk? "; read answer
-    [[ "$answer" =~ [yY] ]] && echo "paritioning with sgdisk..."  # && cfdisk "$IN_DEVICE"
+    #[[ "$answer" =~ [yY] ]] && cfdisk "$IN_DEVICE"
+    [[ "$answer" =~ [yY] ]] && echo "paritioning with sgdisk..."
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+512M -t 1:ef00 -c 1:EFI "$IN_DEVICE"
     sgdisk -n 2::+13G -t 2:8300 -c 2:ROOT "$IN_DEVICE"
