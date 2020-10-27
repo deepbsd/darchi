@@ -13,6 +13,21 @@ ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
 
+###########  SOFTWARE SETS ###################
+
+base_system=()
+base_essentials=()
+basic_x=()
+extra_x=()
+display_mgr=()
+graphics_driver=()
+extra_drivers=()
+cinnamon_desktop=()
+devel_stuff=()
+printing_stuff=()
+multimedia_stuff=()
+fonts_themes=()
+
 ###########  FUNCTIONS ###################
 
 # VERIFY BOOT MODE
