@@ -15,17 +15,30 @@ SWAP_SLICE=''
 
 ###########  SOFTWARE SETS ###################
 
-base_system=()
-base_essentials=()
-basic_x=()
-extra_x=()
-display_mgr=()
-graphics_driver=()
-extra_drivers=()
-cinnamon_desktop=()
-devel_stuff=()
+base_system=( base base-devel linux linux-headers linux-firmware vim sudo bash-completion )
+
+base_essentials=(pacman-contrib dkms openssh networkmanager dhcpcd man-db man-pages)
+
+display_mgr=(lightdm)
+
+my_services=( dhcpcd sshd NetworkManager lightdm )
+
+basic_x=( xorg-server xorg-xinit mesa xkill xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
+
+extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+
+graphics_driver=(xf86-video-vmware)
+
+extra_drivers=(broadcom-wl-dkms)
+
+cinnamon_desktop=( cinnamon nemo-fileroller )
+
+devel_stuff=( git base-devel nodejs )
+
 printing_stuff=()
+
 multimedia_stuff=()
+
 fonts_themes=()
 
 ###########  FUNCTIONS ###################
@@ -179,7 +192,8 @@ install_base(){
     clear
     echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
     echo && echo "pacstrap system with base base-devel linux linux-headers linux-firmware vim..."
-    pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
+    #pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
+    pacstrap /mnt "${base_system[@]}"
     echo && echo "Base system installed.  Press any key to continue..."; read empty
 }
 
