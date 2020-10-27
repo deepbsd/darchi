@@ -99,9 +99,15 @@ part_disk(){
     device=$1
     IN_DEVICE="/dev/$device"
     echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
-    echo && echo "Continue to cfdisk? "; read answer
+    #echo && echo "Continue to cfdisk? "; read answer
+    echo && echo "Continue to sgdisk? "; read answer
     [[ "$answer" =~ [yY] ]] && cfdisk "$IN_DEVICE"
 
+    sgdisk -Z "$IN_DEVICE"
+    sgdisk -n 1::+512M -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+    sgdisk -n 2::+13G -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+    sgdisk -n 3::+2G -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+    sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
 
     # SHOW RESULTS:
     clear
