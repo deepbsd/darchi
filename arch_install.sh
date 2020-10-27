@@ -35,11 +35,11 @@ cinnamon_desktop=( cinnamon nemo-fileroller )
 
 devel_stuff=( git base-devel nodejs )
 
-printing_stuff=()
+printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
 multimedia_stuff=()
 
-fonts_themes=()
+##  fonts_themes=()    #  in case I want to break these out from extra_x
 
 ###########  FUNCTIONS ###################
 
