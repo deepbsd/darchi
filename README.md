@@ -5,7 +5,7 @@ booting the archiso ISO image.
 
 You can download it to your booted archiso image like this:
 
-`curl -OL https://raw.githubusercontent.com/deepbsd/darchi/arch_install.sh`
+`curl -O https://raw.githubusercontent.com/deepbsd/darchi/arch_install.sh`
 
 It depends on *cfdisk* for editing the partition table.  *Cfdisk* seems to
 work just fine for me when editing GPT disks as well as MBR disks.  
