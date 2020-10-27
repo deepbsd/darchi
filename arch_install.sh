@@ -283,7 +283,7 @@ set_variables(){
 install_grub(){
     clear
     echo "Installing grub..."
-    arch-chroot /mnt pacman -S grub 
+    arch-chroot /mnt pacman -S grub os-prober
 
     if $(efi_boot_mode); then
         arch-chroot /mnt pacman -S efibootmgr
