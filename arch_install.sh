@@ -33,6 +33,13 @@ extra_drivers=(broadcom-wl-dkms)
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
+xfce_desktop=( xfce4 xfce4-goodies )
+
+mate_desktop=( mate mate-extra )
+
+i3gaps_desktop=( i3-gaps dmenu feh rofi i3bar i3blocks i3status ttf-font-awesome
+    ttfionicons ttf-font-icons )
+
 devel_stuff=( git base-devel nodejs )
 
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
