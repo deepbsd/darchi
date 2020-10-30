@@ -5,7 +5,7 @@
 # KEYBOARD: default console keymap is US so no need to change
 
 ### GLOBAL VARIABLES
-##  ** Do NOT edit these! **
+##  ** Do NOT edit these! They are updated programmatically **
 DISKTABLE=''
 IN_DRIVE=''
 EFI_SLICE=''
@@ -29,24 +29,31 @@ extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts 
 
 graphics_driver=(xf86-video-vmware)
 
-extra_drivers=(broadcom-wl-dkms)
+wifi_drivers=(broadcom-wl-dkms)
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
+#####  Include in 'all_extras' array if desired
 xfce_desktop=( xfce4 xfce4-goodies )
 
 mate_desktop=( mate mate-extra )
 
-i3gaps_desktop=( i3-gaps dmenu feh rofi i3bar i3blocks i3status ttf-font-awesome
-    ttfionicons ttf-font-icons )
+i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3bar i3blocks
+    nitrogen i3status ttf-font-awesome
+    ttf-ionicons ttf-font-icons )
 
-devel_stuff=( git base-devel nodejs )
+## Python3 should be installed by default
+devel_stuff=( git base-devel nodejs ruby )
 
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
-multimedia_stuff=()
+multimedia_stuff=( eog shotwell imagemagick sox cmus mpg123 alsa-utils
+    cheese brasaero )
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
+
+all_extras=("${i3gaps_desktop[@]} ${devel_stuff[@]} ${printing_stuff[@]}
+    ${multimedia_stuff[@]}" )
 
 ###########  FUNCTIONS ###################
 
@@ -270,10 +277,12 @@ install_essential(){
     clear
     echo && echo "Enabling dhcpcd, sshd and NetworkManager services..."
     echo
-    arch-chroot /mnt pacman -S git openssh networkmanager dhcpcd man-db man-pages
-    arch-chroot /mnt systemctl enable dhcpcd.service
-    arch-chroot /mnt systemctl enable sshd.service
-    arch-chroot /mnt systemctl enable NetworkManager.service
+    #arch-chroot /mnt pacman -S git openssh networkmanager dhcpcd man-db man-pages
+    #arch-chroot /mnt systemctl enable dhcpcd.service
+    #arch-chroot /mnt systemctl enable sshd.service
+    #arch-chroot /mnt systemctl enable NetworkManager.service
+
+    arch-chroot /mnt pacman -S 
 
 
     echo && echo "Press any key to continue..."; read empty
@@ -342,7 +351,8 @@ install_grub(){
 # WIFI (BCM4360) IF NECESSARY
 wl_wifi(){
     clear && echo "Installing broadcomm-wl-dkms..."
-    arch-chroot /mnt pacman -S broadcom-wl-dkms
+    #arch-chroot /mnt pacman -S broadcom-wl-dkms
+    arch-chroot /mnt pacman -S "${wifi_drivers[@]}"
     [[ "$?" -eq 0 ]] && echo "Wifi Driver installed!"; sleep 3
 }
 
@@ -352,25 +362,37 @@ install_desktop(){
     clear
     echo "Installing Xorg and Desktop..."
 
-    basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
+    #basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
 
-    arch-chroot /mnt pacman -S "${basicx[@]}"
+    arch-chroot /mnt pacman -S "${basic_x[@]}"
 
-    extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+    #extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
     ## Also, install fonts and icon and cursor themes
     arch-chroot /mnt pacman -S "${extra_x[@]}"
 
     # INSTALL DRIVER FOR YOUR GRAPHICS CARD
-    find_card
-    arch-chroot /mnt pacman -Ss | grep 'xf86-video' | more
-    echo "Which driver is yours?"; read driver
-    arch-chroot /mnt pacman -S "$driver"
+    #find_card
+    #arch-chroot /mnt pacman -Ss | grep 'xf86-video' | more
+    #echo "Which driver is yours?"; read driver
+    #arch-chroot /mnt pacman -S "$driver"
 
-    echo "Enabling lightdm service..."
-    arch-chroot /mnt systemctl enable lightdm.service
-    echo && echo "Cinnamon and lightdm should now be installed..."
-    sleep 5
+    #echo "Enabling lightdm service..."
+    #arch-chroot /mnt systemctl enable lightdm.service
+    #echo && echo "Cinnamon and lightdm should now be installed..."
+    #sleep 5
+
+    arch-chroot /mnt pacman -S "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"
+
+    #arch-chroot /mnt systemctl enable "${my_services[@]}"
+    for service in "${my_services[@]}"; do
+        arch-chroot /mnt systemctl enable "$service"
+    done
+
+}
+
+install_extra_stuff(){
+    arch-chroot /mnt pacman -S "${all_extras[@]}"
 }
 
 check_reflector(){
