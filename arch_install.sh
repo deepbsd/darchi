@@ -23,7 +23,7 @@ base_system=( base base-devel linux linux-headers dkms linux-firmware vim sudo b
 
 base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
-network_essentials=( dhcpcd sshd networkmanagers openssh)
+network_essentials=( dhcpcd openssh networkmanager )
 
 display_mgr=(lightdm)
 
@@ -54,12 +54,11 @@ devel_stuff=( git base-devel nodejs ruby )
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
 multimedia_stuff=( eog shotwell imagemagick sox cmus mpg123 alsa-utils
-    cheese brasaero )
+    cheese )
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
-all_extras=("${i3gaps_desktop[@]} ${devel_stuff[@]} ${printing_stuff[@]}
-    ${multimedia_stuff[@]}" )
+all_extras=("${i3gaps_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 ##########################################
 ###########  FUNCTIONS ###################
@@ -396,9 +395,11 @@ install_desktop(){
     #sleep 5
 
     # INSTALL GRAPHICS DRIVER, DESKTOP, DISPLAY MGR
-    for package in "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"; do
-        arch-chroot /mnt pacman -S "$package"
-    done
+    #for package in "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"; do
+    #    arch-chroot /mnt pacman -S "$package"
+    #done
+
+    arch-chroot /mnt pacman -S "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"
 
     # ENABLE SERVICES
     for service in "${my_services[@]}"; do
@@ -411,8 +412,15 @@ install_desktop(){
 install_extra_stuff(){
     #arch-chroot /mnt pacman -S "${all_extras[@]}"
 
-    for package in "${all_extras[@]}"; do
-        arch-chroot /mnt pacman -S "$package"
+    #for package in "${all_extras[@]}"; do
+    #    arch-chroot /mnt pacman -S "$package"
+    #done
+
+    arch-chroot /mnt pacman -S "${all_extras[@]}"
+
+    # restart services so lightdm gets all WM picks
+    for service in "${my_services[@]}"; do
+        arch-chroot /mnt systemctl enable "$service"
     done
     
     echo "Type any key to continue..."; read empty
