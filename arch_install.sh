@@ -21,7 +21,9 @@ LOCALE="en_US.UTF-8"
 
 base_system=( base base-devel linux linux-headers dkms linux-firmware vim sudo bash-completion )
 
-base_essentials=(git pacman-contrib openssh networkmanager dhcpcd man-db man-pages)
+base_essentials=(git mlocate pacman-contrib man-db man-pages)
+
+network_essentials=( dhcpcd sshd networkmanagers openssh)
 
 display_mgr=(lightdm)
 
@@ -292,7 +294,8 @@ install_essential(){
     #arch-chroot /mnt systemctl enable sshd.service
     #arch-chroot /mnt systemctl enable NetworkManager.service
 
-    arch-chroot /mnt pacman -S "$base_essentials"
+    arch-chroot /mnt pacman -S "${base_essentials[@]}"
+    arch-chroot /mnt pacman -S "${network_essentials[@]}"
 
 
     echo && echo "Press any key to continue..."; read empty
@@ -379,7 +382,7 @@ install_desktop(){
 
     arch-chroot /mnt pacman -S "${basic_x[@]}"
     arch-chroot /mnt pacman -S "${extra_x[@]}"
-    arch-chroot /mnt pacman -S "${my_services[@]}"
+    #arch-chroot /mnt pacman -S "${my_services[@]}"
 
     # INSTALL DRIVER FOR YOUR GRAPHICS CARD
     #find_card
@@ -392,9 +395,12 @@ install_desktop(){
     #echo && echo "Cinnamon and lightdm should now be installed..."
     #sleep 5
 
-    arch-chroot /mnt pacman -S "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]} "
+    # INSTALL GRAPHICS DRIVER, DESKTOP, DISPLAY MGR
+    for package in "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"; do
+        arch-chroot /mnt pacman -S "$package"
+    done
 
-    #arch-chroot /mnt systemctl enable "${my_services[@]}"
+    # ENABLE SERVICES
     for service in "${my_services[@]}"; do
         arch-chroot /mnt systemctl enable "$service"
     done
@@ -403,7 +409,11 @@ install_desktop(){
 }
 
 install_extra_stuff(){
-    arch-chroot /mnt pacman -S "${all_extras[@]}"
+    #arch-chroot /mnt pacman -S "${all_extras[@]}"
+
+    for package in "${all_extras[@]}"; do
+        arch-chroot /mnt pacman -S "$package"
+    done
     
     echo "Type any key to continue..."; read empty
 }
