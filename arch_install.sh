@@ -23,9 +23,9 @@ display_mgr=(lightdm)
 
 my_services=( dhcpcd sshd NetworkManager lightdm )
 
-basic_x=( xorg-server xorg-xinit mesa xkill xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
+basic_x=( xorg-server xorg-xinit mesa xkill xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
 
-extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+extra_x=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
 graphics_driver=(xf86-video-vmware)
 
@@ -55,7 +55,9 @@ multimedia_stuff=( eog shotwell imagemagick sox cmus mpg123 alsa-utils
 all_extras=("${i3gaps_desktop[@]} ${devel_stuff[@]} ${printing_stuff[@]}
     ${multimedia_stuff[@]}" )
 
+##########################################
 ###########  FUNCTIONS ###################
+##########################################
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
@@ -76,7 +78,7 @@ not_connected(){
     exit 1
 }
 
-# CONNTECTED??
+# ARE WE CONNTECTED??
 check_connect(){
     clear
     echo "Trying to ping google.com..."
