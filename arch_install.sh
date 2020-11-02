@@ -379,6 +379,7 @@ install_desktop(){
 
     arch-chroot /mnt pacman -S "${basic_x[@]}"
     arch-chroot /mnt pacman -S "${extra_x[@]}"
+    arch-chroot /mnt pacman -S "${my_services[@]}"
 
     # INSTALL DRIVER FOR YOUR GRAPHICS CARD
     #find_card
@@ -397,10 +398,14 @@ install_desktop(){
     for service in "${my_services[@]}"; do
         arch-chroot /mnt systemctl enable "$service"
     done
+
+    echo "Type any key to continue..."; read empty
 }
 
 install_extra_stuff(){
     arch-chroot /mnt pacman -S "${all_extras[@]}"
+    
+    echo "Type any key to continue..."; read empty
 }
 
 check_reflector(){
