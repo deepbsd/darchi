@@ -210,8 +210,8 @@ get_install_device(){
 # INSTALL ESSENTIAL PACKAGES
 install_base(){
     clear
-    echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
-    echo && echo "pacstrap system with base base-devel linux linux-headers dkms linux-firmware vim..."
+    #echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
+    #echo && echo "pacstrap system with base base-devel linux linux-headers dkms linux-firmware vim..."
     #pacstrap /mnt base base-devel linux linux-headers dkms linux-firmware vim 
     pacstrap /mnt "${base_system[@]}"
     echo && echo "Base system installed.  Press any key to continue..."; read empty
@@ -452,7 +452,7 @@ startmenu(){
     clear
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
         echo -e "\n\n\n What do you want to do?  \n\n"
-        echo -e "  1) check connection and date   2) Prepare Installation Disk"
+        echo -e "  1) Check connection and date   2) Prepare Installation Disk"
         echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
         echo -e "\n  5) Set new hostname            6) Set new root password"
         echo -e "\n  7) Install more essentials     8) Add user + sudo account"
