@@ -44,9 +44,9 @@ xfce_desktop=( xfce4 xfce4-goodies )
 
 mate_desktop=( mate mate-extra )
 
-i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3bar i3blocks
+i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks
     nitrogen i3status ttf-font-awesome
-    ttf-ionicons ttf-font-icons )
+    ttf-ionicons )
 
 ## Python3 should be installed by default
 devel_stuff=( git base-devel nodejs ruby )
@@ -58,7 +58,7 @@ multimedia_stuff=( eog shotwell imagemagick sox cmus mpg123 alsa-utils
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
-all_extras=("${i3gaps_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
+all_extras=("${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 ##########################################
 ###########  FUNCTIONS ###################
@@ -253,12 +253,15 @@ set_locale(){
     clear
     echo && echo "setting locale to en_US.UTF-8..."
     #arch-chroot /mnt sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
+    sleep 3
     arch-chroot /mnt sed -i "s/#$LOCALE/$LOCALE/g" /etc/locale.gen
     arch-chroot /mnt locale-gen
     #echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+    sleep 3
     echo "LANG=$LOCALE" > /mnt/etc/locale.conf
     #export LANG=en_US.UTF-8
     export LANG="$LOCALE"
+    sleep 3
     cat /mnt/etc/locale.conf
     echo && echo "Does locale setting look correct?"; read loc_yn
     [[ "$loc_yn" =~ [yY] ]] || exit 0
@@ -399,7 +402,9 @@ install_desktop(){
     #    arch-chroot /mnt pacman -S "$package"
     #done
 
-    arch-chroot /mnt pacman -S "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"
+    arch-chroot /mnt pacman -S "${display_mgr[@]}"     
+    arch-chroot /mnt pacman -S "${graphics_driver[@]}" 
+    arch-chroot /mnt pacman -S "${cinnamon_desktop[@]}"
 
     # ENABLE SERVICES
     for service in "${my_services[@]}"; do
@@ -490,7 +495,7 @@ startmenu(){
         1) check_connect; time_date ;;
         2) get_install_device ;;
         3) install_base ;;
-        4) gen_fstab; set_tz; set_local ;;
+        4) gen_fstab; set_tz; set_locale ;;
         5) set_hostname ;;
         6) echo "Setting ROOT password..."; arch-chroot /mnt passwd ;;
         7) install_essential ;;
