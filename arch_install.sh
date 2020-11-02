@@ -15,7 +15,7 @@ SWAP_SLICE=''
 
 # You can edit this if you want
 TIMEZONE='America/New_York'
-LOCALE="en_US-UTF-8"
+LOCALE="en_US.UTF-8"
 
 ###########  SOFTWARE SETS ###################
 
@@ -211,8 +211,8 @@ get_install_device(){
 install_base(){
     clear
     echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
-    echo && echo "pacstrap system with base base-devel linux linux-headers linux-firmware vim..."
-    #pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
+    echo && echo "pacstrap system with base base-devel linux linux-headers dkms linux-firmware vim..."
+    #pacstrap /mnt base base-devel linux linux-headers dkms linux-firmware vim 
     pacstrap /mnt "${base_system[@]}"
     echo && echo "Base system installed.  Press any key to continue..."; read empty
 }
@@ -234,10 +234,10 @@ gen_fstab(){
 # TIMEZONE
 set_tz(){
     clear
-    echo && echo "Continue on to setting timezone with CHROOT?"; read tz_yn
-    [[ "$tz_yn" =~ [yY] ]] || exit 0
+    #echo && echo "Continue on to setting timezone with CHROOT?"; read tz_yn
+    #[[ "$tz_yn" =~ [yY] ]] || exit 0
 
-    echo && echo "setting timezone to America/New_York..."
+    echo && echo "setting timezone to $TIMEZONE..."
     #arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
     arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
     arch-chroot /mnt hwclock --systohc --utc
