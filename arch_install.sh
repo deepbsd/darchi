@@ -13,6 +13,10 @@ ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
 
+# You can edit this if you want
+TIMEZONE='America/New_York'
+LOCALE="en_US-UTF-8"
+
 ###########  SOFTWARE SETS ###################
 
 base_system=( base base-devel linux linux-headers linux-firmware vim sudo bash-completion )
@@ -234,7 +238,8 @@ set_tz(){
     [[ "$tz_yn" =~ [yY] ]] || exit 0
 
     echo && echo "setting timezone to America/New_York..."
-    arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+    #arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
     arch-chroot /mnt hwclock --systohc --utc
     arch-chroot /mnt date
     echo && echo "Does date look correct?"; read td_yn
@@ -246,10 +251,13 @@ set_tz(){
 set_locale(){
     clear
     echo && echo "setting locale to en_US.UTF-8..."
-    arch-chroot /mnt sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
+    #arch-chroot /mnt sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
+    arch-chroot /mnt sed -i "s/#$LOCALE/$LOCALE/g" /etc/locale.gen
     arch-chroot /mnt locale-gen
-    echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
-    export LANG=en_US.UTF-8
+    #echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+    echo "LANG=$LOCALE" > /mnt/etc/locale.conf
+    #export LANG=en_US.UTF-8
+    export LANG="$LOCALE"
     cat /mnt/etc/locale.conf
     echo && echo "Does locale setting look correct?"; read loc_yn
     [[ "$loc_yn" =~ [yY] ]] || exit 0
