@@ -7,7 +7,7 @@
 ### GLOBAL VARIABLES
 ##  ** Do NOT edit these! They are updated programmatically **
 DISKTABLE=''
-IN_DRIVE=''
+IN_DEVICE=''
 EFI_SLICE=''
 ROOT_SLICE=''
 HOME_SLICE=''
@@ -19,9 +19,9 @@ LOCALE="en_US.UTF-8"
 
 ###########  SOFTWARE SETS ###################
 
-base_system=( base base-devel linux linux-headers linux-firmware vim sudo bash-completion )
+base_system=( base base-devel linux linux-headers dkms linux-firmware vim sudo bash-completion )
 
-base_essentials=(pacman-contrib dkms openssh networkmanager dhcpcd man-db man-pages)
+base_essentials=(git pacman-contrib openssh networkmanager dhcpcd man-db man-pages)
 
 display_mgr=(lightdm)
 
@@ -292,7 +292,7 @@ install_essential(){
     #arch-chroot /mnt systemctl enable sshd.service
     #arch-chroot /mnt systemctl enable NetworkManager.service
 
-    arch-chroot /mnt pacman -S 
+    arch-chroot /mnt pacman -S "$base_essentials"
 
 
     echo && echo "Press any key to continue..."; read empty
@@ -360,7 +360,7 @@ install_grub(){
 
 # WIFI (BCM4360) IF NECESSARY
 wl_wifi(){
-    clear && echo "Installing broadcomm-wl-dkms..."
+    clear && echo "Installing $wifi_drivers..."
     #arch-chroot /mnt pacman -S broadcom-wl-dkms
     arch-chroot /mnt pacman -S "${wifi_drivers[@]}"
     [[ "$?" -eq 0 ]] && echo "Wifi Driver installed!"; sleep 3
@@ -374,11 +374,10 @@ install_desktop(){
 
     #basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
 
-    arch-chroot /mnt pacman -S "${basic_x[@]}"
 
     #extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
-    ## Also, install fonts and icon and cursor themes
+    arch-chroot /mnt pacman -S "${basic_x[@]}"
     arch-chroot /mnt pacman -S "${extra_x[@]}"
 
     # INSTALL DRIVER FOR YOUR GRAPHICS CARD
@@ -392,13 +391,12 @@ install_desktop(){
     #echo && echo "Cinnamon and lightdm should now be installed..."
     #sleep 5
 
-    arch-chroot /mnt pacman -S "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"
+    arch-chroot /mnt pacman -S "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]} "
 
     #arch-chroot /mnt systemctl enable "${my_services[@]}"
     for service in "${my_services[@]}"; do
         arch-chroot /mnt systemctl enable "$service"
     done
-
 }
 
 install_extra_stuff(){
@@ -444,6 +442,7 @@ start(){
     [[ "$wifi" =~ [yY] ]] && wl_wifi
     install_grub
     install_desktop
+    install_extra_stuff
     echo "Type 'shutdown -r now' to reboot..."
 }
 
@@ -458,8 +457,8 @@ startmenu(){
         echo -e "\n  5) Set new hostname            6) Set new root password"
         echo -e "\n  7) Install more essentials     8) Add user + sudo account"
         echo -e "\n  9) Install BCM4360 drivers     10) Install grub"
-        echo -e "\n  11) Install Xorg + Desktop     12) Repopulate Variables"
-        echo -e "\n  13) Exit script"
+        echo -e "\n  11) Install Xorg + Desktop     12) Install Extra Stuff"
+        echo -e "\n  13) Repopulate Variables       14) Exit Script"
 
 
         echo -e "\n\n   Your choice?  "; read menupick
@@ -476,8 +475,9 @@ startmenu(){
         9) wl_wifi ;;
         10) install_grub ;;
         11) install_desktop ;;
-        12) set_variables ;;
-        13) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+        12) install_extra_stuff ;;
+        13) set_variables ;;
+        14) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
             exit 0 ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
