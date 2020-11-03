@@ -17,9 +17,6 @@ cd yay-git
 makepkg -si
 cd
 
-## INSTALL OS-PROBER AND HTOP
-sudo pacman -S os-prober htop
-
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
 
