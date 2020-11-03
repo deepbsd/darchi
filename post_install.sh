@@ -6,7 +6,7 @@
 echo "Making personal subdirectories..."
 mkdir tmp repos build
 echo "Download home directory files from what host on network?"; read whathost
-scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,Music,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg} .
+scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
 
 
 ## INSTALL YAY
@@ -19,6 +19,12 @@ cd
 
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
+
+## REPLACE GNOME_TERMINAL WITH TRANSPARENCY VERSION (and mate-terminal)
+yay -S gnome-terminal-transparency mate-terminal 
+
+## INSTALL POWERLINE AND DEV STUFF 
+sudo pacman -S  ruby nodejs npm npm-check-updates gvim mlocate gkrellm
 
 ## INSTALL CHROME and ORANCHELO ICONS AND BREEZE CURSOR
 yay -S google-chrome oranchelo-icon-theme-git xcursor-breeze

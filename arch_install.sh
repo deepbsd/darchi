@@ -49,7 +49,7 @@ i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks
     ttf-ionicons )
 
 ## Python3 should be installed by default
-devel_stuff=( git base-devel nodejs ruby )
+devel_stuff=( git nodejs npm npm-check-updates ruby )
 
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
