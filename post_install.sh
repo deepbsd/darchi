@@ -20,12 +20,6 @@ cd
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
 
-## REPLACE GNOME_TERMINAL WITH TRANSPARENCY VERSION (and mate-terminal)
-yay -S gnome-terminal-transparency mate-terminal 
-
-## INSTALL POWERLINE AND DEV STUFF 
-sudo pacman -S powerline powerline-vim powerline-fonts nodejs gvim mlocate gkrellm
-
 ## INSTALL CHROME and ORANCHELO ICONS AND BREEZE CURSOR
 yay -S google-chrome oranchelo-icon-theme-git xcursor-breeze
 
