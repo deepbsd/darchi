@@ -49,7 +49,7 @@ i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks
     ttf-ionicons )
 
 ## Python3 should be installed by default
-devel_stuff=( git base-devel nodejs ruby )
+devel_stuff=( git nodejs npm npm-check-updates ruby )
 
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
@@ -349,7 +349,6 @@ install_grub(){
         arch-chroot /mnt pacman -S efibootmgr
         # /boot/efi should aready be mounted
         [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
-        #[[ -n "$IN_DEVICE" ]] || echo "Install device global variable undefined!" && exit 1
         arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
         echo "efi grub bootloader installed..."
     else
@@ -377,31 +376,11 @@ install_desktop(){
     clear
     echo "Installing Xorg and Desktop..."
 
-    #basicx=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
-
-
-    #extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
     arch-chroot /mnt pacman -S "${basic_x[@]}"
     arch-chroot /mnt pacman -S "${extra_x[@]}"
-    #arch-chroot /mnt pacman -S "${my_services[@]}"
 
-    # INSTALL DRIVER FOR YOUR GRAPHICS CARD
-    #find_card
-    #arch-chroot /mnt pacman -Ss | grep 'xf86-video' | more
-    #echo "Which driver is yours?"; read driver
-    #arch-chroot /mnt pacman -S "$driver"
-
-    #echo "Enabling lightdm service..."
-    #arch-chroot /mnt systemctl enable lightdm.service
-    #echo && echo "Cinnamon and lightdm should now be installed..."
-    #sleep 5
-
-    # INSTALL GRAPHICS DRIVER, DESKTOP, DISPLAY MGR
-    #for package in "${display_mgr[@]} ${graphics_driver[@]} ${cinnamon_desktop[@]}"; do
-    #    arch-chroot /mnt pacman -S "$package"
-    #done
-
+    # DRIVER FOR GRAPHICS CARD, DESKTOP, DISPLAY MGR
     arch-chroot /mnt pacman -S "${display_mgr[@]}"     
     arch-chroot /mnt pacman -S "${graphics_driver[@]}" 
     arch-chroot /mnt pacman -S "${cinnamon_desktop[@]}"
@@ -415,11 +394,6 @@ install_desktop(){
 }
 
 install_extra_stuff(){
-    #arch-chroot /mnt pacman -S "${all_extras[@]}"
-
-    #for package in "${all_extras[@]}"; do
-    #    arch-chroot /mnt pacman -S "$package"
-    #done
 
     arch-chroot /mnt pacman -S "${all_extras[@]}"
 
