@@ -148,9 +148,7 @@ part_disk(){
     device=$1
     IN_DEVICE="/dev/$device"
     echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
-    #echo && echo "Continue to cfdisk? "; read answer
     echo && echo "Continue to sgdisk? "; read answer
-    #[[ "$answer" =~ [yY] ]] && cfdisk "$IN_DEVICE"
     [[ "$answer" =~ [yY] ]] && echo "paritioning with sgdisk..."
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+512M -t 1:ef00 -c 1:EFI "$IN_DEVICE"
@@ -211,9 +209,6 @@ get_install_device(){
 # INSTALL ESSENTIAL PACKAGES
 install_base(){
     clear
-    #echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
-    #echo && echo "pacstrap system with base base-devel linux linux-headers dkms linux-firmware vim..."
-    #pacstrap /mnt base base-devel linux linux-headers dkms linux-firmware vim 
     pacstrap /mnt "${base_system[@]}"
     echo && echo "Base system installed.  Press any key to continue..."; read empty
 }
@@ -235,11 +230,7 @@ gen_fstab(){
 # TIMEZONE
 set_tz(){
     clear
-    #echo && echo "Continue on to setting timezone with CHROOT?"; read tz_yn
-    #[[ "$tz_yn" =~ [yY] ]] || exit 0
-
     echo && echo "setting timezone to $TIMEZONE..."
-    #arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
     arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
     arch-chroot /mnt hwclock --systohc --utc
     arch-chroot /mnt date
@@ -251,15 +242,12 @@ set_tz(){
 # LOCALE
 set_locale(){
     clear
-    echo && echo "setting locale to en_US.UTF-8..."
-    #arch-chroot /mnt sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
+    echo && echo "setting locale to $LOCALE..."
     sleep 3
     arch-chroot /mnt sed -i "s/#$LOCALE/$LOCALE/g" /etc/locale.gen
     arch-chroot /mnt locale-gen
-    #echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
     sleep 3
     echo "LANG=$LOCALE" > /mnt/etc/locale.conf
-    #export LANG=en_US.UTF-8
     export LANG="$LOCALE"
     sleep 3
     cat /mnt/etc/locale.conf
@@ -291,14 +279,9 @@ install_essential(){
     clear
     echo && echo "Enabling dhcpcd, sshd and NetworkManager services..."
     echo
-    #arch-chroot /mnt pacman -S git openssh networkmanager dhcpcd man-db man-pages
-    #arch-chroot /mnt systemctl enable dhcpcd.service
-    #arch-chroot /mnt systemctl enable sshd.service
-    #arch-chroot /mnt systemctl enable NetworkManager.service
 
     arch-chroot /mnt pacman -S "${base_essentials[@]}"
     arch-chroot /mnt pacman -S "${network_essentials[@]}"
-
 
     echo && echo "Press any key to continue..."; read empty
 }
@@ -365,7 +348,6 @@ install_grub(){
 # WIFI (BCM4360) IF NECESSARY
 wl_wifi(){
     clear && echo "Installing $wifi_drivers..."
-    #arch-chroot /mnt pacman -S broadcom-wl-dkms
     arch-chroot /mnt pacman -S "${wifi_drivers[@]}"
     [[ "$?" -eq 0 ]] && echo "Wifi Driver installed!"; sleep 3
 }
