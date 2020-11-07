@@ -13,12 +13,19 @@ ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
 
+# PARTITION SIZES  (You can edit these if desired)
+EFI_SIZE=512M
+ROOT_SIZE="13.5G"
+SWAP_SIZE=2G
+HOME_SIZE=12G
+
 # You can edit this if you want
 TIMEZONE='America/New_York'
 LOCALE="en_US.UTF-8"
 
 ###########  SOFTWARE SETS ###################
 
+# replace with linux-lts or -zen if preferrable
 base_system=( base base-devel linux linux-headers dkms linux-firmware vim sudo bash-completion )
 
 base_essentials=(git mlocate pacman-contrib man-db man-pages)
@@ -58,7 +65,7 @@ multimedia_stuff=( eog shotwell imagemagick sox cmus mpg123 alsa-utils
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
-all_extras=("${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
+all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 ##########################################
 ###########  FUNCTIONS ###################
@@ -151,9 +158,9 @@ part_disk(){
     echo && echo "Continue to sgdisk? "; read answer
     [[ "$answer" =~ [yY] ]] && echo "paritioning with sgdisk..."
     sgdisk -Z "$IN_DEVICE"
-    sgdisk -n 1::+512M -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2::+13G -t 2:8300 -c 2:ROOT "$IN_DEVICE"
-    sgdisk -n 3::+2G -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
     sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
 
     # SHOW RESULTS:
