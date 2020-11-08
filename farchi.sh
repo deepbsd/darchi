@@ -38,7 +38,8 @@ BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock 
 ## These are your specific choices for fonts and wallpapers and X-related goodies
 EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
-EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce-goodies i3gaps i3blocks feh rofi dmenu xterm )
+EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks 
+    nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
 
 ##########################################
 ## SCRIPT STARTS HERE
