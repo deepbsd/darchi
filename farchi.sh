@@ -2,7 +2,7 @@
 
 #####  GLOBAL VARIABLES  ######
 HOSTNAME="effie3"
-INSTALL_DEVICE=/dev/sda
+IN_DEVICE=/dev/sda
 EFI_DEVICE=/dev/sda1
 ## If you change the EFI_MTPT You must change
 ## it when making and mounting EFI dirs and also
