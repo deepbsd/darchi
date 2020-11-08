@@ -103,7 +103,7 @@ if [[ "$HOME_DEVICE" != "" ]]; then
     mount "$HOME_DEVICE" /mnt/home
 fi
 
-lsblk "$INSTALL_DEVICE"
+lsblk "$IN_DEVICE"
 echo "Type any key to continue..."; read empty
 
 ## INSTALL BASE SYSTEM
