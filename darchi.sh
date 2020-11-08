@@ -15,7 +15,7 @@ SWAP_SLICE=''
 
 # PARTITION SIZES  (You can edit these if desired)
 EFI_SIZE=512M
-ROOT_SIZE="13.5G"
+ROOT_SIZE="13G"
 SWAP_SIZE=2G
 HOME_SIZE=12G
 
@@ -460,7 +460,9 @@ startmenu(){
         3) install_base ;;
         4) gen_fstab; set_tz; set_locale ;;
         5) set_hostname ;;
-        6) echo "Setting ROOT password..."; arch-chroot /mnt passwd ;;
+        6) echo "Setting ROOT password..."; 
+            arch-chroot /mnt passwd; 
+            echo "Any key to continue..."; read continue ;;
         7) install_essential ;;
         8) add_user_acct ;;
         9) wl_wifi ;;

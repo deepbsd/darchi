@@ -11,6 +11,14 @@ EFI_MTPT=/mnt/boot/efi
 ROOT_DEVICE=/dev/sda2
 SWAP_DEVICE=/dev/sda3
 HOME_DEVICE=/dev/sda4
+
+# PARTITION SIZES
+EFI_SIZE=512M
+SWAP_SIZE=2G
+ROOT_SIZE=12G
+#HOME_SIZE=
+
+
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 #$(ls /sys/firmware/efi/efivars &>/dev/null) && DISKTABLE='GPT' ) || DISKTABLE='MBR'
@@ -71,7 +79,13 @@ sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
 clear && echo "Partitioning Installation Drive..." && sleep 3
-cfdisk "$INSTALL_DEVICE"
+
+sgdisk -Z "$IN_DEVICE"
+sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+
 mkfs."$FILESYSTEM" "$ROOT_DEVICE"
 mount "$ROOT_DEVICE" /mnt
 if [[ "$EFI_DEVICE" != "" ]] ; then
