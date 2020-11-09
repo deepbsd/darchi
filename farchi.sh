@@ -1,13 +1,40 @@
 #!/usr/bin/env bash
 
-#####  GLOBAL VARIABLES  ######
-HOSTNAME="effie3"
+##########################################
+######       FUNCTIONS       #############
+##########################################
+ 
+# VERIFY BOOT MODE
+efi_boot_mode(){
+    ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
+}
+
+# FIND GRAPHICS CARD
+find_card(){
+    card=$(lspci | grep VGA | sed 's/^.*: //g')
+    echo "You're using a $card" && echo
+}
+
+##########################################
+#####       GLOBAL VARIABLES        ######
+##########################################
+HOSTNAME="effie5"
 IN_DEVICE=/dev/sda
-EFI_DEVICE=/dev/sda1
-## If you change the EFI_MTPT You must change
-## it when making and mounting EFI dirs and also
-## when installing grub. Just search for efi
-EFI_MTPT=/mnt/boot/efi
+VIDEO_DRIVER="xf86-video-vmware"
+WIRELESSDRIVERS="broadcom-wl-dkms"
+USE_LVM='false'
+
+if $(efi_boot_mode) ; then
+    DISKTABLE='GPT'
+    EFI_DEVICE=/dev/sda1
+    ## If you change the EFI_MTPT You must change
+    ## it when making and mounting EFI dirs and also
+    ## when installing grub. Just search for efi
+    EFI_MTPT=/mnt/boot/efi
+else
+    DISKTABLE='MBR'
+fi
+
 ROOT_DEVICE=/dev/sda2
 SWAP_DEVICE=/dev/sda3
 HOME_DEVICE=/dev/sda4
@@ -18,16 +45,10 @@ SWAP_SIZE=2G
 ROOT_SIZE=12G
 HOME_SIZE=
 
-
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
-#$(ls /sys/firmware/efi/efivars &>/dev/null) && DISKTABLE='GPT' ) || DISKTABLE='MBR'
-## Set this manually either to 'MBR' or 'GPT' for EFI systems
-DISKTABLE=GPT
 FILESYSTEM=ext4
 DESKTOP=cinnamon
-WIRELESSDRIVERS="broadcom-wl-dkms"
-VIDEO_DRIVER="xf86-video-vmware"
 
 ## If you change display manager, be sure to change when
 ## we enable display manager service at end of script
@@ -51,7 +72,7 @@ echo -e "\n\n\nWelcome to the Fast ARCH Installer!"
 sleep 4
 clear && count=5
 while true; do
-    [[ "$count" -lt 0 ]] && break
+    [[ "$count" -lt 1 ]] && break
     echo -e  "\e[1A\e[K Launching install in $count seconds"
     count=$(( count - 1 ))
     sleep 1
