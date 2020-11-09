@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+###  Dave's Fast ARCH Installer
+
 ##########################################
 ######       FUNCTIONS       #############
 ##########################################
@@ -15,18 +17,26 @@ find_card(){
     echo "You're using a $card" && echo
 }
 
+use_lvm(){ return 1; }  # return 0 if you want lvm
+use_crypt(){ return 1; }  # return 0 if you want crypt
+use_bcm4360() { return 1; }  # return 0 if you want bcm4360
+
 ##########################################
 #####       GLOBAL VARIABLES        ######
 ##########################################
 HOSTNAME="effie5"
 IN_DEVICE=/dev/sda
 VIDEO_DRIVER="xf86-video-vmware"
-WIRELESSDRIVERS="broadcom-wl-dkms"
-USE_LVM='false'
+if $(use_bcm4360) ; then
+    WIRELESSDRIVERS="broadcom-wl-dkms"
+else
+    WIRELESSDRIVERS=""
+fi
 
 if $(efi_boot_mode) ; then
     DISKTABLE='GPT'
     EFI_DEVICE=/dev/sda1
+    EFI_SIZE=512M
     ## If you change the EFI_MTPT You must change
     ## it when making and mounting EFI dirs and also
     ## when installing grub. Just search for efi
@@ -40,7 +50,6 @@ SWAP_DEVICE=/dev/sda3
 HOME_DEVICE=/dev/sda4
 
 # PARTITION SIZES
-EFI_SIZE=512M
 SWAP_SIZE=2G
 ROOT_SIZE=12G
 HOME_SIZE=
@@ -57,7 +66,7 @@ DESKTOP=cinnamon
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
 
 ## These are your specific choices for fonts and wallpapers and X-related goodies
-EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
 EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks 
     nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
@@ -224,6 +233,7 @@ clear && echo "Installing X and X Extras and Video Driver. Type any key to conti
 arch-chroot /mnt pacman -S "${BASIC_X[@]}"
 arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
 arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
+arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
 echo "Enabling display manager service..."
 ### CHANGE THIS IS YOU WANT A DIFFERENT DISPLAY MANAGER
 ### ALSO, ALTER BASIC_X and EXTRA_X ACCORDINGLY
