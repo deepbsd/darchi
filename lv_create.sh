@@ -47,3 +47,5 @@ lv_create(){
     mount /dev/sda1 /mnt/boot/efi
     echo "LVs created and mounted. Press any key."; read empty;
 }
+
+lv_create
