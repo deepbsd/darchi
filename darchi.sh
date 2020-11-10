@@ -404,6 +404,29 @@ check_reflector(){
     done
 }
 
+lv_create(){
+    # Create the physical partitions
+    sgdisk -Z "$IN_DEVICE"
+    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8e00 -c 2:ROOT_VOL "$IN_DEVICE"
+    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+    sgdisk -n 4 4:8e00 -c 4:HOME_VOL "$IN_DEVICE"
+
+    mkfs.fat -F32 /dev/sda1
+    
+    mkswap /dev/sda3
+    pvcreate /dev/sda2 
+    pvcreate /dev/sda4
+    vgcreate root_vg /dev/sda2
+    vgcreate home_vg /dev/sda4
+    lvcreate -L "$ROOT_SIZE" /dev/sda2
+    lvcreate -L "$HOME_SIZE" /dev/sda4
+    modprobe dm_mod
+    vgchange -ay
+
+
+
+}
 
 #############################################################
 ############         START SCRIPT
