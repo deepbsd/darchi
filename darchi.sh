@@ -438,7 +438,7 @@ lv_create(){
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
     mount /dev/sda1 /mnt/boot/efi
-
+    echo "LVs created and mounted. Press any key."; read empty;
 }
 
 #############################################################
