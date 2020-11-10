@@ -433,6 +433,7 @@ lv_create(){
     mkfs.ext4 /dev/home_vg -n home_vg
     # mount the volumes
     mount /dev/root_vg/root_vg /mnt
+    mkdir /mnt/home
     mount /dev/home_vg/home_vg /mnt/home
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
@@ -479,6 +480,7 @@ startmenu(){
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
         echo -e "\n\n\n What do you want to do?  \n\n"
         echo -e "  1) Check connection and date   2) Prepare Installation Disk"
+        echo -e "  2a) Prepare Installation Disk with LVM"
         echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
         echo -e "\n  5) Set new hostname            6) Set new root password"
         echo -e "\n  7) Install more essentials     8) Add user + sudo account"
@@ -492,6 +494,7 @@ startmenu(){
     case $menupick in
         1) check_connect; time_date ;;
         2) get_install_device ;;
+        2a) lv_create ;;
         3) install_base ;;
         4) gen_fstab; set_tz; set_locale ;;
         5) set_hostname ;;
