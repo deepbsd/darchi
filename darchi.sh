@@ -410,21 +410,33 @@ lv_create(){
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
     sgdisk -n 2::+"$ROOT_SIZE" -t 2:8e00 -c 2:ROOT_VOL "$IN_DEVICE"
     sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-    sgdisk -n 4 4:8e00 -c 4:HOME_VOL "$IN_DEVICE"
-
+    sgdisk -n 4 -t 4:8e00 -c 4:HOME_VOL "$IN_DEVICE"
+    # Format the EFI partition
     mkfs.fat -F32 /dev/sda1
-    
+    # Format SWAP 
     mkswap /dev/sda3
+    # create the root and home physical volumes
     pvcreate /dev/sda2 
     pvcreate /dev/sda4
+    # create the volume groups
     vgcreate root_vg /dev/sda2
     vgcreate home_vg /dev/sda4
+    # create the volumes with specific size
     lvcreate -L "$ROOT_SIZE" /dev/sda2
     lvcreate -L "$HOME_SIZE" /dev/sda4
+    # insert the vol group module
     modprobe dm_mod
+    # activate the vol groups
     vgchange -ay
-
-
+    # format the volumes
+    mkfs.ext4 /dev/root_vg -n root_vg
+    mkfs.ext4 /dev/home_vg -n home_vg
+    # mount the volumes
+    mount /dev/root_vg/root_vg /mnt
+    mount /dev/home_vg/home_vg /mnt/home
+    # mount the EFI partitions
+    mkdir /mnt/boot && mkdir /mnt/boot/efi
+    mount /dev/sda1 /mnt/boot/efi
 
 }
 
