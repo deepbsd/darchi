@@ -4,11 +4,9 @@ IN_DEVICE=/dev/sda
 EFI_DEVICE=/dev/sda1
 SWAP_DEVICE=/dev/sda2
 ROOT_DEVICE=/dev/sda3
-#HOME_DEVICE=/dev/sda4
 VOL_GROUP=arch_vg
 LV_ROOT="ArchRoot"
 LV_HOME="ArchHome"
-#HOME_GROUP=home_vg
 
 EFI_SIZE=512M
 ROOT_SIZE=12G
@@ -50,6 +48,7 @@ lv_create(){
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
     mount /dev/sda1 /mnt/boot/efi
+    lsblk
     echo "LVs created and mounted. Press any key."; read empty;
 }
 
