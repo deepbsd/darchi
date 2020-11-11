@@ -22,7 +22,7 @@ LV_HOME="ArchHome"
 EFI_SIZE=512M
 ROOT_SIZE=13G
 SWAP_SIZE=2G
-HOME_SIZE=12G
+HOME_SIZE=12G   # This is set automatically if using LVM
 
 # You can edit this if you want
 TIMEZONE='America/New_York'
@@ -132,7 +132,6 @@ mount_part(){
 format_disk(){
     device=$1; slice=$2
     # only do efi slice if efi_boot_mode return 0; else return 0
-    ##  This is a problem!!  The efi slice is not getting formatted or mounted!!!
     [[ "$slice" =~ 'efi' && ! "$DISKTABLE" =~ 'GPT' ]] && return 0
     clear
     echo "Formatting $device with $slice. . ."
@@ -496,7 +495,6 @@ diskmenu(){
         *) echo "Please make a valid pick from menu!" ;;
     esac
     done
-
 }
 
 startmenu(){
