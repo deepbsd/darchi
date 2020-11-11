@@ -19,7 +19,7 @@ lv_create(){
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
     sgdisk -n 2::+"$SWAP_SIZE" -t 2:8200 -c 2:SWAP "$IN_DEVICE"
-    sgdisk -n 3 -t 4:8e00 -c 4:VOLGROUP "$IN_DEVICE"
+    sgdisk -n 3 -t 3:8e00 -c 3:VOLGROUP "$IN_DEVICE"
     # Format the EFI partition
     mkfs.fat -F32 "$SWAP_DEVICE"
     # Format SWAP 
@@ -33,19 +33,19 @@ lv_create(){
     #vgcreate "$VOL_GROUP" "$ROOT_DEVICE" "$HOME_DEVICE"
     vgcreate "$VOL_GROUP" "$ROOT_DEVICE" 
     # create the volumes with specific size
-    lvcreate -L "$ROOT_SIZE"  "$VOL_GROUP" -n ArchRoot  "$ROOT_DEVICE"
-    lvcreate -L "$HOME_SIZE" "$VOL_GROUP" -n ArchHome "$ROOT_DEVICE"
+    lvcreate -L "$ROOT_SIZE"  "$VOL_GROUP" -n ArchRoot 
+    lvcreate -L "$HOME_SIZE" "$VOL_GROUP" -n ArchHome 
     # insert the vol group module
     modprobe dm_mod
     # activate the vol groups
     vgchange -ay
     # format the volumes
-    mkfs.ext4 /dev/"$VOL_GROUP" -n "$ROOT_GROUP"
-    mkfs.ext4 /dev/"$VOL_GROUP" -n "$HOME_GROUP"
+    mkfs.ext4 /dev/"$VOL_GROUP"/ArchRoot
+    mkfs.ext4 /dev/"$VOL_GROUP"/ArchHome
     # mount the volumes
-    mount /dev/root_vg/root_vg /mnt
+    mount /dev/"$VOL_GROUP"/ArchRoot /mnt
     mkdir /mnt/home
-    mount /dev/home_vg/home_vg /mnt/home
+    mount /dev/"$VOL_GROUP"/ArchHome /mnt/home
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
     mount /dev/sda1 /mnt/boot/efi
