@@ -13,6 +13,11 @@ ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
 
+# VOL GROUP VARIABLES
+VOL_GROUP="arch_vg"
+LV_ROOT="ArchRoot"
+LV_HOME="ArchHome"
+
 # PARTITION SIZES  (You can edit these if desired)
 EFI_SIZE=512M
 ROOT_SIZE=13G
@@ -408,37 +413,40 @@ lv_create(){
     # Create the physical partitions
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8e00 -c 2:ROOT_VOL "$IN_DEVICE"
-    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-    sgdisk -n 4 -t 4:8e00 -c 4:HOME_VOL "$IN_DEVICE"
+    sgdisk -n 2::+"$SWAP_SIZE" -t 2:8200 -c 2:SWAP "$IN_DEVICE"
+    sgdisk -n 3 -t 3:8e00 -c 3:VOLGROUP "$IN_DEVICE"
     # Format the EFI partition
-    mkfs.fat -F32 /dev/sda1
+    mkfs.fat -F32 "$EFI_DEVICE"
     # Format SWAP 
-    mkswap /dev/sda3
-    # create the root and home physical volumes
-    pvcreate /dev/sda2 
-    pvcreate /dev/sda4
-    # create the volume groups
-    vgcreate root_vg /dev/sda2
-    vgcreate home_vg /dev/sda4
+    mkswap "$SWAP_DEVICE"
+    swapon "$SWAP_DEVICE"
+    # create the physical volumes
+    pvcreate "$ROOT_DEVICE"
+    # create the volume group
+    vgcreate "$VOL_GROUP" "$ROOT_DEVICE" 
+    
+    # You can extend with 'vgextend' to other devices too
+
     # create the volumes with specific size
-    lvcreate -L "$ROOT_SIZE" /dev/sda2
-    lvcreate -L "$HOME_SIZE" /dev/sda4
+    lvcreate -L "$ROOT_SIZE" "$VOL_GROUP" -n "$LV_ROOT"
+    lvcreate -l 100%FREE  "$VOL_GROUP" -n "$LV_HOME"
     # insert the vol group module
     modprobe dm_mod
-    # activate the vol groups
+    # activate the vol group
     vgchange -ay
     # format the volumes
-    mkfs.ext4 /dev/root_vg -n root_vg
-    mkfs.ext4 /dev/home_vg -n home_vg
+    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_ROOT"
+    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_HOME"
     # mount the volumes
-    mount /dev/root_vg/root_vg /mnt
+    mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
     mkdir /mnt/home
-    mount /dev/home_vg/home_vg /mnt/home
+    mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt/home
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
     mount /dev/sda1 /mnt/boot/efi
+    lsblk
     echo "LVs created and mounted. Press any key."; read empty;
+
 }
 
 #############################################################
@@ -473,6 +481,24 @@ start(){
     echo "Type 'shutdown -r now' to reboot..."
 }
 
+diskmenu(){
+    clear
+    while true ; do
+        echo -e "\n\n     Prepare Installation Disk (Choose One)" 
+        echo -e "  1) Prepare Installation Disk with Normal Partitions"
+        echo -e "  2) Prepare Installation Disk with LVM"
+
+        echo -e "\n\n   Your choice?  "; read diskmenupick
+
+    case $diskmenupick in
+        1) get_install_device ;;
+        2) lv_create ;;
+        *) echo "Please make a valid pick from menu!" ;;
+    esac
+    done
+
+}
+
 startmenu(){
     check_reflector
     while true ; do
@@ -480,7 +506,6 @@ startmenu(){
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
         echo -e "\n\n\n What do you want to do?  \n\n"
         echo -e "  1) Check connection and date   2) Prepare Installation Disk"
-        echo -e "  2a) Prepare Installation Disk with LVM"
         echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
         echo -e "\n  5) Set new hostname            6) Set new root password"
         echo -e "\n  7) Install more essentials     8) Add user + sudo account"
@@ -493,8 +518,7 @@ startmenu(){
 
     case $menupick in
         1) check_connect; time_date ;;
-        2) get_install_device ;;
-        2a) lv_create ;;
+        2) diskmenu ;;
         3) install_base ;;
         4) gen_fstab; set_tz; set_locale ;;
         5) set_hostname ;;
