@@ -14,6 +14,7 @@ HOME_SLICE=''
 SWAP_SLICE=''
 
 # VOL GROUP VARIABLES
+USE_LVM=''   # gets set programmatically
 VOL_GROUP="arch_vg"
 LV_ROOT="ArchRoot"
 LV_HOME="ArchHome"
@@ -75,6 +76,12 @@ all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "$
 ##########################################
 ###########  FUNCTIONS ###################
 ##########################################
+
+# USING LVM?
+use_lvm(){
+    [[ -d /dev/"$VOL_GROUP" ]] && USE_LVM='true' && return 0
+    return 1
+}
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
@@ -288,9 +295,10 @@ HOSTS
 # SOME MORE ESSENTIAL NETWORK STUFF
 install_essential(){
     clear
-    echo && echo "Enabling dhcpcd, sshd and NetworkManager services..."
+    echo && echo "Installing (lvm2?) dhcpcd, sshd and NetworkManager services..."
     echo
-
+    # install lvm2 if we're using LVM
+    use_lvm && base_essentials+=( "lvm2" )
     arch-chroot /mnt pacman -S "${base_essentials[@]}"
     arch-chroot /mnt pacman -S "${network_essentials[@]}"
 
