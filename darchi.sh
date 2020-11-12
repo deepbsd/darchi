@@ -417,6 +417,21 @@ check_reflector(){
 }
 
 lv_create(){
+    IN_DEVICE=/dev/sda
+    EFI_DEVICE=/dev/sda1
+    SWAP_DEVICE=/dev/sda2
+    ROOT_DEVICE=/dev/sda3
+    VOL_GROUP=arch_vg
+    LV_ROOT="ArchRoot"
+    LV_HOME="ArchHome"
+
+    EFI_SIZE=512M
+    ROOT_SIZE=12G
+    HOME_SIZE=16G
+    SWAP_SIZE=2G
+
+    clear
+
     # Create the physical partitions
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
@@ -453,7 +468,7 @@ lv_create(){
     mount /dev/sda1 /mnt/boot/efi
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
-
+    startmenu
 }
 
 #############################################################
