@@ -542,10 +542,10 @@ startmenu(){
         echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
         echo -e "\n  5) Set new hostname            6) Set new root password"
         echo -e "\n  7) Install more essentials     8) Add user + sudo account"
-        echo -e "\n  9) Install BCM4360 drivers     10) Install grub"
-        echo -e "\n  10a) Install mkinitcpio hooks for LVM"
-        echo -e "\n  11) Install Xorg + Desktop     12) Install Extra Stuff"
-        echo -e "\n  13) Repopulate Variables       14) Exit Script"
+        echo -e "\n  9) Install BCM4360 drivers     10) Install mkinitcpio hooks for LVM"
+        echo -e "\n  11) Install grub               12) Install Xorg + Desktop"
+        echo -e "\n  13) Install Extra Stuff        14) Repopulate Variables "
+        echo -e "\n  15) Exit Script"
 
 
         echo -e "\n\n   Your choice?  "; read menupick
@@ -562,12 +562,12 @@ startmenu(){
         7) install_essential ;;
         8) add_user_acct ;;
         9) wl_wifi ;;
-        10) install_grub ;;
-        10a) lvm_hooks ;;
-        11) install_desktop ;;
-        12) install_extra_stuff ;;
-        13) set_variables ;;
-        14) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+        10) lvm_hooks ;;
+        11) install_grub ;;
+        12) install_desktop ;;
+        13) install_extra_stuff ;;
+        14) set_variables ;;
+        15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
             exit 0 ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
