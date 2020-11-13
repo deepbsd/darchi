@@ -31,6 +31,10 @@ and so forth are already installed.
 Just fetch the script from my git page and run it after booting the archiso iso
 image.
 
+Nov 13 2020 -- I've been working on adding LVM to the darchi.sh script.  It works fine in 
+vbox, but you have to set the sizes by hand.  I still have to figure a way to programmatically
+set the sizes...
+
 ## The FARCHI script
 
 I also created a script called farchi.sh for "Fast ARCH Installer".
