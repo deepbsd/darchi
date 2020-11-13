@@ -419,7 +419,7 @@ check_reflector(){
 lvm_hooks(){
     clear
     echo "add lvm2 to mkinitcpio hooks HOOKS=( base udev ... block lvm2 filesystems )"
-    sleep 5
+    sleep 4
     vim /mnt/etc/mkinitcpio.conf
     arch-chroot /mnt mkinitcpio -P
     echo "Press any key to continue..."; read empty
