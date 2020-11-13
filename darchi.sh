@@ -32,7 +32,7 @@ LOCALE="en_US.UTF-8"
 ###########  SOFTWARE SETS ###################
 
 # replace with linux-lts or -zen if preferrable
-base_system=( base base-devel linux linux-headers lvm2 dkms linux-firmware vim sudo bash-completion )
+base_system=( base base-devel linux linux-headers dkms linux-firmware vim sudo bash-completion )
 
 base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
