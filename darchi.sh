@@ -227,6 +227,8 @@ get_install_device(){
 # INSTALL ESSENTIAL PACKAGES
 install_base(){
     clear
+    # install lvm2 if we're using LVM
+    use_lvm && base_system+=( "lvm2" )
     pacstrap /mnt "${base_system[@]}"
     echo && echo "Base system installed.  Press any key to continue..."; read empty
 }
@@ -295,10 +297,8 @@ HOSTS
 # SOME MORE ESSENTIAL NETWORK STUFF
 install_essential(){
     clear
-    echo && echo "Installing (lvm2?) dhcpcd, sshd and NetworkManager services..."
+    echo && echo "Installing dhcpcd, sshd and NetworkManager services..."
     echo
-    # install lvm2 if we're using LVM
-    use_lvm && base_essentials+=( "lvm2" )
     arch-chroot /mnt pacman -S "${base_essentials[@]}"
     arch-chroot /mnt pacman -S "${network_essentials[@]}"
 
@@ -539,10 +539,10 @@ startmenu(){
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
         echo -e "\n\n\n What do you want to do?  \n\n"
         echo -e "  1) Check connection and date   2) Prepare Installation Disk"
-        echo -e "\n  3) Install Base System         4) New FSTAB and TZ/Locale"
-        echo -e "\n  5) Set new hostname            6) Set new root password"
-        echo -e "\n  7) Install more essentials     8) Add user + sudo account"
-        echo -e "\n  9) Install BCM4360 drivers     10) Install mkinitcpio hooks for LVM"
+        echo -e "\n  3) Install mkinitcpio hooks for LVM   4) Install Base System "
+        echo -e "\n  5) New FSTAB and TZ/Locale    6) Set new hostname"
+        echo -e "\n  7) Set new root password      8) Install more essentials "
+        echo -e "\n  9) Add user + sudo account    10) Install BCM4360 drivers  "
         echo -e "\n  11) Install grub               12) Install Xorg + Desktop"
         echo -e "\n  13) Install Extra Stuff        14) Repopulate Variables "
         echo -e "\n  15) Exit Script"
@@ -553,16 +553,16 @@ startmenu(){
     case $menupick in
         1) check_connect; time_date ;;
         2) diskmenu ;;
-        3) install_base ;;
-        4) gen_fstab; set_tz; set_locale ;;
-        5) set_hostname ;;
-        6) echo "Setting ROOT password..."; 
+        3) lvm_hooks ;;
+        4) install_base ;;
+        5) gen_fstab; set_tz; set_locale ;;
+        6) set_hostname ;;
+        7) echo "Setting ROOT password..."; 
             arch-chroot /mnt passwd; 
             echo "Any key to continue..."; read continue ;;
-        7) install_essential ;;
-        8) add_user_acct ;;
-        9) wl_wifi ;;
-        10) lvm_hooks ;;
+        8) install_essential ;;
+        9) add_user_acct ;;
+        10) wl_wifi ;;
         11) install_grub ;;
         12) install_desktop ;;
         13) install_extra_stuff ;;
