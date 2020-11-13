@@ -560,7 +560,7 @@ startmenu(){
         8) add_user_acct ;;
         9) wl_wifi ;;
         10) install_grub ;;
-        10a) add_hooks ;;
+        10a) lvm_hooks ;;
         11) install_desktop ;;
         12) install_extra_stuff ;;
         13) set_variables ;;
