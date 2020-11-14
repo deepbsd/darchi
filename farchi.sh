@@ -17,15 +17,132 @@ find_card(){
     echo "You're using a $card" && echo
 }
 
+### CHANGE ACCORDING TO PREFERENCE
 use_lvm(){ return 1; }  # return 0 if you want lvm
 use_crypt(){ return 1; }  # return 0 if you want crypt
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
+
+non_lvm_partition(){
+    IN_DEVICE=/dev/sda
+    if $(efi_boot_mode) ; then
+        DISKTABLE='GPT'
+        EFI_DEVICE=/dev/sda1
+        EFI_SIZE=512M
+        ## If you change the EFI_MTPT You must change
+        ## it when making and mounting EFI dirs and also
+        ## when installing grub. Just search for efi
+        EFI_MTPT=/mnt/boot/efi
+    else
+        DISKTABLE='MBR'
+    fi
+    ROOT_DEVICE=/dev/sda2
+    SWAP_DEVICE=/dev/sda3
+    HOME_DEVICE=/dev/sda4
+
+    # PARTITION SIZES
+    SWAP_SIZE=2G
+    ROOT_SIZE=12G
+    HOME_SIZE=
+    sgdisk -Z "$IN_DEVICE"
+    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+    sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+
+    mkfs."$FILESYSTEM" "$ROOT_DEVICE"
+    mount "$ROOT_DEVICE" /mnt
+    if [[ "$EFI_DEVICE" != "" ]] ; then
+        mkfs.fat -F32 "$EFI_DEVICE" 
+        ### script assumes efi mounted at /mnt/boot/efi for now
+        mkdir /mnt/boot
+        mkdir /mnt/boot/efi 
+        ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
+    fi
+    if [[ "$SWAP_DEVICE" != "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
+    if [[ "$HOME_DEVICE" != "" ]]; then
+        mkfs."$FILESYSTEM" "$HOME_DEVICE"
+        mkdir /mnt/home
+        mount "$HOME_DEVICE" /mnt/home
+    fi
+
+    lsblk "$IN_DEVICE"
+    echo "Type any key to continue..."; read empty
+}
+
+# PART OF LVM INSTALLATION
+lvm_hooks(){
+    clear
+    echo "add lvm2 to mkinitcpio hooks HOOKS=( base udev ... block lvm2 filesystems )"
+    sleep 4
+    vim /mnt/etc/mkinitcpio.conf
+    arch-chroot /mnt mkinitcpio -P
+    echo "Press any key to continue..."; read empty
+}
+
+# ONLY FOR LVM INSTALLATION
+lvm_create(){
+    IN_DEVICE=/dev/sda
+    EFI_DEVICE=/dev/sda1
+    ROOT_DEVICE=/dev/sda2
+    VOL_GROUP=arch_vg
+    LV_ROOT="ArchRoot"
+    LV_HOME="ArchHome"
+    LV_SWAP="ArchSwap"
+
+    EFI_SIZE=512M
+    ROOT_SIZE=12G
+    HOME_SIZE=16G
+    SWAP_SIZE=2G
+
+    clear
+
+    # Create the physical partitions
+    sgdisk -Z "$IN_DEVICE"
+    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+    sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
+    # Format the EFI partition
+    mkfs.fat -F32 "$EFI_DEVICE"
+
+    # create the physical volumes
+    pvcreate "$ROOT_DEVICE"
+    # create the volume group
+    vgcreate "$VOL_GROUP" "$ROOT_DEVICE" 
+    
+    # You can extend with 'vgextend' to other devices too
+
+    # create the volumes with specific size
+    lvcreate -L "$ROOT_SIZE" "$VOL_GROUP" -n "$LV_ROOT"
+    lvcreate -L "$SWAP_SIZE" "$VOL_GROUP" -n "$LV_SWAP"
+    lvcreate -l 100%FREE  "$VOL_GROUP" -n "$LV_HOME"
+    
+    # Format SWAP 
+    mkswap /dev/"$VOL_GROUP"/"$LV_SWAP"
+    swapon /dev/"$VOL_GROUP"/"$LV_SWAP"
+
+    # insert the vol group module
+    modprobe dm_mod
+    # activate the vol group
+    vgchange -ay
+    # format the volumes
+    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_ROOT"
+    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_HOME"
+    # mount the volumes
+    mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
+    mkdir /mnt/home
+    mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
+    # mount the EFI partitions
+    mkdir /mnt/boot && mkdir /mnt/boot/efi
+    mount /dev/sda1 /mnt/boot/efi
+    lsblk
+    echo "LVs created and mounted. Press any key."; read empty;
+    startmenu
+}
 
 ##########################################
 #####       GLOBAL VARIABLES        ######
 ##########################################
 HOSTNAME="effie5"
-IN_DEVICE=/dev/sda
+#IN_DEVICE=/dev/sda
 VIDEO_DRIVER="xf86-video-vmware"
 if $(use_bcm4360) ; then
     WIRELESSDRIVERS="broadcom-wl-dkms"
@@ -33,26 +150,18 @@ else
     WIRELESSDRIVERS=""
 fi
 
-if $(efi_boot_mode) ; then
-    DISKTABLE='GPT'
-    EFI_DEVICE=/dev/sda1
-    EFI_SIZE=512M
-    ## If you change the EFI_MTPT You must change
-    ## it when making and mounting EFI dirs and also
-    ## when installing grub. Just search for efi
-    EFI_MTPT=/mnt/boot/efi
-else
-    DISKTABLE='MBR'
-fi
+#if $(efi_boot_mode) ; then
+#    DISKTABLE='GPT'
+#    EFI_DEVICE=/dev/sda1
+#    EFI_SIZE=512M
+#    ## If you change the EFI_MTPT You must change
+#    ## it when making and mounting EFI dirs and also
+#    ## when installing grub. Just search for efi
+#    EFI_MTPT=/mnt/boot/efi
+#else
+#    DISKTABLE='MBR'
+#fi
 
-ROOT_DEVICE=/dev/sda2
-SWAP_DEVICE=/dev/sda3
-HOME_DEVICE=/dev/sda4
-
-# PARTITION SIZES
-SWAP_SIZE=2G
-ROOT_SIZE=12G
-HOME_SIZE=
 
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
@@ -111,31 +220,13 @@ sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
 clear && echo "Partitioning Installation Drive..." && sleep 3
-
-sgdisk -Z "$IN_DEVICE"
-sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
-sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
-
-mkfs."$FILESYSTEM" "$ROOT_DEVICE"
-mount "$ROOT_DEVICE" /mnt
-if [[ "$EFI_DEVICE" != "" ]] ; then
-    mkfs.fat -F32 "$EFI_DEVICE" 
-    ### script assumes efi mounted at /mnt/boot/efi for now
-    mkdir /mnt/boot
-    mkdir /mnt/boot/efi 
-    ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
-fi
-if [[ "$SWAP_DEVICE" != "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
-if [[ "$HOME_DEVICE" != "" ]]; then
-    mkfs."$FILESYSTEM" "$HOME_DEVICE"
-    mkdir /mnt/home
-    mount "$HOME_DEVICE" /mnt/home
+if $(use_lvm) ; then
+    lvm_create
+    lvm_hooks
+else
+    non_lvm_create
 fi
 
-lsblk "$IN_DEVICE"
-echo "Type any key to continue..."; read empty
 
 ## INSTALL BASE SYSTEM
 clear

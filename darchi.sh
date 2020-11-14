@@ -539,7 +539,7 @@ startmenu(){
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
         echo -e "\n\n\n What do you want to do?  \n\n"
         echo -e "  1) Check connection and date   2) Prepare Installation Disk"
-        echo -e "\n  3) Install mkinitcpio hooks for LVM   4) Install Base System "
+        echo -e "\n  3) Install Base System        4) Install mkinitcpio hooks for LVM "
         echo -e "\n  5) New FSTAB and TZ/Locale    6) Set new hostname"
         echo -e "\n  7) Set new root password      8) Install more essentials "
         echo -e "\n  9) Add user + sudo account    10) Install BCM4360 drivers  "
@@ -553,8 +553,8 @@ startmenu(){
     case $menupick in
         1) check_connect; time_date ;;
         2) diskmenu ;;
-        3) lvm_hooks ;;
-        4) install_base ;;
+        3) install_base ;;
+        4) lvm_hooks ;;
         5) gen_fstab; set_tz; set_locale ;;
         6) set_hostname ;;
         7) echo "Setting ROOT password..."; 
