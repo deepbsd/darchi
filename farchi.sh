@@ -12,6 +12,7 @@
 
 HOSTNAME="effie5"
 IN_DEVICE=/dev/sda
+DISKTABLE=GPT
 VIDEO_DRIVER="xf86-video-vmware"
 if $(use_bcm4360) ; then
     WIRELESSDRIVERS="broadcom-wl-dkms"
@@ -24,6 +25,10 @@ LOCALE="en_US.UTF-8"
 FILESYSTEM=ext4
 DESKTOP=cinnamon
 
+### CHANGE ACCORDING TO PREFERENCE
+use_lvm(){ return 0; }  # return 0 if you want lvm
+use_crypt(){ return 1; }  # return 0 if you want crypt
+use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 ##########################################
 ######       FUNCTIONS       #############
@@ -39,11 +44,6 @@ find_card(){
     card=$(lspci | grep VGA | sed 's/^.*: //g')
     echo "You're using a $card" && echo
 }
-
-### CHANGE ACCORDING TO PREFERENCE
-use_lvm(){ return 0; }  # return 0 if you want lvm
-use_crypt(){ return 1; }  # return 0 if you want crypt
-use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 non_lvm_partition(){
     IN_DEVICE=/dev/sda
@@ -174,7 +174,7 @@ lvm_create(){
 }
 
 ##########################################
-#####    MORE GLOBAL VARIABLES      ######
+#####  MORE GLOBAL VARIABLES FOR X  ######
 ##########################################
 
 ## These are packages required for a working Xorg desktop
@@ -187,7 +187,7 @@ EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks
     nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
 
 ##########################################
-## SCRIPT STARTS HERE
+##        SCRIPT STARTS HERE
 ##########################################
 
 ###  WELCOME
