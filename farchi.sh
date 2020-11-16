@@ -18,7 +18,7 @@ find_card(){
 }
 
 ### CHANGE ACCORDING TO PREFERENCE
-use_lvm(){ return 1; }  # return 0 if you want lvm
+use_lvm(){ return 0; }  # return 0 if you want lvm
 use_crypt(){ return 1; }  # return 0 if you want crypt
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
@@ -83,7 +83,7 @@ lvm_hooks(){
 lvm_create(){
     IN_DEVICE=/dev/sda
     EFI_DEVICE=/dev/sda1
-    ROOT_DEVICE=/dev/sda2
+    PV_DEVICE=/dev/sda2
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
     LV_HOME="ArchHome"
@@ -104,9 +104,9 @@ lvm_create(){
     mkfs.fat -F32 "$EFI_DEVICE"
 
     # create the physical volumes
-    pvcreate "$ROOT_DEVICE"
+    pvcreate "$PV_DEVICE"
     # create the volume group
-    vgcreate "$VOL_GROUP" "$ROOT_DEVICE" 
+    vgcreate "$VOL_GROUP" "$PV_DEVICE" 
     
     # You can extend with 'vgextend' to other devices too
 
