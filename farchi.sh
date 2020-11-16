@@ -94,6 +94,18 @@ lvm_create(){
     HOME_SIZE=16G
     SWAP_SIZE=2G
 
+    if $(efi_boot_mode) ; then
+        DISKTABLE='GPT'
+        EFI_DEVICE=/dev/sda1
+        EFI_SIZE=512M
+        ## If you change the EFI_MTPT You must change
+        ## it when making and mounting EFI dirs and also
+        ## when installing grub. Just search for efi
+        EFI_MTPT=/mnt/boot/efi
+    else
+        DISKTABLE='MBR'
+    fi
+
     clear
 
     # Create the physical partitions
