@@ -278,6 +278,7 @@ arch-chroot /mnt passwd
 clear
 echo && echo "Enabling dhcpcd, sshd and NetworkManager services..." && echo
 arch-chroot /mnt pacman -S git openssh networkmanager dhcpcd man-db man-pages
+$(use_lvm) && arch-chroot /mnt pacman -S lvm2
 arch-chroot /mnt systemctl enable dhcpcd.service
 arch-chroot /mnt systemctl enable sshd.service
 arch-chroot /mnt systemctl enable NetworkManager.service
