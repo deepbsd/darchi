@@ -209,7 +209,6 @@ sleep 4
 clear && echo "Partitioning Installation Drive..." && sleep 3
 if $(use_lvm) ; then
     lvm_create
-    lvm_hooks
 else
     non_lvm_create
 fi
@@ -221,6 +220,9 @@ echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
 echo && echo "pacstrap system with base base-devel linux linux-headers linux-firmware vim..."
 pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
 echo && echo "Base system installed.  Press any key to continue..."; read empty
+
+## UPDATE mkinitrd HOOKS if using LVM
+$(use_lvm) && lvm_hooks
 
 # GENERATE FSTAB
 echo "Generating fstab..."
