@@ -150,19 +150,6 @@ else
     WIRELESSDRIVERS=""
 fi
 
-#if $(efi_boot_mode) ; then
-#    DISKTABLE='GPT'
-#    EFI_DEVICE=/dev/sda1
-#    EFI_SIZE=512M
-#    ## If you change the EFI_MTPT You must change
-#    ## it when making and mounting EFI dirs and also
-#    ## when installing grub. Just search for efi
-#    EFI_MTPT=/mnt/boot/efi
-#else
-#    DISKTABLE='MBR'
-#fi
-
-
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 FILESYSTEM=ext4
