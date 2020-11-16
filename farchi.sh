@@ -313,7 +313,7 @@ echo && echo "Password for $sudo_user?"
 arch-chroot /mnt passwd "$sudo_user"
 
 ## INSTALL WIFI
-clear && echo "Want to install $WIRELESSDRIVERS drivers?"; read wifi_yn
+clear && echo "Want to install Wireless drivers?"; read wifi_yn
 if [[ "$wifi_yn" =~ [yY] ]]; then
     #arch-chroot /mnt pacman -S broadcom-wl-dkms
     arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
