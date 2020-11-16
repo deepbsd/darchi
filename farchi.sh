@@ -3,6 +3,29 @@
 ###  Dave's Fast ARCH Installer
 
 ##########################################
+######     GLOBAL VARIABLS   #############
+##########################################
+
+## If you change display manager, in BASIC_X below, 
+## be sure to change when we enable display manager 
+## service at end of script
+
+HOSTNAME="effie5"
+IN_DEVICE=/dev/sda
+VIDEO_DRIVER="xf86-video-vmware"
+if $(use_bcm4360) ; then
+    WIRELESSDRIVERS="broadcom-wl-dkms"
+else
+    WIRELESSDRIVERS=""
+fi
+
+TIME_ZONE="America/New_York"
+LOCALE="en_US.UTF-8"
+FILESYSTEM=ext4
+DESKTOP=cinnamon
+
+
+##########################################
 ######       FUNCTIONS       #############
 ##########################################
  
@@ -151,24 +174,8 @@ lvm_create(){
 }
 
 ##########################################
-#####       GLOBAL VARIABLES        ######
+#####    MORE GLOBAL VARIABLES      ######
 ##########################################
-HOSTNAME="effie5"
-#IN_DEVICE=/dev/sda
-VIDEO_DRIVER="xf86-video-vmware"
-if $(use_bcm4360) ; then
-    WIRELESSDRIVERS="broadcom-wl-dkms"
-else
-    WIRELESSDRIVERS=""
-fi
-
-TIME_ZONE="America/New_York"
-LOCALE="en_US.UTF-8"
-FILESYSTEM=ext4
-DESKTOP=cinnamon
-
-## If you change display manager, be sure to change when
-## we enable display manager service at end of script
 
 ## These are packages required for a working Xorg desktop
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
@@ -346,7 +353,7 @@ if [[ "$DISKTABLE" =~ 'GPT' ]]; then
     arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
     echo "efi grub bootloader installed..."
 else
-    arch-chroot /mnt grub-install "$INSTALL_DEVICE"
+    arch-chroot /mnt grub-install "$IN_DEVICE"
     echo "mbr bootloader installed..."
 fi
 echo "configuring /boot/grub/grub.cfg..."
