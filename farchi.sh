@@ -325,7 +325,7 @@ sleep 5
 ## INSTALL GRUB
 clear
 echo "Installing grub..." && sleep 4
-arch-chroot /mnt pacman -S grub 
+arch-chroot /mnt pacman -S grub os-prober
 
 if [[ "$DISKTABLE" =~ 'GPT' ]]; then
     arch-chroot /mnt pacman -S efibootmgr
