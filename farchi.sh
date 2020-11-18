@@ -10,7 +10,7 @@
 ## be sure to change when we enable display manager 
 ## service at end of script
 
-HOSTNAME="effie5"
+HOSTNAME="effie1"
 IN_DEVICE=/dev/sda
 DISKTABLE=GPT
 VIDEO_DRIVER="xf86-video-vmware"
