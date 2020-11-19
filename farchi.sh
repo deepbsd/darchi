@@ -118,6 +118,8 @@ lvm_create(){
     HOME_SIZE=16G
     SWAP_SIZE=2G
 
+    ## This is set up in beginning of script, but without EFI_DEVICE or EFI_SIZE
+    ## Not sure whether to keep this here or not.  For now it stays.
     #if $(efi_boot_mode) ; then
     #    DISKTABLE='GPT'
     #    EFI_DEVICE=/dev/sda1
