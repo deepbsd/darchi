@@ -352,6 +352,9 @@ if [[ "$DISKTABLE" =~ 'GPT' ]]; then
     # /boot/efi should aready be mounted
     [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
     arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+    [[ $? != 0 ]] && arch-chroot /mnt grub-install \
+       "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB \
+       --efi-directory=/boot/efi --no-nvram --removable
     echo "efi grub bootloader installed..."
 else
     arch-chroot /mnt grub-install "$IN_DEVICE"
