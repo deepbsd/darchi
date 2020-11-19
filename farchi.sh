@@ -27,6 +27,7 @@ DESKTOP=cinnamon
 
 ### CHANGE ACCORDING TO PREFERENCE
 use_lvm(){ return 0; }  # return 0 if you want lvm
+## use_crypt is not available yet...
 use_crypt(){ return 1; }  # return 0 if you want crypt
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
