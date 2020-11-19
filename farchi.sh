@@ -14,11 +14,6 @@ HOSTNAME="effie1"
 IN_DEVICE=/dev/sda
 DISKTABLE="GPT"
 VIDEO_DRIVER="xf86-video-vmware"
-if $(use_bcm4360) ; then
-    WIRELESSDRIVERS="broadcom-wl-dkms"
-else
-    WIRELESSDRIVERS=""
-fi
 
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
@@ -31,6 +26,11 @@ use_lvm(){ return 0; }  # return 0 if you want lvm
 use_crypt(){ return 1; }  # return 0 if you want crypt
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
+if $(use_bcm4360) ; then
+    WIRELESSDRIVERS="broadcom-wl-dkms"
+else
+    WIRELESSDRIVERS=""
+fi
 ##########################################
 ######       FUNCTIONS       #############
 ##########################################
