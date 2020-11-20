@@ -4,7 +4,7 @@
 
 ### GLOBAL VARIABLES
 
-###  SEARCH FOR lv_create IF USING LVM: CHANGE THESE VARIABLES
+###  SEARCH FOR lv_create IF USING LVM: CHANGE THESE VARIABLES AS NEEDED
    # IN_DEVICE=/dev/nvme0n1
    # EFI_DEVICE=/dev/nvme0n1p1
    # ROOT_DEVICE=/dev/nvme0n1p2
@@ -20,6 +20,7 @@
 
 
 ##  ** Do NOT edit these! They are updated programmatically **
+##                        --- for non-lvm systems ---
 DISKTABLE=''
 IN_DEVICE=''
 EFI_SLICE=''
@@ -27,7 +28,7 @@ ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
 
-# GRAPHICS DRIVER
+# GRAPHICS DRIVER    ---  change as needed ---
 wifi_drivers=(broadcom-wl-dkms)
 
 # VOL GROUP VARIABLES
@@ -441,7 +442,7 @@ lvm_hooks(){
 }
 
 lv_create(){
-    ## Change if NOT installing on a VM...
+    ## Change if NOT installing on a VM..
     IN_DEVICE=/dev/sda
     EFI_DEVICE=/dev/sda1
     ROOT_DEVICE=/dev/sda2
