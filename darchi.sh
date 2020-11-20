@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 
-### Dave's Arch Installer -- execute from archiso 
-
-# KEYBOARD: default console keymap is US so no need to change
+### Dave's Arch Installer -- execute from archiso iso
 
 ### GLOBAL VARIABLES
+
+###  SEARCH FOR lv_create IF USING LVM: CHANGE THESE VARIABLES
+   # IN_DEVICE=/dev/sda
+   # EFI_DEVICE=/dev/sda1
+   # ROOT_DEVICE=/dev/sda2
+   # VOL_GROUP=arch_vg
+   # LV_ROOT="ArchRoot"
+   # LV_HOME="ArchHome"
+   # LV_SWAP="ArchSwap"
+
+   # EFI_SIZE=512M
+   # ROOT_SIZE=12G
+   # HOME_SIZE=16G
+   # SWAP_SIZE=2G
+
+
 ##  ** Do NOT edit these! They are updated programmatically **
 DISKTABLE=''
 IN_DEVICE=''
@@ -12,6 +26,9 @@ EFI_SLICE=''
 ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
+
+# GRAPHICS DRIVER
+wifi_drivers=(broadcom-wl-dkms)
 
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
@@ -47,8 +64,6 @@ basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock 
 extra_x=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
 graphics_driver=(xf86-video-vmware)
-
-wifi_drivers=(broadcom-wl-dkms)
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
