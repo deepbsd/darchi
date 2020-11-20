@@ -5,18 +5,18 @@
 ### GLOBAL VARIABLES
 
 ###  SEARCH FOR lv_create IF USING LVM: CHANGE THESE VARIABLES
-   # IN_DEVICE=/dev/sda
-   # EFI_DEVICE=/dev/sda1
-   # ROOT_DEVICE=/dev/sda2
+   # IN_DEVICE=/dev/nvme0n1
+   # EFI_DEVICE=/dev/nvme0n1p1
+   # ROOT_DEVICE=/dev/nvme0n1p2
    # VOL_GROUP=arch_vg
    # LV_ROOT="ArchRoot"
    # LV_HOME="ArchHome"
    # LV_SWAP="ArchSwap"
 
    # EFI_SIZE=512M
-   # ROOT_SIZE=12G
-   # HOME_SIZE=16G
-   # SWAP_SIZE=2G
+   # ROOT_SIZE=100G
+   # HOME_SIZE=     # ALL REMAINING SPACE
+   # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
 
 ##  ** Do NOT edit these! They are updated programmatically **
@@ -441,6 +441,7 @@ lvm_hooks(){
 }
 
 lv_create(){
+    ## Change if NOT installing on a VM...
     IN_DEVICE=/dev/sda
     EFI_DEVICE=/dev/sda1
     ROOT_DEVICE=/dev/sda2
