@@ -442,19 +442,23 @@ lvm_hooks(){
 }
 
 lv_create(){
-    ## Change if NOT installing on a VM..
-    IN_DEVICE=/dev/sda
-    EFI_DEVICE=/dev/sda1
-    ROOT_DEVICE=/dev/sda2
+    echo "What disk are you installing to? (nvme0n1, sda, sdb, etc)"; read disk
+    IN_DEVICE=/dev/"$disk"
+    echo "What partition is your EFI device? (nvme0n1p1, sda1, etc)"; read efi_dev
+    EFI_DEVICE=/dev/"$efi_dev"
+    echo "What partition is your Physical Device for your Volume Group?"; read root_dev
+    ROOT_DEVICE=/dev/"$root_dev"
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
     LV_HOME="ArchHome"
     LV_SWAP="ArchSwap"
 
     EFI_SIZE=512M
-    ROOT_SIZE=12G
-    HOME_SIZE=16G
-    SWAP_SIZE=2G
+    echo "How big is your root partition? (50G 100G, etc)"; root_size
+    ROOT_SIZE="$root_size"
+    echo "How big is your Swap partition?"; read swap_size
+    SWAP_SIZE="$swap_size"
+    #HOME_SIZE=16G
 
     clear
 
