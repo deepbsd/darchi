@@ -105,32 +105,23 @@ lvm_hooks(){
 
 # ONLY FOR LVM INSTALLATION
 lvm_create(){
-    IN_DEVICE=/dev/sda
-    EFI_DEVICE=/dev/sda1
-    PV_DEVICE=/dev/sda2
+    echo "What disk are you installing to? (nvme0n1, sda, sdb, etc)"; read disk
+    IN_DEVICE=/dev/"$disk"
+    echo "What partition is your EFI device? (nvme0n1p1, sda1, etc)"; read efi_dev
+    EFI_DEVICE=/dev/"$efi_dev"
+    echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
+    ROOT_DEVICE=/dev/"$root_dev"
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
     LV_HOME="ArchHome"
     LV_SWAP="ArchSwap"
 
-    EFI_SIZE=512M
-    ROOT_SIZE=12G
-    HOME_SIZE=16G
-    SWAP_SIZE=2G
-
-    ## This is set up in beginning of script, but without EFI_DEVICE or EFI_SIZE
-    ## Not sure whether to keep this here or not.  For now it stays.
-    #if $(efi_boot_mode) ; then
-    #    DISKTABLE='GPT'
-    #    EFI_DEVICE=/dev/sda1
-    #    EFI_SIZE=512M
-    #    ## If you change the EFI_MTPT You must change
-    #    ## it when making and mounting EFI dirs and also
-    #    ## when installing grub. Just search for efi
-    #    EFI_MTPT=/mnt/boot/efi
-    #else
-    #    DISKTABLE='MBR'
-    #fi
+    EFI_SIZE=512M   # I'll go ahead and make this size a static one
+    echo "How big is your root partition? (12G, 50G, 100G, etc)"; read rootsize
+    ROOT_SIZE="$rootsize"
+    echo "How big is your Swap partition?"; read swap_size
+    SWAP_SIZE="$swap_size"
+    #HOME_SIZE=16G
 
     clear
 
