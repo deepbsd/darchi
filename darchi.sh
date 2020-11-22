@@ -446,7 +446,7 @@ lv_create(){
     IN_DEVICE=/dev/"$disk"
     echo "What partition is your EFI device? (nvme0n1p1, sda1, etc)"; read efi_dev
     EFI_DEVICE=/dev/"$efi_dev"
-    echo "What partition is your Physical Device for your Volume Group?"; read root_dev
+    echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
     ROOT_DEVICE=/dev/"$root_dev"
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
