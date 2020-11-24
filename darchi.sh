@@ -40,7 +40,7 @@ LV_HOME="ArchHome"
 # PARTITION SIZES  (You can edit these if desired)
 EFI_SIZE=512M
 ROOT_SIZE=13G
-SWAP_SIZE=2G
+SWAP_SIZE=2G   # swap="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
 HOME_SIZE=12G   # This is set automatically if using LVM
 
 # You can edit this if you want
