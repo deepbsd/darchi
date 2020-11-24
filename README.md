@@ -5,10 +5,17 @@ booting the archiso ISO image.
 
 You can download it to your booted archiso image like this:
 
-`curl -O https://raw.githubusercontent.com/deepbsd/darchi/arch_install.sh`
+`curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/darchi.sh`
 
-It depends on *cfdisk* for editing the partition table.  *Cfdisk* seems to
+You can use *cfdisk* for editing the partition table.  *Cfdisk* seems to
 work just fine for me when editing GPT disks as well as MBR disks.  
+Or follow the on-screen promptings that ask how big you want the various
+partitions.  Darchi.sh is more interactive than Farchi.sh.  When you run
+darchi.sh, you get a menu system where you can install an Arch system to
+LVM or to regular partitions, using either an MBR or GPT disktable.  (The
+system simply looks for a directory which could only exist in an EFI system:
+`/sys/firmware/efi`; if this exists, you are running an EFI system. Otherwise
+you are running an MBR system.)
 
 The script makes a number of assumptions and is not as flexible as other
 tools.  For example, it assumes you'll want to edit your partitions.  You

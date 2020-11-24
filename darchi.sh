@@ -18,6 +18,19 @@
    # HOME_SIZE=     # ALL REMAINING SPACE
    # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
+   # populate the disks array for potential installation targets
+   : '    
+   DISKS=()
+   for d in $(lsblk | grep disk | awk '{printf "%s\n%s\n",$1,$4}'); do
+        DISKS+=($d)
+   done
+
+   max=${#DISKS[@]}
+   for ((n=0;n<$max;n+=2)); do
+        printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]}
+   done
+   '
+
 
 ##  ** Do NOT edit these! They are updated programmatically **
 ##                        --- for non-lvm systems ---
@@ -40,7 +53,7 @@ LV_HOME="ArchHome"
 # PARTITION SIZES  (You can edit these if desired)
 EFI_SIZE=512M
 ROOT_SIZE=13G
-SWAP_SIZE=2G   # swap="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
+SWAP_SIZE=2G   # SWAP_SIZE="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
 HOME_SIZE=12G   # This is set automatically if using LVM
 
 # You can edit this if you want
