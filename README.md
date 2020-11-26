@@ -42,7 +42,7 @@ Nov 13 2020 -- I've been working on adding LVM to the darchi.sh script.  It work
 vbox, but you have to set the sizes by hand.  I still have to figure a way to programmatically
 set the sizes...
 
-## The FARCHI script
+## The FARCHI Script
 
 I also created a script called farchi.sh for "Fast ARCH Installer".
 
@@ -51,3 +51,28 @@ You'll need to know things like the device names of your installation partitions
 hostname, your video driver, timezone, and then edit the BASIC\_X and EXTRA\_X arrays in bash to
 include your desktop selections and preferences. Also, if you need wifi drivers, 
 you'll need to edit that variable.
+
+## Next Steps
+
+I spent the last few days learning AWK. With that tool, I can calculate disk and memory sizes
+from a running linux system.  With that data, I can programmatically create partitions based on
+whether someone wants the ability to hibernate a system (which I tend to like) by create a swap
+partition that is 2.5 times the size of the available RAM.  Also, I tend to like a larger root partition
+so I don't have to keep cleaning out the package cache.  Or if I accumulate a few extra kernels in 
+/boot, I don't have to worry about overflowing the root partition.  For that reason, I tend to like
+root partitions of around 100GBs, and home partitions that contain the rest of the system.  You can
+easily install a linux system on a 10GB root partition, and most distros create around a 20-50GB 
+root partition by default.  If you're using LVM you can easily resize the LVs inside the PV (Physical
+Volume), but these days, your disk will probably be at least a half terabyte.  My music and video libraries
+do not take up more than 400GB, so why not give the root partition all of 100GB?  400GB for my home
+partition is plenty.  And if I need more, I can add other physical volumes to the Volume Group
+and mount them as required.
+
+Anyway, I want to implement auto partitioning according to four schemes:
+
+1) Partition with LVM and with hibernate
+2) Partition without LVM and with hibernate
+3) Partition with LVM and without hibernate
+4) Partition without LVM and without hibernate
+
+
