@@ -75,4 +75,5 @@ Anyway, I want to implement auto partitioning according to four schemes:
 3) Partition with LVM and without hibernate
 4) Partition without LVM and without hibernate
 
-
+After that, I think I can begin to use curses-based library so the graphical installation for darchi.sh
+is more attractive and easier for newer users.
