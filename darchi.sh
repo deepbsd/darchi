@@ -41,8 +41,11 @@ ROOT_SLICE=''
 HOME_SLICE=''
 SWAP_SLICE=''
 
-# GRAPHICS DRIVER    ---  change as needed ---
+# GRAPHICS DRIVERS ETC   ---  change as needed ---
 wifi_drivers=(broadcom-wl-dkms)
+graphics_driver=(xf86-video-vmware)
+display_mgr=(lightdm)
+all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
@@ -69,7 +72,7 @@ base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
 network_essentials=( dhcpcd openssh networkmanager )
 
-display_mgr=(lightdm)
+#display_mgr=(lightdm)
 
 my_services=( dhcpcd sshd NetworkManager lightdm )
 
@@ -77,7 +80,7 @@ basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock 
 
 extra_x=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
-graphics_driver=(xf86-video-vmware)
+#graphics_driver=(xf86-video-vmware)
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
@@ -100,7 +103,7 @@ multimedia_stuff=( eog shotwell imagemagick sox cmus mpg123 alsa-utils
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
-all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
+#all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 ##########################################
 ###########  FUNCTIONS ###################
