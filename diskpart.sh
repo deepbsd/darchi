@@ -8,7 +8,9 @@
 #  4) do you want LVM?    5) calculate swap
 
 RAM=()
-DISKS=( sdb 400G )
+DISKS=( sdb 400 )
+#DISKS=()
+hibernate='n'
 
 get_disks(){
    for d in $(lsblk | grep disk | awk '{printf "%s\n%s\n",$1,$4}'); do
@@ -22,7 +24,6 @@ get_disks(){
 }
 
 get_swap(){
-    hibernate='y'
     ram=$(free | grep Mem | awk '{print ($2/1000000)}')
     ram=16
     half=$(echo "scale=1;$ram*0.5" | bc)
@@ -31,9 +32,10 @@ get_swap(){
     one_pt_five=${one_pt_five%.*}
     case 1 in
         $(( $ram <= 2 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((ram*3)) || swap=$((ram*2)) ;;
-        $(( $ram <= 8 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((ram*2)) || swap=$ram ;;
-        $(( $ram <= 64 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((one_pt_five)) || swap=$((half)) ;;
-        $(( $ram > 64 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((half)) || swap=16  ;;
+        $(( $ram <= 8 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((ram*2)) || swap=$((ram)) ;;
+        $(( $ram <= 16 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((ram*2)) || swap=$((ram)) ;;
+        $(( $ram <= 32 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((ram*2)) || swap=$((ram)) ;;
+        $(( $ram > 32 )) ) [[ "$hibernate" =~ [yY] ]] && swap=$((one_pt_five)) || swap=$((half))  ;;
     esac
     echo "$swap"
 }
@@ -51,7 +53,8 @@ get_root(){
     echo "${size}"
 }
 
-get_disks | awk '{print $2}'
+echo "do you want to hibernate? "; read hibernate
+get_disks 
 get_swap 
 #get_root
 
