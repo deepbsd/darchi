@@ -41,16 +41,27 @@ get_swap(){
 }
 
 get_root(){
-    if [[ $(get_disks | awk '{print $2}') -le 30 ]]; then
-        size=12
-    elif [[ $(get_disks | awk '{print $2}') -le 50 ]]; then
-        size=20
-    elif [[ $(get_disks | awk '{print $2}') -le 100 ]]; then
-        size=75
+    if [[ ${#DISKS[@]} -le 2 ]]; then
+        if [[ $(get_disks | awk '{print $2}') -le 30 ]]; then
+            size=12
+        elif [[ $(get_disks | awk '{print $2}') -le 50 ]]; then
+            size=20
+        elif [[ $(get_disks | awk '{print $2}') -le 100 ]]; then
+            size=75
+        else
+            size=100
+        fi
+        echo "${size}"
     else
-        size=100
+        ## Still gotta work on this one...
+        echo "Which disk? "
+        max=${#DISKS[@]}
+        for ((n=0;n<$max;n+=2)); do
+             printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
+        done
+        read dsk
+
     fi
-    echo "${size}"
 }
 
 echo "do you want to hibernate? "; read hibernate
