@@ -60,7 +60,6 @@ get_root(){
              printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
         done
         read dsk
-
     fi
 }
 

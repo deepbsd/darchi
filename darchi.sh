@@ -506,6 +506,7 @@ lv_create(){
     # activate the vol group
     vgchange -ay
     # format the volumes
+    mkfs.fat -F32 "$EFI_DEVICE"
     mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_ROOT"
     mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_HOME"
     # mount the volumes
@@ -514,7 +515,7 @@ lv_create(){
     mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
-    mount /dev/sda1 /mnt/boot/efi
+    mount "$EFI_DEVICE" /mnt/boot/efi
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
     startmenu
