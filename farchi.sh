@@ -65,9 +65,9 @@ BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim )
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock "${DESKTOP[@]}" ${DISPLAY_MGR[dm]} firefox neofetch screenfetch )
 
 ## These are your specific choices for fonts and wallpapers and X-related goodies
-EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers powerline powerline-fonts powerline-vim )
 
-EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons powerline powerline-fonts powerline-vim )
+EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
 
 ##########################################
 ######       FUNCTIONS       #############
