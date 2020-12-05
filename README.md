@@ -77,3 +77,12 @@ Anyway, I want to implement auto partitioning according to four schemes:
 
 After that, I think I can begin to use curses-based library so the graphical installation for darchi.sh
 is more attractive and easier for newer users.
+
+## Concern
+
+Right now I have two separate methods for disk partitioning, one called lv\_create() and disk\_partition() I think.
+It's not called that but I can't think of the name right now.  Anyway, I should consolodate all that code
+so I'm not duplicating my efforts.  There should be one pipe that everything goes through.  Only thing different
+is making PVs, LVs, and VGs.  That's going to be different from just using physical partitions alone.  
+
+I should just consolodate a lot of that code!
