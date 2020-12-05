@@ -18,9 +18,9 @@ VIDEO_DRIVER="xf86-video-vmware"
 DISKTABLE='GPT'   # or 'MBR'
 IN_DEVICE=/dev/sda
 EFI_DEVICE=/dev/sda1
-ROOT_DEVICE=/dev/sda2  
-SWAP_DEVICE=/dev/sda3
-HOME_DEVICE=/dev/sda4
+ROOT_DEVICE=/dev/sda2  # only for non-LVM
+SWAP_DEVICE=/dev/sda3  # only for non-LVM 
+HOME_DEVICE=/dev/sda4  # only for non-LVM
 
 # VOLUME GROUPS
 PV_DEVICE="$ROOT_DEVICE"
@@ -32,7 +32,7 @@ LV_SWAP="ArchSwap"
 # PARTITION SIZES
 EFI_SIZE=512M
 SWAP_SIZE=2G
-ROOT_SIZE=12G
+ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
 
 # MOUNT POINTS
@@ -45,9 +45,8 @@ DESKTOP=('cinnamon' 'nemo-fileroller' 'lightdm-gtk-greeter')
 declare -A DISPLAY_MGR=( [dm]='lightdm' [service]='lightdm.service' )
 
 ### CHANGE ACCORDING TO PREFERENCE
-use_lvm(){ return 0; }  # return 0 if you want lvm
-## use_crypt is not available yet...
-use_crypt(){ return 1; }  # return 0 if you want crypt (not implemented yet)
+use_lvm(){ return 0; }       # return 0 if you want lvm
+use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 if $(use_bcm4360) ; then
@@ -331,9 +330,6 @@ arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
 arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
 arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
 echo "Enabling display manager service..."
-
-### CHANGE THIS IS YOU WANT A DIFFERENT DISPLAY MANAGER
-### ALSO, ALTER BASIC_X and EXTRA_X ACCORDINGLY
 
 arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
 echo && echo "Your desktop and display manager should now be installed..."
