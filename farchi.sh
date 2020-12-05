@@ -41,7 +41,8 @@ EFI_MTPT=/mnt/boot/efi
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 FILESYSTEM=ext4
-DESKTOP=cinnamon
+DESKTOP=('cinnamon' 'nemo-fileroller' 'lightdm-gtk-greeter')
+declare -A DISPLAY_MGR=( [dm]='lightdm' [service]='lightdm.service' )
 
 ### CHANGE ACCORDING TO PREFERENCE
 use_lvm(){ return 0; }  # return 0 if you want lvm
@@ -62,7 +63,7 @@ fi
 BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim )
 
 ## These are packages required for a working Xorg desktop
-BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
+BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock "${DESKTOP[@]}" ${DISPLAY_MGR[dm]} firefox neofetch screenfetch )
 
 ## These are your specific choices for fonts and wallpapers and X-related goodies
 EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
@@ -330,9 +331,11 @@ arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
 arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
 arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
 echo "Enabling display manager service..."
+
 ### CHANGE THIS IS YOU WANT A DIFFERENT DISPLAY MANAGER
 ### ALSO, ALTER BASIC_X and EXTRA_X ACCORDINGLY
-arch-chroot /mnt systemctl enable lightdm.service
+
+arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
 echo && echo "Your desktop and display manager should now be installed..."
 sleep 5
 
