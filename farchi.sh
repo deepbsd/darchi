@@ -11,9 +11,32 @@
 ## service at end of script
 
 HOSTNAME="effie1"
-IN_DEVICE=/dev/sda
 DISKTABLE="GPT"
 VIDEO_DRIVER="xf86-video-vmware"
+
+# DISK DEVICES and SLICES
+DISKTABLE='GPT'   # or 'MBR'
+IN_DEVICE=/dev/sda
+EFI_DEVICE=/dev/sda1
+ROOT_DEVICE=/dev/sda2  
+SWAP_DEVICE=/dev/sda3
+HOME_DEVICE=/dev/sda4
+
+# VOLUME GROUPS
+PV_DEVICE="$ROOT_DEVICE"
+VOL_GROUP="arch_vg"
+LV_ROOT="ArchRoot"
+LV_HOME="ArchHome"
+LV_SWAP="ArchSwap"
+
+# PARTITION SIZES
+EFI_SIZE=512M
+SWAP_SIZE=2G
+ROOT_SIZE=12G
+HOME_SIZE=    # Take whatever is left over after other partitions
+
+# MOUNT POINTS
+EFI_MTPT=/mnt/boot/efi
 
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
@@ -23,7 +46,7 @@ DESKTOP=cinnamon
 ### CHANGE ACCORDING TO PREFERENCE
 use_lvm(){ return 0; }  # return 0 if you want lvm
 ## use_crypt is not available yet...
-use_crypt(){ return 1; }  # return 0 if you want crypt
+use_crypt(){ return 1; }  # return 0 if you want crypt (not implemented yet)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 if $(use_bcm4360) ; then
@@ -31,6 +54,22 @@ if $(use_bcm4360) ; then
 else
     WIRELESSDRIVERS=""
 fi
+
+##################################################
+#####  SOFTWARE SETS: X, EXTRA_X, DESKTOPS  ######
+##################################################
+
+BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim )
+
+## These are packages required for a working Xorg desktop
+BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
+
+## These are your specific choices for fonts and wallpapers and X-related goodies
+EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+
+EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks 
+    nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
+
 ##########################################
 ######       FUNCTIONS       #############
 ##########################################
@@ -47,26 +86,25 @@ find_card(){
 }
 
 non_lvm_partition(){
-    IN_DEVICE=/dev/sda
     if $(efi_boot_mode) ; then
         DISKTABLE='GPT'
-        EFI_DEVICE=/dev/sda1
-        EFI_SIZE=512M
+        EFI_DEVICE="$EFI_DEVICE"
+        EFI_SIZE="$EFI_SIZE"
         ## If you change the EFI_MTPT You must change
         ## it when making and mounting EFI dirs and also
         ## when installing grub. Just search for efi
-        EFI_MTPT=/mnt/boot/efi
+        EFI_MTPT="$EFI_MTPT"
     else
-        DISKTABLE='MBR'
+        DISKTABLE="$DISKTABLE"
     fi
-    ROOT_DEVICE=/dev/sda2
-    SWAP_DEVICE=/dev/sda3
-    HOME_DEVICE=/dev/sda4
+    ROOT_DEVICE="$ROOT_DEVICE"
+    SWAP_DEVICE="$SWAP_DEVICE"
+    HOME_DEVICE="$HOME_DEVICE"
 
     # PARTITION SIZES
-    SWAP_SIZE=2G
-    ROOT_SIZE=12G
-    HOME_SIZE=
+    SWAP_SIZE="$SWAP_SIZE"
+    ROOT_SIZE="$ROOT_SIZE"
+    HOME_SIZE="$HOME_SIZE"
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
     sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
@@ -105,26 +143,7 @@ lvm_hooks(){
 
 # ONLY FOR LVM INSTALLATION
 lvm_create(){
-    echo "What disk are you installing to? (nvme0n1, sda, sdb, etc)"; read disk
-    IN_DEVICE=/dev/"$disk"
-    echo "What partition is your EFI device? (nvme0n1p1, sda1, etc)"; read efi_dev
-    EFI_DEVICE=/dev/"$efi_dev"
-    echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
-    ROOT_DEVICE=/dev/"$root_dev"
-    VOL_GROUP=arch_vg
-    LV_ROOT="ArchRoot"
-    LV_HOME="ArchHome"
-    LV_SWAP="ArchSwap"
-
-    EFI_SIZE=512M   # I'll go ahead and make this size a static one
-    echo "How big is your root partition? (12G, 50G, 100G, etc)"; read rootsize
-    ROOT_SIZE="$rootsize"
-    echo "How big is your Swap partition?"; read swap_size
-    SWAP_SIZE="$swap_size"
-    #HOME_SIZE=16G
-
     clear
-
     # Create the physical partitions
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
@@ -161,24 +180,12 @@ lvm_create(){
     mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
     # mount the EFI partitions
     mkdir /mnt/boot && mkdir /mnt/boot/efi
-    mount /dev/sda1 /mnt/boot/efi
+    mount "$EFI_DEVICE" "$EFI_MTPT"
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
     startmenu
 }
 
-##########################################
-#####  MORE GLOBAL VARIABLES FOR X  ######
-##########################################
-
-## These are packages required for a working Xorg desktop
-BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock cinnamon nemo-fileroller lightdm xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter)
-
-## These are your specific choices for fonts and wallpapers and X-related goodies
-EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
-
-EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks 
-    nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
 
 ##########################################
 ##        SCRIPT STARTS HERE
@@ -230,8 +237,8 @@ fi
 ## INSTALL BASE SYSTEM
 clear
 echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
-echo && echo "pacstrap system with base base-devel linux linux-headers linux-firmware vim..."
-pacstrap /mnt base base-devel linux linux-headers linux-firmware vim 
+echo && echo "${BASE_SYSTEM[@]}"
+pacstrap /mnt "${BASE_SYSTEM[@]}"
 echo && echo "Base system installed.  Press any key to continue..."; read empty
 
 ## UPDATE mkinitrd HOOKS if using LVM
@@ -252,7 +259,6 @@ echo && echo "Edit /etc/fstab?"; read edit_fstab
 ## SET UP TIMEZONE AND LOCALE
 clear
 echo && echo "setting timezone to $TIME_ZONE..."
-#arch-chroot /mnt ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$TIME_ZONE" /etc/localtime
 arch-chroot /mnt hwclock --systohc --utc
 arch-chroot /mnt date
@@ -314,13 +320,8 @@ echo && echo "Password for $sudo_user?"
 arch-chroot /mnt passwd "$sudo_user"
 
 ## INSTALL WIFI
-clear && echo "Want to install Wireless drivers?"; read wifi_yn
-if [[ "$wifi_yn" =~ [yY] ]]; then
-    #arch-chroot /mnt pacman -S broadcom-wl-dkms
-    arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
-    [[ "$?" -eq 0 ]] && echo "Wifi Driver successfully installed!"; sleep 5
-fi
-
+$(use_bcm4360) && arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
+[[ "$?" -eq 0 ]] && echo "Wifi Driver successfully installed!"; sleep 5
 
 ## INSTALL X AND DESKTOP
 clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
@@ -345,6 +346,7 @@ if [[ "$DISKTABLE" =~ 'GPT' ]]; then
     # /boot/efi should aready be mounted
     [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
     arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+    ## This next bit is for Ryzen systems with weird BIOS/EFI issues; --no-nvram and --removable might help
     [[ $? != 0 ]] && arch-chroot /mnt grub-install \
        "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB \
        --efi-directory=/boot/efi --no-nvram --removable
