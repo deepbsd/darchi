@@ -71,6 +71,20 @@ EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks ni
 
 GOODIES=( htop neofetch screenfetch powerline powerline-fonts powerline-vim )
 
+## -----------  Some of these are included, but it's all up to you...
+xfce_desktop=( xfce4 xfce4-goodies )
+
+mate_desktop=( mate mate-extra )
+
+i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks nitrogen i3status ttf-font-awesome ttf-ionicons )
+
+## Python3 should be installed by default
+devel_stuff=( git nodejs npm npm-check-updates ruby )
+
+printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
+
+multimedia_stuff=( brasero cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
+
 ##########################################
 ######       FUNCTIONS       #############
 ##########################################
