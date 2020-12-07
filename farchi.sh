@@ -104,41 +104,58 @@ multimedia_stuff=( brasero cheese eog shotwell imagemagick sox cmus mpg123 alsa-
 ######       FUNCTIONS       #############
 ##########################################
  
+# All purpose error
+error(){ echo "Error: $1" && exit 1; }
+
 # FIND GRAPHICS CARD
 find_card(){
     card=$(lspci | grep VGA | sed 's/^.*: //g')
     echo "You're using a $card" && echo
 }
 
+format_it(){
+    device=$1; fstype=$2
+    mkfs."$fstype" "$device" || exit 1
+}
+
+mount_it(){
+    device=$1; mt_pt=$2
+    mount "$device" "$mt_pt" || exit 1
+}
+
 non_lvm_partition(){
-    # We know we're just doing partitions, no LVM here
+    # We're just doing partitions, no LVM here
     if $(efi_boot_mode); then
         sgdisk -Z "$IN_DEVICE"
         sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
         sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
         sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
         sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+       
+        # Format and mount slices for EFI
+        format_it "$ROOT_DEVICE" "$FILESYSTEM"
+        mount_it "$ROOT_DEVICE" /mnt
+        format_it "$EFI_DEVICE" "fat -F32"
+        mkdir /mnt/boot && mkdir /mnt/boot/efi
+        mount_it "$EFI_DEVICE" "$EFI_MTPT"
+        format_it "$HOME_DEVICE" "$FILESYSTEM"
+        mkdir /mnt/home
+        mount_it "$HOME_DEVICE" /mnt/home
+        mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
+        # For non-EFI systems
         sgdisk -Z "$IN_DEVICE"
         sgdisk -n 1::+"$ROOT_SIZE" -t 1:8300 -c 1:ROOT "$IN_DEVICE"
         sgdisk -n 2::+"$SWAP_SIZE" -t 2:8200 -c 2:SWAP "$IN_DEVICE"
         sgdisk -n 3 -c 3:HOME "$IN_DEVICE"
-    fi
 
-    mkfs."$FILESYSTEM" "$ROOT_DEVICE"
-    mount "$ROOT_DEVICE" /mnt
-    if [[ $(efi_boot_mode) && -n $EFI_DEVICE ]] ; then
-        mkfs.fat -F32 "$EFI_DEVICE" 
-        ### script assumes efi mounted at /mnt/boot/efi for now
-        mkdir /mnt/boot
-        mkdir /mnt/boot/efi 
-        ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
-    fi
-    if [[ "$SWAP_DEVICE" != "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
-    if [[ "$HOME_DEVICE" != "" ]]; then
-        mkfs."$FILESYSTEM" "$HOME_DEVICE"
+        # Format and mount slices for non-EFI
+        format_it "$ROOT_DEVICE" "$FILESYSTEM"
+        mount_it "$ROOT_DEVICE" /mnt
+        format_it "$HOME_DEVICE" "$FILESYSTEM"
         mkdir /mnt/home
-        mount "$HOME_DEVICE" /mnt/home
+        mount_it "$HOME_DEVICE" /mnt/home
+        mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     fi
 
     lsblk "$IN_DEVICE"
