@@ -35,9 +35,10 @@ if [[ "$DISKTABLE" =~ 'GPT' && $(efi_boot_mode) ]] ; then
     HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
 else
     unset EFI_DEVICE
-    ROOT_DEVICE="${IN_DEVICE}1"
-    SWAP_DEVICE="${IN_DEVICE}2"  # only for non-LVM 
-    HOME_DEVICE="${IN_DEVICE}3"  # only for non-LVM
+    BOOT_DEVICE="${IN_DEVICE}1"
+    ROOT_DEVICE="${IN_DEVICE}2"
+    SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
+    HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
 fi
 
 # VOLUME GROUPS
@@ -143,13 +144,17 @@ non_lvm_partition(){
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
         # For non-EFI systems
-        sgdisk -n 1::+"$ROOT_SIZE" -t 1:8300 -c 1:ROOT "$IN_DEVICE"
-        sgdisk -n 2::+"$SWAP_SIZE" -t 2:8200 -c 2:SWAP "$IN_DEVICE"
-        sgdisk -n 3 -c 3:HOME "$IN_DEVICE"
+        sgdisk -n 1::+500MB -t 1:8300 1:8300 -c 1:BOOT "$IN_DEVICE"
+        sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+        sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+        sgdisk -n 4 -c 3:HOME "$IN_DEVICE"
 
         # Format and mount slices for non-EFI
         format_it "$ROOT_DEVICE" "$FILESYSTEM"
         mount_it "$ROOT_DEVICE" /mnt
+        format_it "$BOOT_DEVICE" "$FILESYSTEM"
+        mkdir /mnt/boot
+        mount_it "$BOOT_DEVICE" /mnt/boot
         format_it "$HOME_DEVICE" "$FILESYSTEM"
         mkdir /mnt/home
         mount_it "$HOME_DEVICE" /mnt/home
@@ -181,7 +186,8 @@ lvm_create(){
         format_it "$EFI_DEVICE" "fat -F32"
     else
         # Create the slice for the Volume Group as first and only slice
-        sgdisk -n 1 -t 1:8e00 -c 1:VOLGROUP "$IN_DEVICE"
+        sgdisk -n 1 -t 1:8e00 -c 2:BOOT "$IN_DEVICE"
+        sgdisk -n 2 -t 2:8e00 -c 1:VOLGROUP "$IN_DEVICE"
     fi
     
     # create the physical volumes
@@ -205,10 +211,13 @@ lvm_create(){
     # activate the vol group
     vgchange -ay
     
+    format_it "$BOOT_DEVICE" "$FILESYSTEM"
     format_it /dev/"$VOL_GROUP"/"$LV_ROOT" "$FILESYSTEM"
     format_it /dev/"$VOL_GROUP"/"$LV_HOME" "$FILESYSTEM"
     # mount the volumes
     mount_it /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
+    mkdir /mnt/boot
+    mount_it "$BOOT_DEVICE" /mnt/boot
     mkdir /mnt/home
     mount_it /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
     # mount the EFI partition
