@@ -3,24 +3,43 @@
 ###  Dave's Fast ARCH Installer
 
 ##########################################
-######     GLOBAL VARIABLS   #############
+######     GLOBAL PREFERENCES   ##########
 ##########################################
 
 ## If you change display manager, in BASIC_X below, 
 ## be sure to change when we enable display manager 
 ## service at end of script
 
-HOSTNAME="effie1"
-DISKTABLE="GPT"
+# VERIFY BOOT MODE
+efi_boot_mode(){
+    ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
+}
+
+### CHANGE ACCORDING TO PREFERENCE
+use_lvm(){ return 0; }       # return 0 if you want lvm
+use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
+use_bcm4360() { return 1; }  # return 0 if you want bcm4360
+
+HOSTNAME="marbie1"
+
+( $(efi_boot_mode) && DISKTABLE="GPT" ) || DISKTABLE="MBR"
+
 VIDEO_DRIVER="xf86-video-vmware"
 
 # DISK DEVICES and SLICES
-DISKTABLE='GPT'   # or 'MBR'
 IN_DEVICE=/dev/sda
-EFI_DEVICE=/dev/sda1
-ROOT_DEVICE=/dev/sda2  # only for non-LVM
-SWAP_DEVICE=/dev/sda3  # only for non-LVM 
-HOME_DEVICE=/dev/sda4  # only for non-LVM
+
+if [[ "$DISKTABLE" =~ 'GPT' && $(efi_boot_mode) ]] ; then
+    EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
+    ROOT_DEVICE="${IN_DEVICE}2"  # only for non-LVM
+    SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
+    HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
+else
+    unset EFI_DEVICE
+    ROOT_DEVICE="${IN_DEVICE}1"
+    SWAP_DEVICE="${IN_DEVICE}2"  # only for non-LVM 
+    HOME_DEVICE="${IN_DEVICE}3"  # only for non-LVM
+fi
 
 # VOLUME GROUPS
 PV_DEVICE="$ROOT_DEVICE"
@@ -44,10 +63,6 @@ FILESYSTEM=ext4
 DESKTOP=('cinnamon' 'nemo-fileroller' 'lightdm-gtk-greeter')
 declare -A DISPLAY_MGR=( [dm]='lightdm' [service]='lightdm.service' )
 
-### CHANGE ACCORDING TO PREFERENCE
-use_lvm(){ return 0; }       # return 0 if you want lvm
-use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
-use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 if $(use_bcm4360) ; then
     WIRELESSDRIVERS="broadcom-wl-dkms"
@@ -89,11 +104,6 @@ multimedia_stuff=( brasero cheese eog shotwell imagemagick sox cmus mpg123 alsa-
 ######       FUNCTIONS       #############
 ##########################################
  
-# VERIFY BOOT MODE
-efi_boot_mode(){
-    ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
-}
-
 # FIND GRAPHICS CARD
 find_card(){
     card=$(lspci | grep VGA | sed 's/^.*: //g')
@@ -101,34 +111,23 @@ find_card(){
 }
 
 non_lvm_partition(){
-    if $(efi_boot_mode) ; then
-        DISKTABLE='GPT'
-        EFI_DEVICE="$EFI_DEVICE"
-        EFI_SIZE="$EFI_SIZE"
-        ## If you change the EFI_MTPT You must change
-        ## it when making and mounting EFI dirs and also
-        ## when installing grub. Just search for efi
-        EFI_MTPT="$EFI_MTPT"
+    # We know we're just doing partitions, no LVM here
+    if $(efi_boot_mode); then
+        sgdisk -Z "$IN_DEVICE"
+        sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+        sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+        sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+        sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
     else
-        DISKTABLE="$DISKTABLE"
+        sgdisk -Z "$IN_DEVICE"
+        sgdisk -n 1::+"$ROOT_SIZE" -t 1:8300 -c 1:ROOT "$IN_DEVICE"
+        sgdisk -n 2::+"$SWAP_SIZE" -t 2:8200 -c 2:SWAP "$IN_DEVICE"
+        sgdisk -n 3 -c 3:HOME "$IN_DEVICE"
     fi
-    ROOT_DEVICE="$ROOT_DEVICE"
-    SWAP_DEVICE="$SWAP_DEVICE"
-    HOME_DEVICE="$HOME_DEVICE"
-
-    # PARTITION SIZES
-    SWAP_SIZE="$SWAP_SIZE"
-    ROOT_SIZE="$ROOT_SIZE"
-    HOME_SIZE="$HOME_SIZE"
-    sgdisk -Z "$IN_DEVICE"
-    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
-    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-    sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
 
     mkfs."$FILESYSTEM" "$ROOT_DEVICE"
     mount "$ROOT_DEVICE" /mnt
-    if [[ "$EFI_DEVICE" != "" ]] ; then
+    if [[ $(efi_boot_mode) && -n $EFI_DEVICE ]] ; then
         mkfs.fat -F32 "$EFI_DEVICE" 
         ### script assumes efi mounted at /mnt/boot/efi for now
         mkdir /mnt/boot
@@ -342,11 +341,13 @@ $(use_bcm4360) && arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
 clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
 arch-chroot /mnt pacman -S "${BASIC_X[@]}"
 arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
+your_card=$(find_card)
+echo "${your_card} and you're installing the $VIDEO_DRIVER driver... (Type key to continue) "; read blah
 arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
 arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
 arch-chroot /mnt pacman -S "${GOODIES[@]}"
-echo "Enabling display manager service..."
 
+echo "Enabling display manager service..."
 arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
 echo && echo "Your desktop and display manager should now be installed..."
 sleep 5
