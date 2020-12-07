@@ -49,14 +49,13 @@ LV_HOME="ArchHome"
 LV_SWAP="ArchSwap"
 
 # PARTITION SIZES
-EFI_SIZE=512M
+( $(efi_boot_mode) && EFI_SIZE=512M ) || unset EFI_SIZE
 SWAP_SIZE=2G
 ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
 
 # MOUNT POINTS
-EFI_MTPT=/mnt/boot/efi
-
+( $(efi_boot_mode) && EFI_MTPT=/mnt/boot/efi ) || unset EFI_MTPT
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 FILESYSTEM=ext4
@@ -242,7 +241,7 @@ done
 
 ##  check if reflector update is done...
 clear
-echo "checking if reflector has finished updating mirrorlist yet..."
+echo "Waiting until reflector has finished updating mirrorlist..."
 while true; do
     pgrep -x reflector &>/dev/null || break
     echo -n '.'
