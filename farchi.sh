@@ -10,7 +10,7 @@
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
-    ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
+    ( $(ls /sys/firmware/efi/efivars 2&>/dev/null) && return 0 ) || return 1
 }
 
 ### CHANGE ACCORDING TO PREFERENCE
