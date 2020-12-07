@@ -179,20 +179,13 @@ lvm_create(){
     if $(efi_boot_mode); then
         sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
         sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
-        # Format and Mount
+        # Format
         format_it "$EFI_DEVICE" "fat -F32"
-        mount_it "$EFI_DEVICE" "$EFI_MTPT"
-
     else
-        echo
+        # Create the slice for the Volume Group as first and only slice
+        sgdisk -n 1 -t 1:8e00 -c 1:VOLGROUP "$IN_DEVICE"
     fi
-    # Create the physical partitions
-    sgdisk -Z "$IN_DEVICE"
-    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
-    # Format the EFI partition
-    mkfs.fat -F32 "$EFI_DEVICE"
-
+    
     # create the physical volumes
     pvcreate "$PV_DEVICE"
     # create the volume group
@@ -213,16 +206,18 @@ lvm_create(){
     modprobe dm_mod
     # activate the vol group
     vgchange -ay
-    # format the volumes
-    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_ROOT"
-    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_HOME"
+    
+    format_it /dev/"$VOL_GROUP"/"$LV_ROOT" "$FILESYSTEM"
+    format_it /dev/"$VOL_GROUP"/"$LV_HOME" "$FILESYSTEM"
     # mount the volumes
-    mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
+    mount_it /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
     mkdir /mnt/home
-    mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
-    # mount the EFI partitions
-    mkdir /mnt/boot && mkdir /mnt/boot/efi
-    mount "$EFI_DEVICE" "$EFI_MTPT"
+    mount_it /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
+    # mount the EFI partition
+    if $(efi_boot_mode) ; then
+        mkdir /mnt/boot && mkdir /mnt/boot/efi
+        mount_it "$EFI_DEVICE" "$EFI_MTPT"
+    fi
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
     startmenu
@@ -385,11 +380,12 @@ clear
 echo "Installing grub..." && sleep 4
 arch-chroot /mnt pacman -S grub os-prober
 
-if [[ "$DISKTABLE" =~ 'GPT' ]]; then
+if [[ $(efi_boot_mode) && -n $EFI_DEVICE ]]; then
     arch-chroot /mnt pacman -S efibootmgr
-    # /boot/efi should aready be mounted
-    [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
+    
+    [[ ! -d /mnt/boot/efi ]] && error "Grub Install: no /mnt/boot/efi directory!!!" 
     arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+
     ## This next bit is for Ryzen systems with weird BIOS/EFI issues; --no-nvram and --removable might help
     [[ $? != 0 ]] && arch-chroot /mnt grub-install \
        "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB \
