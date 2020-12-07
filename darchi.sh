@@ -42,7 +42,7 @@ HOME_SLICE=''
 SWAP_SLICE=''
 
 # GRAPHICS DRIVERS ETC   ---  change as needed ---
-wifi_drivers=(broadcom-wl-dkms)
+wifi_drivers=(broadcom-wl-dkms iwd)
 graphics_driver=(xf86-video-vmware)
 display_mgr=(lightdm)
 all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
