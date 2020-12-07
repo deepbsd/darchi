@@ -4,7 +4,7 @@
 
 ## PERSONAL DIRECTORIES AND RESOURCES
 echo "Making personal subdirectories..."
-mkdir tmp repos build
+mkdir tmp repos build 
 echo "Download home directory files from what host on network?"; read whathost
 scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
 

@@ -6,9 +6,7 @@
 ######     GLOBAL PREFERENCES   ##########
 ##########################################
 
-## If you change display manager, in BASIC_X below, 
-## be sure to change when we enable display manager 
-## service at end of script
+## Actual script begins around line 220 or so
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
@@ -16,6 +14,7 @@ efi_boot_mode(){
 }
 
 ### CHANGE ACCORDING TO PREFERENCE
+install_x()( return 1; )       # return 0 if you want to install X
 use_lvm(){ return 0; }       # return 0 if you want lvm
 use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
@@ -359,20 +358,22 @@ arch-chroot /mnt passwd "$sudo_user"
 $(use_bcm4360) && arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
 [[ "$?" -eq 0 ]] && echo "Wifi Driver successfully installed!"; sleep 5
 
-## INSTALL X AND DESKTOP
-clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
-arch-chroot /mnt pacman -S "${BASIC_X[@]}"
-arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
-your_card=$(find_card)
-echo "${your_card} and you're installing the $VIDEO_DRIVER driver... (Type key to continue) "; read blah
-arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
-arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
-arch-chroot /mnt pacman -S "${GOODIES[@]}"
+## INSTALL X AND DESKTOP  
+if $(install_x); then
+    clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
+    arch-chroot /mnt pacman -S "${BASIC_X[@]}"
+    arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
+    your_card=$(find_card)
+    echo "${your_card} and you're installing the $VIDEO_DRIVER driver... (Type key to continue) "; read blah
+    arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
+    arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
+    arch-chroot /mnt pacman -S "${GOODIES[@]}"
 
-echo "Enabling display manager service..."
-arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
-echo && echo "Your desktop and display manager should now be installed..."
-sleep 5
+    echo "Enabling display manager service..."
+    arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
+    echo && echo "Your desktop and display manager should now be installed..."
+    sleep 5
+fi
 
 ## INSTALL GRUB
 clear
