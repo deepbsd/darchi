@@ -125,8 +125,9 @@ mount_it(){
 
 non_lvm_partition(){
     # We're just doing partitions, no LVM here
+    clear
+    sgdisk -Z "$IN_DEVICE"
     if $(efi_boot_mode); then
-        sgdisk -Z "$IN_DEVICE"
         sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
         sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
         sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
@@ -144,7 +145,6 @@ non_lvm_partition(){
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
         # For non-EFI systems
-        sgdisk -Z "$IN_DEVICE"
         sgdisk -n 1::+"$ROOT_SIZE" -t 1:8300 -c 1:ROOT "$IN_DEVICE"
         sgdisk -n 2::+"$SWAP_SIZE" -t 2:8200 -c 2:SWAP "$IN_DEVICE"
         sgdisk -n 3 -c 3:HOME "$IN_DEVICE"
@@ -175,6 +175,17 @@ lvm_hooks(){
 # ONLY FOR LVM INSTALLATION
 lvm_create(){
     clear
+    sgdisk -Z "$IN_DEVICE"
+    if $(efi_boot_mode); then
+        sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+        sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
+        # Format and Mount
+        format_it "$EFI_DEVICE" "fat -F32"
+        mount_it "$EFI_DEVICE" "$EFI_MTPT"
+
+    else
+        echo
+    fi
     # Create the physical partitions
     sgdisk -Z "$IN_DEVICE"
     sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
