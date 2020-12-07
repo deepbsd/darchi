@@ -1,7 +1,7 @@
 # DARCHI    Dave's Arch Linux Installer
 
 This is just a personal script, very very simple, to install Arch Linux after
-booting the archiso ISO image.
+booting the archiso ISO image.  (It started off as being really simple, anyway.)
 
 You can download it to your booted archiso image like this:
 
@@ -44,13 +44,21 @@ set the sizes...
 
 ## The FARCHI Script
 
-I also created a script called farchi.sh for "Fast ARCH Installer".
+I also created a script called farchi.sh for "Fast ARCH Installer".  This was supposed
+to be a bone simple script that you could edit and get installed fast with.  It's longer
+now, since I tend to like LVM.  But I have a mix of both EFI and non-EFI machines, so 
+I've had to build some intelligence into the script at the expense of more lines of code!
 
-With this script you type in the installation variables at the top of the script.
+With this script you set the installation variables at the top of the script.
 You'll need to know things like the device names of your installation partitions and
 hostname, your video driver, timezone, and then edit the BASIC\_X and EXTRA\_X arrays in bash to
 include your desktop selections and preferences. Also, if you need wifi drivers, 
-you'll need to edit that variable.
+you'll need to edit that variable.  Also, the script can figure out whether you have an 
+EFI or system or not, but you need to decide whether you want to use LVM or not.
+
+You can download it to your booted archiso image like this:
+
+`curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/farchi.sh`
 
 ## Next Steps
 
