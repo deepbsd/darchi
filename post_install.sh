@@ -11,6 +11,10 @@ scp -r dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wallp
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
 
+## CHECK FOR OLD FAITHFULS
+$(which gkrellm) || sudo pacman -S gkrellm
+[[ -f /opt/anaconda/bin/anaconda-navigator ]] || yay -S anaconda
+
 ## INSTALL POWERLINE AND DEV STUFF 
 sudo pacman -S  ruby nodejs npm npm-check-updates gvim mlocate gkrellm
 
