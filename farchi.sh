@@ -30,12 +30,14 @@ IN_DEVICE=/dev/sda
 
 if [[ "$DISKTABLE" =~ 'GPT' && $(efi_boot_mode) ]] ; then
     EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
+    EFI_MTPT=/mnt/boot/efi
     ROOT_DEVICE="${IN_DEVICE}2"  # only for non-LVM
     SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
     HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
 else
     unset EFI_DEVICE
     BOOT_DEVICE="${IN_DEVICE}1"
+    BOOT_MTPT=/boot
     ROOT_DEVICE="${IN_DEVICE}2"
     SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
     HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
@@ -54,7 +56,6 @@ SWAP_SIZE=2G
 ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
 
-# MOUNT POINTS
 ( $(efi_boot_mode) && EFI_MTPT=/mnt/boot/efi ) || unset EFI_MTPT
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
