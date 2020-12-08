@@ -10,7 +10,8 @@
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
-    ( $(ls /sys/firmware/efi/efivars 2&>/dev/null) && return 0 ) || return 1
+    [[ -d /sys/firmware/efi/efivars ]] && return 0
+    return 1
 }
 
 ### CHANGE ACCORDING TO PREFERENCE
@@ -37,7 +38,7 @@ if [[ "$DISKTABLE" =~ 'GPT' && $(efi_boot_mode) ]] ; then
 else
     unset EFI_DEVICE
     BOOT_DEVICE="${IN_DEVICE}1"
-    BOOT_MTPT=/boot
+    BOOT_MTPT=/mnt/boot
     ROOT_DEVICE="${IN_DEVICE}2"
     SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
     HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
@@ -145,7 +146,8 @@ non_lvm_partition(){
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
         # For non-EFI systems
-        sgdisk -n 1::+500MB -t 1:8300 1:8300 -c 1:BOOT "$IN_DEVICE"
+        # sgdisk -p "$IN_DEVICE" ; echo "Press any key to continue..." ; read sgdiskwait
+        sgdisk -n 1::+500M -t 1:8300 1:8300 -c 1:BOOT "$IN_DEVICE"
         sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
         sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
         sgdisk -n 4 -c 3:HOME "$IN_DEVICE"
@@ -155,7 +157,7 @@ non_lvm_partition(){
         mount_it "$ROOT_DEVICE" /mnt
         format_it "$BOOT_DEVICE" "$FILESYSTEM"
         mkdir /mnt/boot
-        mount_it "$BOOT_DEVICE" /mnt/boot
+        mount_it "$BOOT_DEVICE" "$BOOT_MTPT"
         format_it "$HOME_DEVICE" "$FILESYSTEM"
         mkdir /mnt/home
         mount_it "$HOME_DEVICE" /mnt/home
