@@ -75,7 +75,7 @@ fi
 #####  SOFTWARE SETS: X, EXTRA_X, DESKTOPS  ######
 ##################################################
 
-BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim )
+BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim iwd )
 
 ## These are packages required for a working Xorg desktop
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock "${DESKTOP[@]}" ${DISPLAY_MGR[dm]} firefox )
