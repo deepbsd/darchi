@@ -186,7 +186,7 @@ lvm_create(){
         format_it "$EFI_DEVICE" "fat -F32"
     else
         # Create the slice for the Volume Group as first and only slice
-        sgdisk -n 1 -t 1:8e00 -c 2:BOOT "$IN_DEVICE"
+        sgdisk -n 1 -t 1:8300 -c 2:BOOT "$IN_DEVICE"
         sgdisk -n 2 -t 2:8e00 -c 1:VOLGROUP "$IN_DEVICE"
     fi
     
