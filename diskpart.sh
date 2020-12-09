@@ -8,24 +8,37 @@
 #  4) do you want LVM?    5) calculate swap
 
 RAM=()
-DISKS=( sdb 400 )
-#DISKS=()
+#DISKS=( sdb 400 )
+DISKS=()
+declare -A disk_hash
 hibernate='n'
 
 get_disks(){
-   for d in $(lsblk | grep disk | awk '{printf "%s\n%s\n",$1,$4}'); do
-        DISKS+=($d)
+   for line in $(lsblk | grep disk | awk '{ part=$1; size=$4; print part, size; }'); do
+       echo "line:  $line"
+        part=$(echo $line | awk '{print $1}')
+        capacity=$(echo $line | awk '{print $2}')
+        disk_hash[name]=$part  
+        disk_hash[size]=$capacity 
+        echo "part: ${disk_hash[name]}  size: ${disk_hash[capacity]}"
+        DISKS+=( "$disk_hash" )
    done
 
-   max=${#DISKS[@]}
-   for ((n=0;n<$max;n+=2)); do
-        printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
-   done
+   #for dsk in "${DISKS[@]}"; do
+   #     echo "$dsk"
+   #done
+
+   echo "FIRST:  ${DISKS[0]}"
+
+   #max=${#DISKS[@]}
+   #for ((n=0;n<$max;n+=2)); do
+   #     printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
+   #done
 }
 
 get_swap(){
     ram=$(free | grep Mem | awk '{print ($2/1000000)}')
-    ram=16
+    ram=${ram%.*}
     half=$(echo "scale=1;$ram*0.5" | bc)
     half=${half%.*}
     one_pt_five=$(echo "scale=1;$ram*1.5" | bc)
@@ -60,11 +73,12 @@ get_root(){
              printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
         done
         read dsk
+        echo "${DISKS[${dsk}]}"
     fi
 }
 
 echo "do you want to hibernate? "; read hibernate
 get_disks 
-get_swap 
+#get_swap 
 #get_root
 
