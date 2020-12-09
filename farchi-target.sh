@@ -3,24 +3,46 @@
 ###  Dave's Fast ARCH Installer
 
 ##########################################
-######     GLOBAL VARIABLS   #############
+######     GLOBAL PREFERENCES   ##########
 ##########################################
 
-## If you change display manager, in BASIC_X below, 
-## be sure to change when we enable display manager 
-## service at end of script
+## Actual script begins around line 220 or so
+
+# VERIFY BOOT MODE
+efi_boot_mode(){
+    [[ -d /sys/firmware/efi/efivars ]] && return 0
+    return 1
+}
+
+### CHANGE ACCORDING TO PREFERENCE
+install_x()( return 0; )       # return 0 if you want to install X
+use_lvm(){ return 0; }       # return 0 if you want lvm
+use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
+use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 HOSTNAME="peanut"
-DISKTABLE="GPT"
+
+( $(efi_boot_mode) && DISKTABLE="GPT" ) || DISKTABLE="MBR"
+
 VIDEO_DRIVER="xf86-video-nouveau"
 
 # DISK DEVICES and SLICES
-DISKTABLE='GPT'   # or 'MBR'
 IN_DEVICE=/dev/sdc
-EFI_DEVICE=/dev/sdc1
-ROOT_DEVICE=/dev/sdc2  # only for non-LVM
-SWAP_DEVICE=/dev/sdc3  # only for non-LVM 
-HOME_DEVICE=/dev/sdc4  # only for non-LVM
+
+if [[ "$DISKTABLE" =~ 'GPT' && $(efi_boot_mode) ]] ; then
+    EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
+    EFI_MTPT=/mnt/boot/efi
+    ROOT_DEVICE="${IN_DEVICE}2"  # only for non-LVM
+    SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
+    HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
+else
+    unset EFI_DEVICE
+    BOOT_DEVICE="${IN_DEVICE}1"
+    BOOT_MTPT=/mnt/boot
+    ROOT_DEVICE="${IN_DEVICE}2"
+    SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
+    HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
+fi
 
 # VOLUME GROUPS
 PV_DEVICE="$ROOT_DEVICE"
@@ -30,24 +52,20 @@ LV_HOME="ArchHome"
 LV_SWAP="ArchSwap"
 
 # PARTITION SIZES
-EFI_SIZE=512M
+( $(efi_boot_mode) && EFI_SIZE=512M ) || unset EFI_SIZE
+#( !$(efi_boot_mode) && BOOT_SIZE=512M ) || unset BOOT_SIZE
+BOOT_SIZE=512M
 SWAP_SIZE=64G
 ROOT_SIZE=100G
 HOME_SIZE=    # Take whatever is left over after other partitions
 
-# MOUNT POINTS
-EFI_MTPT=/mnt/boot/efi
-
+( $(efi_boot_mode) && EFI_MTPT=/mnt/boot/efi ) || unset EFI_MTPT
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 FILESYSTEM=ext4
 DESKTOP=('cinnamon' 'nemo-fileroller' 'lightdm-gtk-greeter')
 declare -A DISPLAY_MGR=( [dm]='lightdm' [service]='lightdm.service' )
 
-### CHANGE ACCORDING TO PREFERENCE
-use_lvm(){ return 0; }       # return 0 if you want lvm
-use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
-use_bcm4360() { return 0; }  # return 0 if you want bcm4360
 
 if $(use_bcm4360) ; then
     WIRELESSDRIVERS="broadcom-wl-dkms"
@@ -59,7 +77,7 @@ fi
 #####  SOFTWARE SETS: X, EXTRA_X, DESKTOPS  ######
 ##################################################
 
-BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim )
+BASE_SYSTEM=( base base-devel linux linux-headers linux-firmware dkms vim iwd )
 
 ## These are packages required for a working Xorg desktop
 BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock "${DESKTOP[@]}" ${DISPLAY_MGR[dm]} firefox )
@@ -67,7 +85,7 @@ BASIC_X=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-termin
 ## These are your specific choices for fonts and wallpapers and X-related goodies
 EXTRA_X=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
-EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3gaps i3status i3blocks nitrogen feh rofi dmenu xterm ttf-font-awesome ttf-ionicons )
+EXTRA_DESKTOPS=( mate mate-extra xfce4 xfce4-goodies i3-gaps i3status i3blocks nitrogen feh rofi dmenu terminator ttf-font-awesome ttf-ionicons )
 
 GOODIES=( htop neofetch screenfetch powerline powerline-fonts powerline-vim )
 
@@ -83,16 +101,14 @@ devel_stuff=( git nodejs npm npm-check-updates ruby )
 
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
-multimedia_stuff=( brasero cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
+multimedia_stuff=( brasero sox cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
 
 ##########################################
 ######       FUNCTIONS       #############
 ##########################################
  
-# VERIFY BOOT MODE
-efi_boot_mode(){
-    ( $(ls /sys/firmware/efi/efivars &>/dev/null) && return 0 ) || return 1
-}
+# All purpose error
+error(){ echo "Error: $1" && exit 1; }
 
 # FIND GRAPHICS CARD
 find_card(){
@@ -100,46 +116,59 @@ find_card(){
     echo "You're using a $card" && echo
 }
 
-non_lvm_partition(){
-    if $(efi_boot_mode) ; then
-        DISKTABLE='GPT'
-        EFI_DEVICE="$EFI_DEVICE"
-        EFI_SIZE="$EFI_SIZE"
-        ## If you change the EFI_MTPT You must change
-        ## it when making and mounting EFI dirs and also
-        ## when installing grub. Just search for efi
-        EFI_MTPT="$EFI_MTPT"
-    else
-        DISKTABLE="$DISKTABLE"
-    fi
-    ROOT_DEVICE="$ROOT_DEVICE"
-    SWAP_DEVICE="$SWAP_DEVICE"
-    HOME_DEVICE="$HOME_DEVICE"
+format_it(){
+    device=$1; fstype=$2
+    mkfs."$fstype" "$device" || exit 1
+}
 
-    # PARTITION SIZES
-    SWAP_SIZE="$SWAP_SIZE"
-    ROOT_SIZE="$ROOT_SIZE"
-    HOME_SIZE="$HOME_SIZE"
-    sgdisk -Z "$IN_DEVICE"
-    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
-    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-    sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+mount_it(){
+    device=$1; mt_pt=$2
+    mount "$device" "$mt_pt" || exit 1
+}
 
-    mkfs."$FILESYSTEM" "$ROOT_DEVICE"
-    mount "$ROOT_DEVICE" /mnt
-    if [[ "$EFI_DEVICE" != "" ]] ; then
-        mkfs.fat -F32 "$EFI_DEVICE" 
-        ### script assumes efi mounted at /mnt/boot/efi for now
-        mkdir /mnt/boot
-        mkdir /mnt/boot/efi 
-        ( [[ -d "$EFI_MTPT" ]] && mount "$EFI_DEVICE" "$EFI_MTPT" ) || (echo "$EFI_MTPT does not exist!" && sleep 10 && exit 1)
-    fi
-    if [[ "$SWAP_DEVICE" != "" ]]; then mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"; fi
-    if [[ "$HOME_DEVICE" != "" ]]; then
-        mkfs."$FILESYSTEM" "$HOME_DEVICE"
+non_lvm_create(){
+    # We're just doing partitions, no LVM here
+    clear
+    if $(efi_boot_mode); then
+        sgdisk -Z "$IN_DEVICE"
+        sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+        sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+        sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+        sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+       
+        # Format and mount slices for EFI
+        format_it "$ROOT_DEVICE" "$FILESYSTEM"
+        mount_it "$ROOT_DEVICE" /mnt
+        format_it "$EFI_DEVICE" "fat -F32"
+        mkdir /mnt/boot && mkdir /mnt/boot/efi
+        mount_it "$EFI_DEVICE" "$EFI_MTPT"
+        format_it "$HOME_DEVICE" "$FILESYSTEM"
         mkdir /mnt/home
-        mount "$HOME_DEVICE" /mnt/home
+        mount_it "$HOME_DEVICE" /mnt/home
+        mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
+    else
+        # For non-EFI MBR systems 
+cat > /tmp/sfdisk.cmd << EOF
+$BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
+$ROOT_DEVICE : size=+$ROOT_SIZE, type=83
+$SWAP_DEVICE : size=+$SWAP_SIZE, type=82
+$HOME_DEVICE : type=83
+EOF
+
+
+        # Using sfdisk because we're talking MBR disktable now...
+        sfdisk /dev/sda < /tmp/sfdisk.cmd 
+
+        # Format and mount slices for non-EFI
+        format_it "$ROOT_DEVICE" "$FILESYSTEM"
+        mount_it "$ROOT_DEVICE" /mnt
+        format_it "$BOOT_DEVICE" "$FILESYSTEM"
+        mkdir /mnt/boot
+        mount_it "$BOOT_DEVICE" "$BOOT_MTPT"
+        format_it "$HOME_DEVICE" "$FILESYSTEM"
+        mkdir /mnt/home
+        mount_it "$HOME_DEVICE" /mnt/home
+        mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     fi
 
     lsblk "$IN_DEVICE"
@@ -159,13 +188,23 @@ lvm_hooks(){
 # ONLY FOR LVM INSTALLATION
 lvm_create(){
     clear
-    # Create the physical partitions
     sgdisk -Z "$IN_DEVICE"
-    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
-    # Format the EFI partition
-    mkfs.fat -F32 "$EFI_DEVICE"
+    if $(efi_boot_mode); then
+        sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+        sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
+        # Format
+        format_it "$EFI_DEVICE" "fat -F32"
+    else
+        #  # Create the slice for the Volume Group as first and only slice
 
+cat > /tmp/sfdisk.cmd << EOF
+$BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
+$ROOT_DEVICE : type=83
+EOF
+        # Using sfdisk because we're talking MBR disktable now...
+        sfdisk /dev/sda < /tmp/sfdisk.cmd 
+    fi
+    
     # create the physical volumes
     pvcreate "$PV_DEVICE"
     # create the volume group
@@ -186,16 +225,21 @@ lvm_create(){
     modprobe dm_mod
     # activate the vol group
     vgchange -ay
-    # format the volumes
-    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_ROOT"
-    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_HOME"
+    
+    format_it "$BOOT_DEVICE" "$FILESYSTEM"
+    format_it /dev/"$VOL_GROUP"/"$LV_ROOT" "$FILESYSTEM"
+    format_it /dev/"$VOL_GROUP"/"$LV_HOME" "$FILESYSTEM"
     # mount the volumes
-    mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
+    mount_it /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
+    mkdir /mnt/boot
+    mount_it "$BOOT_DEVICE" /mnt/boot
     mkdir /mnt/home
-    mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
-    # mount the EFI partitions
-    mkdir /mnt/boot && mkdir /mnt/boot/efi
-    mount "$EFI_DEVICE" "$EFI_MTPT"
+    mount_it /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
+    # mount the EFI partition
+    if $(efi_boot_mode) ; then
+        mkdir /mnt/boot && mkdir /mnt/boot/efi
+        mount_it "$EFI_DEVICE" "$EFI_MTPT"
+    fi
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
     startmenu
@@ -220,7 +264,7 @@ done
 
 ##  check if reflector update is done...
 clear
-echo "checking if reflector has finished updating mirrorlist yet..."
+echo "Waiting until reflector has finished updating mirrorlist..."
 while true; do
     pgrep -x reflector &>/dev/null || break
     echo -n '.'
@@ -241,7 +285,8 @@ timedatectl status
 sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
-clear && echo "Partitioning Installation Drive..." && sleep 3
+clear
+echo "Partitioning Hard Drive!!  Press any key to continue..." ; read empty
 if $(use_lvm) ; then
     lvm_create
 else
@@ -338,29 +383,34 @@ arch-chroot /mnt passwd "$sudo_user"
 $(use_bcm4360) && arch-chroot /mnt pacman -S "$WIRELESSDRIVERS"
 [[ "$?" -eq 0 ]] && echo "Wifi Driver successfully installed!"; sleep 5
 
-## INSTALL X AND DESKTOP
-clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
-arch-chroot /mnt pacman -S "${BASIC_X[@]}"
-arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
-arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
-arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
-arch-chroot /mnt pacman -S "${GOODIES[@]}"
-echo "Enabling display manager service..."
+## INSTALL X AND DESKTOP  
+if $(install_x); then
+    clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
+    arch-chroot /mnt pacman -S "${BASIC_X[@]}"
+    arch-chroot /mnt pacman -S "${EXTRA_X[@]}"
+    your_card=$(find_card)
+    echo "${your_card} and you're installing the $VIDEO_DRIVER driver... (Type key to continue) "; read blah
+    arch-chroot /mnt pacman -S "$VIDEO_DRIVER"
+    arch-chroot /mnt pacman -S "${EXTRA_DESKTOPS[@]}"
+    arch-chroot /mnt pacman -S "${GOODIES[@]}"
 
-arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
-echo && echo "Your desktop and display manager should now be installed..."
-sleep 5
+    echo "Enabling display manager service..."
+    arch-chroot /mnt systemctl enable ${DISPLAY_MGR[service]}
+    echo && echo "Your desktop and display manager should now be installed..."
+    sleep 5
+fi
 
 ## INSTALL GRUB
 clear
 echo "Installing grub..." && sleep 4
 arch-chroot /mnt pacman -S grub os-prober
 
-if [[ "$DISKTABLE" =~ 'GPT' ]]; then
+if [[ $(efi_boot_mode) && -n $EFI_DEVICE ]]; then
     arch-chroot /mnt pacman -S efibootmgr
-    # /boot/efi should aready be mounted
-    [[ ! -d /mnt/boot/efi ]] && echo "no /mnt/boot/efi directory!!!" && exit 1
+    
+    [[ ! -d /mnt/boot/efi ]] && error "Grub Install: no /mnt/boot/efi directory!!!" 
     arch-chroot /mnt grub-install "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+
     ## This next bit is for Ryzen systems with weird BIOS/EFI issues; --no-nvram and --removable might help
     [[ $? != 0 ]] && arch-chroot /mnt grub-install \
        "$IN_DEVICE" --target=x86_64-efi --bootloader-id=GRUB \

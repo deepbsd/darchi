@@ -286,7 +286,7 @@ sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
 clear
-echo "Partitioning Hard Drive!!  Press any key to continue..." ; read empty
+echo "Partitioning Hard Drive!! Press any key to continue..." ; read empty
 if $(use_lvm) ; then
     lvm_create
 else
