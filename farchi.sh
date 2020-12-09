@@ -16,7 +16,7 @@ efi_boot_mode(){
 
 ### CHANGE ACCORDING TO PREFERENCE
 install_x()( return 1; )       # return 0 if you want to install X
-use_lvm(){ return 1; }       # return 0 if you want lvm
+use_lvm(){ return 0; }       # return 0 if you want lvm
 use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
@@ -199,9 +199,7 @@ lvm_create(){
 
 cat > /tmp/sfdisk.cmd << EOF
 $BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
-$ROOT_DEVICE : size=+$ROOT_SIZE, type=83
-$SWAP_DEVICE : size=+$SWAP_SIZE, type=82
-$HOME_DEVICE : type=83
+$ROOT_DEVICE : type=83
 EOF
         # Using sfdisk because we're talking MBR disktable now...
         sfdisk /dev/sda < /tmp/sfdisk.cmd 
