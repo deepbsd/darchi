@@ -285,8 +285,8 @@ timedatectl status
 sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
-clear && echo "Partitioning Installation Drive..." 
-echo "Press any key to continue..." ; read empty
+clear
+echo "Partitioning Hard Drive!!  Press any key to continue..." ; read empty
 if $(use_lvm) ; then
     lvm_create
 else
