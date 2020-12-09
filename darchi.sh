@@ -96,7 +96,7 @@ devel_stuff=( git nodejs npm npm-check-updates ruby )
 
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
-multimedia_stuff=( brasero cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
+multimedia_stuff=( brasero sox cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
