@@ -147,16 +147,18 @@ non_lvm_create(){
         mount_it "$HOME_DEVICE" /mnt/home
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
-        # For non-EFI s ystems
-        echo "$BOOT_DEVICE : $BOOT_SIZE : "
-sfdisk "$IN_DEVICE" << EOF
-"$BOOT_DEVICE" : start= 2048, size=+"$BOOT_SIZE", type=83, bootable
-"$ROOT_DEVICE" : size=+"$ROOT_SIZE", type=83
-"$SWAP_DEVICE" : size=+"$SWAP_SIZE", type=82
-"$HOME_DEVICE" : type=83
+        # For non-EFI MBR systems 
+cat > /tmp/sfdisk.cmd << EOF
+$BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
+$ROOT_DEVICE : size=+$ROOT_SIZE, type=83
+$SWAP_DEVICE : size=+$SWAP_SIZE, type=82
+$HOME_DEVICE : type=83
 EOF
 
-        echo "Wait here!" ; read empty
+
+        # Using sfdisk because we're talking MBR disktable now...
+        sfdisk /dev/sda < /tmp/sfdisk.cmd 
+
         # Format and mount slices for non-EFI
         format_it "$ROOT_DEVICE" "$FILESYSTEM"
         mount_it "$ROOT_DEVICE" /mnt
@@ -194,12 +196,15 @@ lvm_create(){
         format_it "$EFI_DEVICE" "fat -F32"
     else
         #  # Create the slice for the Volume Group as first and only slice
-sfdisk "$IN_DEVICE" << EOF
-"$BOOT_DEVICE" : start= 2048, size=+"$BOOT_SIZE", type=83, bootable
-"$ROOT_DEVICE" : size=+"$ROOT_SIZE", type=83
-"$SWAP_DEVICE" : size=+"$SWAP_SIZE", type=82
-"$HOME_DEVICE" : type=83
+
+cat > /tmp/sfdisk.cmd << EOF
+$BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
+$ROOT_DEVICE : size=+$ROOT_SIZE, type=83
+$SWAP_DEVICE : size=+$SWAP_SIZE, type=82
+$HOME_DEVICE : type=83
 EOF
+        # Using sfdisk because we're talking MBR disktable now...
+        sfdisk /dev/sda < /tmp/sfdisk.cmd 
     fi
     
     # create the physical volumes
