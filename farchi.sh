@@ -127,8 +127,8 @@ mount_it(){
 non_lvm_create(){
     # We're just doing partitions, no LVM here
     clear
-    sgdisk -Z "$IN_DEVICE"
     if $(efi_boot_mode); then
+        sgdisk -Z "$IN_DEVICE"
         sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
         sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
         sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
@@ -147,37 +147,7 @@ non_lvm_create(){
     else
         # For non-EFI systems
 
-        #fdisk "$IN_DEVICE" 
-fdisk "$IN_DEVICE" <<EOF
-n
-p
-1
-2048
-+512M
-a
-1
-n
-p
-2
-
-+12G
-n
-p
-3
-
-+2G
-n
-p
-4
-
-w
-EOF
-
-        # n p 1 2048  +500M a 1 
-        # n p 2 1026048  +12G  
-        # n p 3 26191872  +2G
-        # n p 4 30386176  
-
+        fdisk "$IN_DEVICE" <fdisk.cmd
         # Format and mount slices for non-EFI
         format_it "$ROOT_DEVICE" "$FILESYSTEM"
         mount_it "$ROOT_DEVICE" /mnt
