@@ -16,7 +16,7 @@ efi_boot_mode(){
 
 ### CHANGE ACCORDING TO PREFERENCE
 install_x()( return 1; )       # return 0 if you want to install X
-use_lvm(){ return 0; }       # return 0 if you want lvm
+use_lvm(){ return 1; }       # return 0 if you want lvm
 use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
@@ -124,7 +124,7 @@ mount_it(){
     mount "$device" "$mt_pt" || exit 1
 }
 
-non_lvm_partition(){
+non_lvm_create(){
     # We're just doing partitions, no LVM here
     clear
     sgdisk -Z "$IN_DEVICE"
@@ -146,11 +146,37 @@ non_lvm_partition(){
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
         # For non-EFI systems
-        # sgdisk -p "$IN_DEVICE" ; echo "Press any key to continue..." ; read sgdiskwait
-        sgdisk -n 1::+500M -t 1:8300 1:8300 -c 1:BOOT "$IN_DEVICE"
-        sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
-        sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-        sgdisk -n 4 -c 3:HOME "$IN_DEVICE"
+
+        #fdisk "$IN_DEVICE" 
+fdisk "$IN_DEVICE" <<EOF
+n
+p
+1
+2048
++512M
+a
+1
+n
+p
+2
+
++12G
+n
+p
+3
+
++2G
+n
+p
+4
+
+w
+EOF
+
+        # n p 1 2048  +500M a 1 
+        # n p 2 1026048  +12G  
+        # n p 3 26191872  +2G
+        # n p 4 30386176  
 
         # Format and mount slices for non-EFI
         format_it "$ROOT_DEVICE" "$FILESYSTEM"
@@ -273,7 +299,8 @@ timedatectl status
 sleep 4
 
 ### PARTITION AND FORMAT AND MOUNT
-clear && echo "Partitioning Installation Drive..." && sleep 3
+clear && echo "Partitioning Installation Drive..." 
+echo "Press any key to continue..." ; read empty
 if $(use_lvm) ; then
     lvm_create
 else
