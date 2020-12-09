@@ -53,6 +53,8 @@ LV_SWAP="ArchSwap"
 
 # PARTITION SIZES
 ( $(efi_boot_mode) && EFI_SIZE=512M ) || unset EFI_SIZE
+#( !$(efi_boot_mode) && BOOT_SIZE=512M ) || unset BOOT_SIZE
+BOOT_SIZE=512M
 SWAP_SIZE=2G
 ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
@@ -145,9 +147,16 @@ non_lvm_create(){
         mount_it "$HOME_DEVICE" /mnt/home
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
-        # For non-EFI systems
+        # For non-EFI s ystems
+        echo "$BOOT_DEVICE : $BOOT_SIZE : "
+sfdisk "$IN_DEVICE" << EOF
+"$BOOT_DEVICE" : start= 2048, size=+"$BOOT_SIZE", type=83, bootable
+"$ROOT_DEVICE" : size=+"$ROOT_SIZE", type=83
+"$SWAP_DEVICE" : size=+"$SWAP_SIZE", type=82
+"$HOME_DEVICE" : type=83
+EOF
 
-        fdisk "$IN_DEVICE" <fdisk.cmd
+        echo "Wait here!" ; read empty
         # Format and mount slices for non-EFI
         format_it "$ROOT_DEVICE" "$FILESYSTEM"
         mount_it "$ROOT_DEVICE" /mnt
@@ -184,9 +193,13 @@ lvm_create(){
         # Format
         format_it "$EFI_DEVICE" "fat -F32"
     else
-        # Create the slice for the Volume Group as first and only slice
-        sgdisk -n 1::+500M -t 1:8300 -c 1:BOOT "$IN_DEVICE"
-        sgdisk -n 2 -t 2:8e00 -c 1:VOLGROUP "$IN_DEVICE"
+        #  # Create the slice for the Volume Group as first and only slice
+sfdisk "$IN_DEVICE" << EOF
+"$BOOT_DEVICE" : start= 2048, size=+"$BOOT_SIZE", type=83, bootable
+"$ROOT_DEVICE" : size=+"$ROOT_SIZE", type=83
+"$SWAP_DEVICE" : size=+"$SWAP_SIZE", type=82
+"$HOME_DEVICE" : type=83
+EOF
     fi
     
     # create the physical volumes
