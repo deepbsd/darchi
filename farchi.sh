@@ -51,10 +51,12 @@ LV_ROOT="ArchRoot"
 LV_HOME="ArchHome"
 LV_SWAP="ArchSwap"
 
-# PARTITION SIZES
+################ PARTITION SIZES ##################
+###################################################
+
 ( $(efi_boot_mode) && EFI_SIZE=512M ) || unset EFI_SIZE
-#( !$(efi_boot_mode) && BOOT_SIZE=512M ) || unset BOOT_SIZE
-BOOT_SIZE=512M
+[[ $(efi_boot_mode) == 1 ]] && BOOT_SIZE=512M || unset BOOT_SIZE
+#BOOT_SIZE=512M   # Only for MBR disks
 SWAP_SIZE=2G
 ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
