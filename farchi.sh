@@ -29,13 +29,15 @@ VIDEO_DRIVER="xf86-video-vmware"
 # DISK DEVICES and SLICES
 IN_DEVICE=/dev/sda
 
-if [[ "$DISKTABLE" =~ 'GPT' && $(efi_boot_mode) ]] ; then
+if  $(efi_boot_mode) ; then
+    DISKTABLE='GPT'
     EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
     EFI_MTPT=/mnt/boot/efi
     ROOT_DEVICE="${IN_DEVICE}2"  # only for non-LVM
     SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
     HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
 else
+    DISKTABLE='MBR'
     unset EFI_DEVICE
     BOOT_DEVICE="${IN_DEVICE}1"
     BOOT_MTPT=/mnt/boot
