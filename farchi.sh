@@ -149,7 +149,7 @@ non_lvm_create(){
         mount_it "$HOME_DEVICE" /mnt/home
         mkswap "$SWAP_DEVICE" && swapon "$SWAP_DEVICE"
     else
-        # For non-EFI MBR systems 
+        # For non-EFI. Eg. for MBR systems 
 cat > /tmp/sfdisk.cmd << EOF
 $BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
 $ROOT_DEVICE : size=+$ROOT_SIZE, type=83
