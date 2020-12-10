@@ -16,7 +16,7 @@ efi_boot_mode(){
 
 ### CHANGE ACCORDING TO PREFERENCE
 install_x(){ return 1; }     # return 0 if you want to install X
-use_lvm(){ return 0; }       # return 0 if you want lvm
+use_lvm(){ return 1; }       # return 0 if you want lvm
 use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
@@ -146,7 +146,7 @@ non_lvm_create(){
         # Format and mount slices for EFI
         format_it "$ROOT_DEVICE" "$FILESYSTEM"
         mount_it "$ROOT_DEVICE" /mnt
-        format_it "$EFI_DEVICE" "fat -F32"
+        mkfs.fat -F32 "$EFI_DEVICE"
         mkdir /mnt/boot && mkdir /mnt/boot/efi
         mount_it "$EFI_DEVICE" "$EFI_MTPT"
         format_it "$HOME_DEVICE" "$FILESYSTEM"
