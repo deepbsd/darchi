@@ -54,14 +54,19 @@ LV_SWAP="ArchSwap"
 ################ PARTITION SIZES ##################
 ###################################################
 
-( $(efi_boot_mode) && EFI_SIZE=512M ) || unset EFI_SIZE
-[[ $(efi_boot_mode) == 1 ]] && BOOT_SIZE=512M || unset BOOT_SIZE
-#BOOT_SIZE=512M   # Only for MBR disks
+if $(efi_boot_mode) ; then
+    EFI_SIZE=512M
+    EFI_MTPT=/mnt/boot/efi
+    unset BOOT_SIZE
+else
+    unset EFI_SIZE; unset EFI_MTPT
+    BOOT_SIZE=512M
+fi
 SWAP_SIZE=2G
 ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
 
-( $(efi_boot_mode) && EFI_MTPT=/mnt/boot/efi ) || unset EFI_MTPT
+#( $(efi_boot_mode) && EFI_MTPT=/mnt/boot/efi ) || unset EFI_MTPT
 TIME_ZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 FILESYSTEM=ext4
@@ -299,7 +304,6 @@ fi
 ## INSTALL BASE SYSTEM
 clear
 echo && echo "Press any key to continue to install BASE SYSTEM..."; read empty
-echo && echo "${BASE_SYSTEM[@]}"
 pacstrap /mnt "${BASE_SYSTEM[@]}"
 echo && echo "Base system installed.  Press any key to continue..."; read empty
 
@@ -349,7 +353,9 @@ cat > /mnt/etc/hosts <<HOSTS
 HOSTS
 
 echo && echo "/etc/hostname and /etc/hosts files configured..."
+echo "/etc/hostname . . . "
 cat /mnt/etc/hostname 
+echo "/etc/hosts"
 cat /mnt/etc/hosts
 echo && echo "Here are /etc/hostname and /etc/hosts. Type any key to continue "; read etchosts_yn
 
