@@ -320,7 +320,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # EDIT FSTAB IF NECESSARY
 clear
 echo && echo "Here's the new /etc/fstab..."; cat /mnt/etc/fstab
-echo && echo "Edit /etc/fstab?"; read edit_fstab
+echo && echo "Edit /etc/fstab? (y or n)"; read edit_fstab
 [[ "$edit_fstab" =~ [yY] ]] && vim /mnt/etc/fstab
 
 
@@ -357,7 +357,7 @@ HOSTS
 echo && echo "/etc/hostname and /etc/hosts files configured..."
 echo "/etc/hostname . . . "
 cat /mnt/etc/hostname 
-echo "/etc/hosts"
+echo "/etc/hosts . . ."
 cat /mnt/etc/hosts
 echo && echo "Here are /etc/hostname and /etc/hosts. Type any key to continue "; read etchosts_yn
 
@@ -415,7 +415,7 @@ clear
 echo "Installing grub..." && sleep 4
 arch-chroot /mnt pacman -S grub os-prober
 
-if [[ $(efi_boot_mode) && -n $EFI_DEVICE ]]; then
+if  $(efi_boot_mode) ; then
     arch-chroot /mnt pacman -S efibootmgr
     
     [[ ! -d /mnt/boot/efi ]] && error "Grub Install: no /mnt/boot/efi directory!!!" 
