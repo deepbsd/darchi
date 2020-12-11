@@ -16,7 +16,7 @@ efi_boot_mode(){
 
 ### CHANGE ACCORDING TO PREFERENCE
 install_x(){ return 1; }     # return 0 if you want to install X
-use_lvm(){ return 1; }       # return 0 if you want lvm
+use_lvm(){ return 0; }       # return 0 if you want lvm
 use_crypt(){ return 1; }     # return 0 if you want crypt (NOT IMPLEMENTED YET)
 use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
@@ -46,12 +46,14 @@ else
     HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
 fi
 
-# VOLUME GROUPS
-PV_DEVICE="$ROOT_DEVICE"
-VOL_GROUP="arch_vg"
-LV_ROOT="ArchRoot"
-LV_HOME="ArchHome"
-LV_SWAP="ArchSwap"
+if $(use_lvm) ; then
+    # VOLUME GROUPS
+    PV_DEVICE="$ROOT_DEVICE"
+    VOL_GROUP="arch_vg"
+    LV_ROOT="ArchRoot"
+    LV_HOME="ArchHome"
+    LV_SWAP="ArchSwap"
+fi
 
 ################ PARTITION SIZES ##################
 ###################################################
@@ -202,7 +204,7 @@ lvm_create(){
         sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
         sgdisk -n 2 -t 2:8e00 -c 2:VOLGROUP "$IN_DEVICE"
         # Format
-        format_it "$EFI_DEVICE" "fat -F32"
+        mkfs.fat -F32 "$EFI_DEVICE"
     else
         #  # Create the slice for the Volume Group as first and only slice
 
@@ -235,20 +237,31 @@ EOF
     # activate the vol group
     vgchange -ay
     
-    format_it "$BOOT_DEVICE" "$FILESYSTEM"
+    # Format either the EFI_DEVICE or the BOOT_DEVICE
+    if $(efi_boot_mode) ; then
+        mkfs.fat -F32 "$EFI_DEVICE"
+    else
+        format_it "$BOOT_DEVICE" "$FILESYSTEM"
+    fi
+
+    # Format the VG members
     format_it /dev/"$VOL_GROUP"/"$LV_ROOT" "$FILESYSTEM"
     format_it /dev/"$VOL_GROUP"/"$LV_HOME" "$FILESYSTEM"
+
     # mount the volumes
     mount_it /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
-    mkdir /mnt/boot
-    mount_it "$BOOT_DEVICE" /mnt/boot
     mkdir /mnt/home
     mount_it /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
-    # mount the EFI partition
+
+    # Mount either the EFI or BOOT partition
     if $(efi_boot_mode) ; then
         mkdir /mnt/boot && mkdir /mnt/boot/efi
         mount_it "$EFI_DEVICE" "$EFI_MTPT"
+    else
+        mkdir /mnt/boot
+        mount_it "$BOOT_DEVICE" /mnt/boot
     fi
+
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
     startmenu
@@ -415,7 +428,7 @@ clear
 echo "Installing grub..." && sleep 4
 arch-chroot /mnt pacman -S grub os-prober
 
-if  $(efi_boot_mode) ; then
+if $(efi_boot_mode) ; then
     arch-chroot /mnt pacman -S efibootmgr
     
     [[ ! -d /mnt/boot/efi ]] && error "Grub Install: no /mnt/boot/efi directory!!!" 
