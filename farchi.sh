@@ -24,6 +24,7 @@ HOSTNAME="marbie1"
 
 ( $(efi_boot_mode) && DISKTABLE="GPT" ) || DISKTABLE="MBR"
 
+# Change if not installing to a VM
 VIDEO_DRIVER="xf86-video-vmware"
 
 # DISK DEVICES and SLICES
@@ -47,7 +48,7 @@ else
 fi
 
 if $(use_lvm) ; then
-    # VOLUME GROUPS
+    # VOLUME GROUPS  (Probably should unset SWAP_DEVICE and HOME_DEVICE)
     PV_DEVICE="$ROOT_DEVICE"
     VOL_GROUP="arch_vg"
     LV_ROOT="ArchRoot"
@@ -66,6 +67,8 @@ else
     unset EFI_SIZE; unset EFI_MTPT
     BOOT_SIZE=512M
 fi
+
+## Change these for YOUR installation.  I'm using a 30G VM
 SWAP_SIZE=2G
 ROOT_SIZE=13G
 HOME_SIZE=    # Take whatever is left over after other partitions
