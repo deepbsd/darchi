@@ -29,7 +29,9 @@ VIDEO_DRIVER="xf86-video-vmware"
 
 # DISK DEVICES and SLICES
 IN_DEVICE=/dev/sda
+#IN_DEVICE=/dev/nvme0n0
 
+# If IN_DEV is nvme then slices are p1, p2 etc
 if  $(efi_boot_mode) ; then
     DISKTABLE='GPT'
     EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
