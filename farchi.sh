@@ -34,12 +34,21 @@ IN_DEVICE=/dev/sda
 # If IN_DEV is nvme then slices are p1, p2 etc
 if  $(efi_boot_mode) ; then
     DISKTABLE='GPT'
-    EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
     EFI_MTPT=/mnt/boot/efi
-    ROOT_DEVICE="${IN_DEVICE}2"  # only for non-LVM
-    SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
-    HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
+    if [[ $IN_DEVICE =~ nvme ]]; then
+        EFI_DEVICE="${IN_DEVICE}p1"   # NOT for MBR systems
+        ROOT_DEVICE="${IN_DEVICE}p2"  # only for non-LVM
+        SWAP_DEVICE="${IN_DEVICE}p3"  # only for non-LVM 
+        HOME_DEVICE="${IN_DEVICE}p4"  # only for non-LVM
+    else
+        EFI_DEVICE="${IN_DEVICE}1"   # NOT for MBR systems
+        ROOT_DEVICE="${IN_DEVICE}2"  # only for non-LVM
+        SWAP_DEVICE="${IN_DEVICE}3"  # only for non-LVM 
+        HOME_DEVICE="${IN_DEVICE}4"  # only for non-LVM
+    fi
 else
+    # Any mobo with nvme probably is gonna be EFI I'm thinkin...
+    # Probably no non-UEFI mobos with nvme drives
     DISKTABLE='MBR'
     unset EFI_DEVICE
     BOOT_DEVICE="${IN_DEVICE}1"
