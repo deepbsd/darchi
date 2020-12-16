@@ -31,6 +31,8 @@
    done
    '
 
+##  Set this
+use_lvm(){ return 0; }  # return 0 for true, 1 for false
 
 ##  ** Do NOT edit these! They are updated programmatically **
 ##                        --- for non-lvm systems ---
@@ -54,6 +56,7 @@ LV_ROOT="ArchRoot"
 LV_HOME="ArchHome"
 
 # PARTITION SIZES  (You can edit these if desired)
+BOOT_SIZE=512M
 EFI_SIZE=512M
 ROOT_SIZE=13G
 SWAP_SIZE=2G   # SWAP_SIZE="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
@@ -105,12 +108,6 @@ multimedia_stuff=( brasero sox cheese eog shotwell imagemagick sox cmus mpg123 a
 ##########################################
 ###########  FUNCTIONS ###################
 ##########################################
-
-# USING LVM?
-use_lvm(){
-    [[ -d /dev/"$VOL_GROUP" ]] && USE_LVM='true' && return 0
-    return 1
-}
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
@@ -190,18 +187,29 @@ format_disk(){
     esac
 }
 
-# PARTITION DISK
+# PARTITION NON-LVM DISK
 part_disk(){
-    device=$1
-    IN_DEVICE="/dev/$device"
-    echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
-    echo && echo "Continue to sgdisk? "; read answer
-    [[ "$answer" =~ [yY] ]] && echo "paritioning with sgdisk..."
-    sgdisk -Z "$IN_DEVICE"
-    sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
-    sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
-    sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
-    sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+    device=$1 ; IN_DEVICE="/dev/$device"
+    if $(efi_boot_mode); then
+            echo && echo "Recommend efi (512MB), root (100G), home (remaining), swap (32G) partitions..."
+            echo && echo "Continue to sgdisk? "; read answer
+            [[ "$answer" =~ [yY] ]] && echo "paritioning with sgdisk..."
+            sgdisk -Z "$IN_DEVICE"
+            sgdisk -n 1::+"$EFI_SIZE" -t 1:ef00 -c 1:EFI "$IN_DEVICE"
+            sgdisk -n 2::+"$ROOT_SIZE" -t 2:8300 -c 2:ROOT "$IN_DEVICE"
+            sgdisk -n 3::+"$SWAP_SIZE" -t 3:8200 -c 3:SWAP "$IN_DEVICE"
+            sgdisk -n 4 -c 4:HOME "$IN_DEVICE"
+    else
+        # For non-EFI. Eg. for MBR systems 
+cat > /tmp/sfdisk.cmd << EOF
+$BOOT_DEVICE : start= 2048, size=+$BOOT_SIZE, type=83, bootable
+$ROOT_DEVICE : size=+$ROOT_SIZE, type=83
+$SWAP_DEVICE : size=+$SWAP_SIZE, type=82
+$HOME_DEVICE : type=83
+EOF
+        # Using sfdisk because we're talking MBR disktable now...
+        sfdisk /dev/sda < /tmp/sfdisk.cmd 
+    fi
 
     # SHOW RESULTS:
     clear
