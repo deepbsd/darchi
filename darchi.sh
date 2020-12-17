@@ -502,9 +502,7 @@ EOF
         sfdisk /dev/sda < /tmp/sfdisk.cmd 
     fi
 
-
     clear
-
 
     # create the physical volumes
     pvcreate "$ROOT_DEVICE"
