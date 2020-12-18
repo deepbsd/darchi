@@ -603,17 +603,17 @@ startmenu(){
     clear
     echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
         echo -e "\n\n\n What do you want to do?  \n\n"
-        echo -e "    1) Check connection and date  2) Prepare Installation Disk"
-        echo -e "\n  3) Install Base System        4) Install mkinitcpio hooks for LVM "
-        echo -e "\n  5) New FSTAB and TZ/Locale    6) Set new hostname"
-        echo -e "\n  7) Set new root password      8) Install more essentials "
-        echo -e "\n  9) Add user + sudo account    10) Install BCM4360 drivers  "
-        echo -e "\n  11) Install grub              12) Install Xorg + Desktop"
+        echo -e "  1) Check connection and date   2) Prepare Installation Disk"
+        echo -e "\n  3) Install Base System         4) Install mkinitcpio hooks (only for LVM) "
+        echo -e "\n  5) New FSTAB and TZ/Locale     6) Set new hostname"
+        echo -e "\n  7) Set new root password       8) Install more essentials "
+        echo -e "\n  9) Add user + sudo account     10) Install BCM4360 drivers  "
+        echo -e "\n  11) Install grub               12) Install Xorg + Desktop"
         echo -e "\n  13) Install Extra Window Mgrs  14) Repopulate Variables "
         echo -e "\n  15) Exit Script"
 
 
-        echo -e "\n\n   Your choice?  "; read menupick
+        echo -ne "\n\n   Your choice?  "; read menupick
 
     case $menupick in
         1) check_connect; time_date ;;
