@@ -73,7 +73,7 @@ base_system=( base base-devel linux linux-headers dkms linux-firmware vim sudo b
 
 base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
-network_essentials=( dhcpcd openssh networkmanager )
+network_essentials=( iwd dhcpcd openssh networkmanager )
 
 #display_mgr=(lightdm)
 
@@ -500,6 +500,9 @@ $ROOT_DEVICE : type=83
 EOF
         # Using sfdisk because we're talking MBR disktable now...
         sfdisk /dev/sda < /tmp/sfdisk.cmd 
+
+        # format the boot partition
+        mkfs.ext4 "$BOOT_DEVICE"
     fi
 
     clear
@@ -532,9 +535,14 @@ EOF
     mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
     mkdir /mnt/home
     mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
-    # mount the EFI partitions
-    mkdir /mnt/boot && mkdir /mnt/boot/efi
-    mount "$EFI_DEVICE" /mnt/boot/efi
+    if $(efi_boot_mode); then
+        # mount the EFI partitions
+        mkdir /mnt/boot && mkdir /mnt/boot/efi
+        mount "$EFI_DEVICE" /mnt/boot/efi
+    else
+        mkdir /mnt/boot
+        mount "$BOOT_DEVICE" /mnt/boot
+    fi
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
     startmenu
