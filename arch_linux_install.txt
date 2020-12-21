@@ -4,7 +4,7 @@
 3. update mirrors
 4. check connection
 #5. set locale, timezone and ntp/clock
-5. prepare drives: partition, make fs, swap, mount, format
+5. prepare drives: partition, make fs, swap, format, mount 
 6. install options
 7. select the mirrors
 8. install essential packages
