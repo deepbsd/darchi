@@ -163,12 +163,14 @@ show_prefs(){
 
     if $(install_x); then 
         echo "We ARE installing X with driver: ${VIDEO_DRIVER}"
+        card=$(lspci | grep VGA | sed 's/^.*: //g')
+        echo "You're using a $card" && echo
     else
         echo "We ARE NOT installing X "
     fi
 
 
-    echo "Type any key to continue..."
+    echo "Type any key to continue or CTRL-C to exit..."
     read empty
 }
 
@@ -350,6 +352,9 @@ echo "Testing internet connection..."
 $(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && exit 1)
 echo "Good!  We're connected!!!" && sleep 3
 
+## SHOW THE PREFERENCES BEFORE STARTING INSTALLATION
+## Last chance for user to doublecheck his preferences
+show_prefs
 
 ## CHECK TIME AND DATE BEFORE INSTALLATION
 timedatectl set-ntp true
