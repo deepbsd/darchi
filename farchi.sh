@@ -6,7 +6,8 @@
 ######     GLOBAL PREFERENCES   ##########
 ##########################################
 
-## Actual script begins around line 220 or so
+## Actual script begins around line 135, so double check 
+## that all your preferences are correct up until then
 
 # VERIFY BOOT MODE
 efi_boot_mode(){
@@ -22,6 +23,8 @@ use_bcm4360() { return 1; }  # return 0 if you want bcm4360
 
 HOSTNAME="marbie1"
 
+# Don't change this.  If you have an EFI motherboard, your going to use
+# a GPT disktable, or an MBR disktable otherwise.
 ( $(efi_boot_mode) && DISKTABLE="GPT" ) || DISKTABLE="MBR"
 
 # Change if not installing to a VM
