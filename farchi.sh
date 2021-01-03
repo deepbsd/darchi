@@ -182,12 +182,12 @@ find_card(){
 
 format_it(){
     device=$1; fstype=$2
-    mkfs."$fstype" "$device" || exit 1
+    mkfs."$fstype" "$device" || error "format_it(): Can't format device $device"
 }
 
 mount_it(){
     device=$1; mt_pt=$2
-    mount "$device" "$mt_pt" || exit 1
+    mount "$device" "$mt_pt" || error "mount_it(): Can't mount $device to $mt_pt"
 }
 
 non_lvm_create(){
