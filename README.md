@@ -1,9 +1,9 @@
 # DARCHI    Dave's Arch Linux Installer
 
-This is just a personal script, very very simple, to install Arch Linux after
-booting the archiso ISO image.  (It started off as being really simple, anyway.)
+This started as just a personal script, very very simple, to install 
+Arch Linux after booting the archiso ISO image.  
 
-You can download it to your booted archiso image like this:
+You can download the script to your booted archiso image like this:
 
 `curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/darchi.sh`
 
@@ -21,7 +21,7 @@ The script makes a number of assumptions and is not as flexible as other
 tools.  For example, it assumes you'll want to edit your partitions.  You
 can install Xorg, and it installs the cinnamon desktop by default.  You
 can edit the script if you like to install your desired desktop and
-utilities.  The script is about 350 lines currently.  Feel free to use it
+utilities.  The script is about 650 lines currently.  Feel free to use it
 and edit it to your taste.  
 
 There is also a post\_install.sh file in the repo.  This will copy files
