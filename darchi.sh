@@ -548,38 +548,6 @@ EOF
     startmenu
 }
 
-#############################################################
-############         START SCRIPT
-#############################################################
-start(){
-    clear
-    echo && echo "WELCOME TO DARCHI!  Dave's Arch Install Script!"
-    sleep 4
-
-    check_reflector
-    check_connect
-    time_date
-    get_install_device  # this func calls partition func
-    #update_mirrorlist # done already in archiso img
-    install_base
-    gen_fstab
-    set_tz
-    set_locale
-    set_hostname
-    # SET ROOT PASSWORD
-    echo "Setting ROOT password..."
-    arch-chroot /mnt passwd
-    install_essential
-    add_user_acct
-    # OPTIONAL WIFI
-    echo && echo "Install drivers for BCM4360? " && read wifi
-    [[ "$wifi" =~ [yY] ]] && wl_wifi
-    install_grub
-    install_desktop
-    install_extra_stuff
-    echo "Type 'shutdown -r now' to reboot..."
-}
-
 diskmenu(){
     clear
     while true ; do
@@ -596,6 +564,10 @@ diskmenu(){
     esac
     done
 }
+
+#############################################################
+############         START SCRIPT
+#############################################################
 
 startmenu(){
     check_reflector
@@ -639,6 +611,5 @@ startmenu(){
     done
 }
 
-#start
 startmenu
 
