@@ -20,19 +20,13 @@ get_disks(){
         disk_hash[name]="$disk"  
         disk_hash[capacity]="$capacity" 
         echo "part: ${disk_hash[name]}  size: ${disk_hash[capacity]}"
-        DISKS+=( "$disk_hash" )
+        #echo "disk_hash: ${!disk_hash[@]} ${disk_hash[@]}"
+        DISKS+=( "${!disk_hash[@]}" "${disk_hash[@]}" )
+        echo "DISKS:  ${DISKS[@]}"
    done
 
-   #for dsk in "${DISKS[@]}"; do
-   #     echo "$dsk"
-   #done
+   echo "DISKS:  ${DISKS[@]}"
 
-   echo "DISKS:  ${DISKS[0][name]}"
-
-   #max=${#DISKS[@]}
-   #for ((n=0;n<$max;n+=2)); do
-   #     printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
-   #done
 }
 
 get_swap(){
@@ -72,12 +66,12 @@ get_root(){
              printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]%.*}
         done
         read dsk
-        echo "${DISKS[${dsk}]}"
+        echo "${DISKS[$dsk]}"
     fi
 }
 
 echo "do you want to hibernate? "; read hibernate
 get_disks 
-#get_swap 
+get_swap 
 #get_root
 
