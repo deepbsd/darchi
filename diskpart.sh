@@ -14,18 +14,18 @@ declare -A disk_hash
 hibernate='n'
 
 get_disks(){
-   for line in $(lsblk | grep disk | awk '{ printf "%s:%s ",  $1, $4 }'); do
+   for line in $(lsblk | grep disk | grep -v fd | awk '{ printf "%s:%s ",  $1, $4 }'); do
         disk=$(echo "$line" | cut -f1 -d:)
         capacity=$(echo "$line" | cut -f2 -d:)
         disk_hash[name]="$disk"  
         disk_hash[capacity]="$capacity" 
         echo "part: ${disk_hash[name]}  size: ${disk_hash[capacity]}"
         #echo "disk_hash: ${!disk_hash[@]} ${disk_hash[@]}"
-        DISKS+=( "${!disk_hash[@]}" "${disk_hash[@]}" )
+        DISKS+=( "$disk" "$capacity" )
         echo "DISKS:  ${DISKS[@]}"
    done
 
-   echo "DISKS:  ${DISKS[@]}"
+   echo "DISKS:  ${DISKS[@]}    "
 
 }
 
