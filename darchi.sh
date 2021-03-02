@@ -246,7 +246,7 @@ EOF
 get_install_device(){
     clear
     echo "Available installation media: "  && echo
-    fdisk -l
+    lsblk
 
     echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
     read device
