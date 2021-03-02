@@ -75,15 +75,11 @@ base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
 network_essentials=( iwd dhcpcd openssh networkmanager )
 
-#display_mgr=(lightdm)
-
 my_services=( dhcpcd sshd NetworkManager lightdm )
 
 basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
 
 extra_x=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
-
-#graphics_driver=(xf86-video-vmware)
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
@@ -102,8 +98,6 @@ printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint
 multimedia_stuff=( brasero sox cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
-
-#all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 ##########################################
 ###########  FUNCTIONS ###################
