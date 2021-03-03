@@ -38,6 +38,8 @@ cd yay-git
 makepkg -si
 cd
 
+yay -S paru
+
 ## REPLACE GNOME_TERMINAL WITH TRANSPARENCY VERSION (and mate-terminal)
 yay -S gnome-terminal-transparency mate-terminal 
 
