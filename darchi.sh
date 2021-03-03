@@ -47,7 +47,6 @@ SWAP_SLICE=''
 wifi_drivers=(broadcom-wl-dkms iwd)
 graphics_driver=(xf86-video-vmware)
 display_mgr=(lightdm)
-all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
@@ -96,6 +95,8 @@ devel_stuff=( git nodejs npm npm-check-updates ruby )
 printing_stuff=( system-config-printer foomatic-db foomatic-db-engine gutenprint cups cups-pdf cups-filters cups-pk-helper ghostscript gsfonts )
 
 multimedia_stuff=( brasero sox cheese eog shotwell imagemagick sox cmus mpg123 alsa-utils cheese )
+
+all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "${devel_stuff[@]}" "${printing_stuff[@]}" "${multimedia_stuff[@]}" )
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
@@ -566,42 +567,42 @@ diskmenu(){
 startmenu(){
     check_reflector
     while true ; do
-    clear
-    echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
-        echo -e "\n\n\n What do you want to do?  \n\n"
-        echo -e "  1) Check connection and date   2) Prepare Installation Disk"
-        echo -e "\n  3) Install Base System         4) Install mkinitcpio hooks (only for LVM) "
-        echo -e "\n  5) New FSTAB and TZ/Locale     6) Set new hostname"
-        echo -e "\n  7) Set new root password       8) Install more essentials "
-        echo -e "\n  9) Add user + sudo account     10) Install BCM4360 drivers  "
-        echo -e "\n  11) Install grub               12) Install Xorg + Desktop"
-        echo -e "\n  13) Install Extra Window Mgrs  14) Repopulate Variables "
-        echo -e "\n  15) Exit Script"
+        clear
+        echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
+            echo -e "\n\n\n What do you want to do?  \n\n"
+            echo -e "  1) Check connection and date   2) Prepare Installation Disk"
+            echo -e "\n  3) Install Base System         4) Install mkinitcpio hooks (only for LVM) "
+            echo -e "\n  5) New FSTAB and TZ/Locale     6) Set new hostname"
+            echo -e "\n  7) Set new root password       8) Install more essentials "
+            echo -e "\n  9) Add user + sudo account     10) Install BCM4360 drivers  "
+            echo -e "\n  11) Install grub               12) Install Xorg + Desktop"
+            echo -e "\n  13) Install Extra Window Mgrs  14) Repopulate Variables "
+            echo -e "\n  15) Exit Script"
 
 
-        echo -ne "\n\n   Your choice?  "; read menupick
+            echo -ne "\n\n   Your choice?  "; read menupick
 
-    case $menupick in
-        1) check_connect; time_date ;;
-        2) diskmenu ;;
-        3) install_base ;;
-        4) lvm_hooks ;;
-        5) gen_fstab; set_tz; set_locale ;;
-        6) set_hostname ;;
-        7) echo "Setting ROOT password..."; 
-            arch-chroot /mnt passwd; 
-            echo "Any key to continue..."; read continue ;;
-        8) install_essential ;;
-        9) add_user_acct ;;
-        10) wl_wifi ;;
-        11) install_grub ;;
-        12) install_desktop ;;
-        13) install_extra_stuff ;;
-        14) set_variables ;;
-        15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
-            exit 0 ;;
-        *) echo "Please make a valid pick from menu!" ;;
-    esac
+        case $menupick in
+            1) check_connect; time_date ;;
+            2) diskmenu ;;
+            3) install_base ;;
+            4) lvm_hooks ;;
+            5) gen_fstab; set_tz; set_locale ;;
+            6) set_hostname ;;
+            7) echo "Setting ROOT password..."; 
+                arch-chroot /mnt passwd; 
+                echo "Any key to continue..."; read continue ;;
+            8) install_essential ;;
+            9) add_user_acct ;;
+            10) wl_wifi ;;
+            11) install_grub ;;
+            12) install_desktop ;;
+            13) install_extra_stuff ;;
+            14) set_variables ;;
+            15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+                exit 0 ;;
+            *) echo "Please make a valid pick from menu!" ;;
+        esac
     done
 }
 
