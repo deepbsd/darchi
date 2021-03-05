@@ -233,7 +233,7 @@ EOF
     [[ -n "$home_device" ]] && format_disk "$HOME_SLICE" home
 
     lsblk -f "$IN_DEVICE"
-    echo && echo "Disks should be partioned and mounted.  Continue?"; read more
+    echo && echo "Disks should be partioned and mounted.  Continue?"; lsblk ; read more
     [[ ! "$more" =~ [yY] ]] && exit 1
 }
 
