@@ -74,7 +74,7 @@ base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
 network_essentials=( iwd dhcpcd openssh networkmanager )
 
-my_services=( dhcpcd sshd NetworkManager lightdm )
+my_services=( dhcpcd sshd NetworkManager lightdm systemd-homed )
 
 basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
 
@@ -227,7 +227,7 @@ EOF
     echo "Formatting $SWAP_SLICE" && sleep 2
     [[ -n "$swap_device" ]] && format_disk "$SWAP_SLICE" swap
 
-    lsblk -f "$IN_DEVICE" && echo "Home device name? (leave empty if no swap device)"; read home_device
+    lsblk -f "$IN_DEVICE" && echo "Home device name? (leave empty if no home device)"; read home_device
     HOME_SLICE="/dev/$home_device"
     echo "Formatting $HOME_SLICE" && sleep 2
     [[ -n "$home_device" ]] && format_disk "$HOME_SLICE" home
