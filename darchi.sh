@@ -78,7 +78,13 @@ my_services=( dhcpcd sshd NetworkManager lightdm systemd-homed )
 
 basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
 
-extra_x=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+extra_x1=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts ) 
+
+extra_x2=( noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme )
+
+extra_x3=( arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme ) 
+
+extra_x4=( materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
@@ -354,7 +360,7 @@ add_user_acct(){
 
 # THIS IS IF YOU HAVE TO RESTART THE SCRIPT AFTER PARTITIONING
 set_variables(){
-    lsblk
+    echo "Available block devices: "; lsblk
     clear && echo "Installation device?  (sda, nvme0n, sdb, etc)"; read inst_device
     echo && echo "Install root to? (sda2? nvme0np2?)"; read root_slice
     echo && echo "Install swap to? (leave emtpy if no swap part)"; read swap_slice
@@ -410,9 +416,12 @@ install_desktop(){
     clear
     echo "Installing Xorg and Desktop..."
 
-
+    # EXTRA PACKAGES, FONTS, THEMES, CURSORS
     arch-chroot /mnt pacman -S "${basic_x[@]}"
-    arch-chroot /mnt pacman -S "${extra_x[@]}"
+    arch-chroot /mnt pacman -S "${extra_x1[@]}"
+    arch-chroot /mnt pacman -S "${extra_x2[@]}"
+    arch-chroot /mnt pacman -S "${extra_x3[@]}"
+    arch-chroot /mnt pacman -S "${extra_x4[@]}"
 
     # DRIVER FOR GRAPHICS CARD, DESKTOP, DISPLAY MGR
     arch-chroot /mnt pacman -S "${display_mgr[@]}"     
