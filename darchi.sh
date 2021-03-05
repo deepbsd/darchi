@@ -328,8 +328,8 @@ HOSTS
     echo && echo "/etc/hostname and /etc/hosts files configured..."
     cat /mnt/etc/hostname 
     cat /mnt/etc/hosts
-    echo && echo "Do /etc/hostname and /etc/hosts look correct?"; read etchosts_yn
-    [[ "$etchosts_yn" =~ [yY] ]] || exit 0
+    echo && echo "Press any key to continue"; read etchosts_yn
+    exit 0
 }
 
 # SOME MORE ESSENTIAL NETWORK STUFF
