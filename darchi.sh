@@ -247,7 +247,7 @@ EOF
 get_install_device(){
     clear
     echo "Available installation media: "  && echo
-    lsblk | grep disk
+    lsblk | grep disk | cut -c1-5,30-40
 
     echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
     read device
@@ -294,7 +294,7 @@ set_tz(){
     arch-chroot /mnt hwclock --systohc --utc
     arch-chroot /mnt date
     echo && echo "Press any key to continue..."; read td_yn
-    exit 0
+    #return 0
 }
 
 # LOCALE
@@ -310,7 +310,7 @@ set_locale(){
     sleep 3
     cat /mnt/etc/locale.conf
     echo && echo "Press any key to continue"; read loc_yn
-    exit 0
+    #return 0
 }
 
 # HOSTNAME
@@ -329,7 +329,7 @@ HOSTS
     cat /mnt/etc/hostname 
     cat /mnt/etc/hosts
     echo && echo "Press any key to continue"; read etchosts_yn
-    exit 0
+    #return 0
 }
 
 # SOME MORE ESSENTIAL NETWORK STUFF
