@@ -473,6 +473,7 @@ lv_create(){
     LV_HOME="ArchHome"
     LV_SWAP="ArchSwap"
 
+    lsblk
     echo "What disk are you installing to? (nvme0n1, sda, sdb, etc)"; read disk
     IN_DEVICE=/dev/"$disk"
     echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
