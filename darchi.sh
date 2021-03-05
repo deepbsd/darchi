@@ -268,6 +268,7 @@ install_base(){
     # install lvm2 if we're using LVM
     use_lvm && base_system+=( "lvm2" )
     pacstrap /mnt "${base_system[@]}"
+    [[ -L /dev/mapper/arch_vg-ArchRoot ]] && lvm_hooks
     echo && echo "Base system installed.  Press any key to continue..."; read empty
 }
 
@@ -292,9 +293,8 @@ set_tz(){
     arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
     arch-chroot /mnt hwclock --systohc --utc
     arch-chroot /mnt date
-    echo && echo "Does date look correct?"; read td_yn
-    [[ "$td_yn" =~ [yY] ]] || exit 0
-
+    echo && echo "Press any key to continue..."; read td_yn
+    exit 0
 }
 
 # LOCALE
@@ -309,8 +309,8 @@ set_locale(){
     export LANG="$LOCALE"
     sleep 3
     cat /mnt/etc/locale.conf
-    echo && echo "Does locale setting look correct?"; read loc_yn
-    [[ "$loc_yn" =~ [yY] ]] || exit 0
+    echo && echo "Press any key to continue"; read loc_yn
+    exit 0
 }
 
 # HOSTNAME
@@ -550,7 +550,6 @@ EOF
     fi
     lsblk
     echo "LVs created and mounted. Press any key."; read empty;
-    lvm_hooks
     startmenu
 }
 
