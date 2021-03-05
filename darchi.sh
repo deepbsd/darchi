@@ -354,6 +354,7 @@ add_user_acct(){
 
 # THIS IS IF YOU HAVE TO RESTART THE SCRIPT AFTER PARTITIONING
 set_variables(){
+    lsblk
     clear && echo "Installation device?  (sda, nvme0n, sdb, etc)"; read inst_device
     echo && echo "Install root to? (sda2? nvme0np2?)"; read root_slice
     echo && echo "Install swap to? (leave emtpy if no swap part)"; read swap_slice
