@@ -482,7 +482,6 @@ lv_create(){
     ROOT_SIZE="$rootsize"
     echo "How big is your Swap partition?"; read swap_size
     SWAP_SIZE="$swap_size"
-    #HOME_SIZE=16G
 
     if $(efi_boot_mode); then
         echo "What partition is your EFI device? (nvme0n1p1, sda1, etc)"; read efi_dev
