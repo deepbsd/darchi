@@ -580,13 +580,13 @@ startmenu(){
         echo -e "\n\n     Welcome to Darchi!   Dave's Archlinux Installer!" 
             echo -e "\n\n\n What do you want to do?  \n\n"
             echo -e "  1) Check connection and date   2) Prepare Installation Disk"
-            echo -e "\n  3) Install Base System        4) Not used right now "
-            echo -e "\n  5) New FSTAB and TZ/Locale     6) Set new hostname"
-            echo -e "\n  7) Set new root password       8) Install more essentials "
-            echo -e "\n  9) Add user + sudo account     10) Install BCM4360 drivers  "
-            echo -e "\n  11) Install grub               12) Install Xorg + Desktop"
-            echo -e "\n  13) Install Extra Window Mgrs  14) Repopulate Variables "
-            echo -e "\n  15) Exit Script"
+            echo -e "\n  3) Install Base System        4) New FSTAB and TZ/Locale "
+            echo -e "\n  5) Set new hostname           6) Set root password "
+            echo -e "\n  7) Install more essentials    8) Add user + sudo account "
+            echo -e "\n  9) Install Wifi Drivers      10) Install grub "
+            echo -e "\n  11) Install Xorg + Desktop   12) Install Extra Window Mgrs "
+            echo -e "\n  13) Repopulate Variables     14) Exit Script "
+            echo -e "\n  "
 
 
             echo -ne "\n\n   Your choice?  "; read menupick
@@ -595,20 +595,19 @@ startmenu(){
             1) check_connect; time_date ;;
             2) diskmenu ;;
             3) install_base ;;
-            4) lvm_hooks ;;  # now it's called automatically when using LVM
-            5) gen_fstab; set_tz; set_locale ;;
-            6) set_hostname ;;
-            7) echo "Setting ROOT password..."; 
+            4) gen_fstab; set_tz; set_locale ;;
+            5) set_hostname ;;
+            6) echo "Setting ROOT password..."; 
                 arch-chroot /mnt passwd; 
                 echo "Any key to continue..."; read continue ;;
-            8) install_essential ;;
-            9) add_user_acct ;;
-            10) wl_wifi ;;
-            11) install_grub ;;
-            12) install_desktop ;;
-            13) install_extra_stuff ;;
-            14) set_variables ;;
-            15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+            7) install_essential ;;
+            8) add_user_acct ;;
+            9) wl_wifi ;;
+            10) install_grub ;;
+            11) install_desktop ;;
+            12) install_extra_stuff ;;
+            13) set_variables ;;
+            14) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
                 exit 0 ;;
             *) echo "Please make a valid pick from menu!" ;;
         esac
