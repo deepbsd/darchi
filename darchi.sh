@@ -282,8 +282,7 @@ gen_fstab(){
     # EDIT FSTAB IF NECESSARY
     clear
     echo && echo "Here's the new /etc/fstab..."; cat /mnt/etc/fstab
-    echo && echo "Edit /etc/fstab?"; read edit_fstab
-    [[ "$edit_fstab" =~ [yY] ]] && vim /mnt/etc/fstab
+    echo && echo "Type any key to continue..."; read empty
 }
 
 # TIMEZONE
