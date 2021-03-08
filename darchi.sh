@@ -145,6 +145,19 @@ time_date(){
     sleep 4
 }
 
+show_disks(){
+   DISKS=()
+   for d in $(lsblk | grep disk | awk '{printf "%s\n%s\n",$1,$4}'); do
+        DISKS+=($d)
+   done
+
+   max=${#DISKS[@]}
+   for ((n=0;n<$max;n+=2)); do
+        printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]}
+   done
+}
+
+
 # MOUNT PARTION
 mount_part(){
     device=$1; mt_pt=$2
@@ -247,7 +260,8 @@ EOF
 get_install_device(){
     clear
     echo "Available installation media: "  && echo
-    lsblk | grep disk | cut -c1-5,30-40
+    #lsblk | grep disk | cut -c1-5,30-40
+    show_disks
 
     echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
     read device
