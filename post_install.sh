@@ -11,6 +11,7 @@ scp -Br dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wall
 
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
+echo "updating locate database..."
 sudo updatedb
 
 ## INSTALL POWERLINE
