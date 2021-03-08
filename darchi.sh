@@ -260,7 +260,7 @@ EOF
 get_install_device(){
     clear
     echo "Available installation media: "  && echo
-    #lsblk | grep disk | cut -c1-5,30-40
+    #lsblk | grep disk | cut -c1-5,30-40    # decided to use show_disks() instead
     show_disks
 
     echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
