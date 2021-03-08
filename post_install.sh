@@ -13,13 +13,13 @@ scp -Br dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wall
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
 
 ## INSTALL POWERLINE
-$(which powerline >/dev/null) && sudo pacman -S powerline powerline-fonts
+$(which powerline >/dev/null) || sudo pacman -S powerline powerline-fonts
 
 ## CHECK FOR OLD FAITHFULS
 $(which gkrellm) || sudo pacman -S gkrellm
 [[ -f /opt/anaconda/bin/anaconda-navigator ]] || yay -S anaconda
 
-## INSTALL POWERLINE AND DEV STUFF 
+## INSTALL DEV STUFF 
 sudo pacman -S  ruby nodejs npm npm-check-updates gvim mlocate gkrellm
 
 ## DOTFILES
