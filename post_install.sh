@@ -2,12 +2,27 @@
 
 # Run this script after system and desktop are already installed
 
+systemctl status systemd-homed
+echo "Be sure to start and enable systemd-homed (as root) or else sudo may not work properly"
+echo "Also, reinstall pambase if necessary `pacman -S pambase`"
+echo "Type any to continue..." ; read empty
+
 ## PERSONAL DIRECTORIES AND RESOURCES
 echo "Making personal subdirectories..."
 mkdir tmp repos build 
+
+# clone the latest dotfiles
+git clone https://github.com/deepbsd/dotfiles.git
+
 echo "Download home directory files from what host on network?"; read whathost
 #scp -o StrictHostKeyChecking=no -r dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
-scp -Br dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
+scp -Br dsj@"$whathost".lan:{adm,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
+
+# SSH-AGENT SERVICE
+echo "Start the ssh-agent service..."
+eval $(ssh-agent)
+ls ~/.ssh/* ; echo "Add which key? "; read key_name
+ssh-add ~/.ssh/"$key_name"
 
 ## INSTALL DVD SUPPORT, GKRELLM, MLOCATE
 sudo pacman -S libdvdread libdvdcss libdvdnav gkrellm mlocate fzf
