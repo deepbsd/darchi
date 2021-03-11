@@ -477,7 +477,6 @@ lvm_hooks(){
     sleep 4
     vim /mnt/etc/mkinitcpio.conf
     arch-chroot /mnt mkinitcpio -P
-    echo "Press any key to continue..."; read empty
 }
 
 lv_create(){
