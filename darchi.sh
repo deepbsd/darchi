@@ -584,6 +584,7 @@ diskmenu(){
         *) echo "Please make a valid pick from menu!" ;;
     esac
     done
+    completed_tasks+=( 2 )
 }
 
 #############################################################
@@ -611,7 +612,7 @@ startmenu(){
 
         case $menupick in
             1) check_connect; time_date; completed_tasks+=( 1 );;
-            2) diskmenu; completed_tasks+=( 2 ) ;;
+            2) diskmenu;;
             3) install_base; completed_tasks+=( 3 ) ;;
             4) gen_fstab; set_tz; set_locale; completed_tasks+=( 4 ) ;;
             5) set_hostname; completed_tasks+=( 5 ) ;;
