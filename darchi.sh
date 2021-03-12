@@ -575,12 +575,15 @@ diskmenu(){
         echo -e "\n\n     Prepare Installation Disk (Choose One)" 
         echo -e "  1) Prepare Installation Disk with Normal Partitions"
         echo -e "  2) Prepare Installation Disk with LVM"
+        echo -e "  3) Return to previous menu"
+        echo -e "\n\n"
 
         echo -e "\n\n   Your choice?  "; read diskmenupick
 
     case $diskmenupick in
         1) get_install_device ;;
         2) lv_create ;;
+        3) startmenu ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
     done
