@@ -11,12 +11,17 @@ echo "Type any to continue..." ; read empty
 echo "Making personal subdirectories..."
 mkdir tmp repos build 
 
+# Pick a host to get stuff from on the local network
+echo "Download home directory files from what host on network?"; read whathost
+
+# get ssh keys...
+scp -o StrictHostKeyChecking=no -r dsj@"$whathost".lan:.ssh .
+
 # clone the latest dotfiles
 git clone https://github.com/deepbsd/dotfiles.git
 
-echo "Download home directory files from what host on network?"; read whathost
 #scp -o StrictHostKeyChecking=no -r dsj@"$whathost".lan:{adm,dotfiles,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
-scp -Br dsj@"$whathost".lan:{adm,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.ssh,.gnupg,Music} .
+scp -Br dsj@"$whathost".lan:{adm,.vim,public_html,sounds,.gkrellm2,wallpaper,wallpaper1,bin,.gnupg,Music} .
 
 # SSH-AGENT SERVICE
 echo "Start the ssh-agent service..."
