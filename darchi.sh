@@ -571,6 +571,7 @@ EOF
 
 diskmenu(){
     clear
+    completed_tasks+=( 2 )
     while true ; do
         echo -e "\n\n     Prepare Installation Disk (Choose One)" 
         echo -e "  1) Prepare Installation Disk with Normal Partitions"
@@ -587,7 +588,6 @@ diskmenu(){
         *) echo "Please make a valid pick from menu!" ;;
     esac
     done
-    completed_tasks+=( 2 )
 }
 
 #############################################################
