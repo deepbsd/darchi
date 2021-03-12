@@ -106,6 +106,8 @@ all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "$
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
+completed_tasks=()
+
 ##########################################
 ###########  FUNCTIONS ###################
 ##########################################
@@ -602,25 +604,27 @@ startmenu(){
             echo -e "\n  11) Install Xorg + Desktop   12) Install Extra Window Mgrs "
             echo -e "\n  13) Repopulate Variables     14) Exit Script "
             echo -e "\n  "
+            echo -e "\n  Tasks completed:  ${completed_tasks[@]}"
 
 
             echo -ne "\n\n   Your choice?  "; read menupick
 
         case $menupick in
-            1) check_connect; time_date ;;
-            2) diskmenu ;;
-            3) install_base ;;
-            4) gen_fstab; set_tz; set_locale ;;
-            5) set_hostname ;;
+            1) check_connect; time_date; completed_tasks+=( 1 );;
+            2) diskmenu; completed_tasks+=( 2 ) ;;
+            3) install_base; completed_tasks+=( 3 ) ;;
+            4) gen_fstab; set_tz; set_locale; completed_tasks+=( 4 ) ;;
+            5) set_hostname; completed_tasks+=( 5 ) ;;
             6) echo "Setting ROOT password..."; 
                 arch-chroot /mnt passwd; 
+                completed_tasks+=( 6 )
                 echo "Any key to continue..."; read continue ;;
-            7) install_essential ;;
-            8) add_user_acct ;;
-            9) wl_wifi ;;
-            10) install_grub ;;
-            11) install_desktop ;;
-            12) install_extra_stuff ;;
+            7) install_essential; completed_tasks+=( 7 ) ;;
+            8) add_user_acct; completed_tasks+=( 8 ) ;;
+            9) wl_wifi; completed_tasks+=( 9 ) ;;
+            10) install_grub; completed_tasks+=( 10 ) ;;
+            11) install_desktop; completed_tasks+=( 11 ) ;;
+            12) install_extra_stuff; completed_tasks+=( 12 ) ;;
             13) set_variables ;;
             14) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
                 exit 0 ;;
