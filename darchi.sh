@@ -164,6 +164,8 @@ crypt_setup(){
     # Takes a disk partition as an argument
     read -p "Encrypting a disk partition. Please enter a memorable passphrase: " passphrase
     echo "$passphrase" | cryptsetup -q luksFormat $1
+
+    cryptsetup open --type luks $1 lvm
 }
 
 # MOUNT PARTION
