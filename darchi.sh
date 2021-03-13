@@ -161,6 +161,7 @@ show_disks(){
 
 # USE CRYPTSETUP
 crypt_setup(){
+    # Takes a disk partition as an argument
     read -p "Encrypting a disk partition. Please enter a memorable passphrase: " passphrase
     echo "$passphrase" | cryptsetup -q luksFormat $1
 }
