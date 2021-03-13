@@ -159,6 +159,11 @@ show_disks(){
    done
 }
 
+# USE CRYPTSETUP
+crypt_setup(){
+    read -p "Encrypting a disk partition. Please enter a memorable passphrase: " passphrase
+    echo "$passphrase" | cryptsetup -q luksFormat $1
+}
 
 # MOUNT PARTION
 mount_part(){
