@@ -18,19 +18,6 @@
    # HOME_SIZE=     # ALL REMAINING SPACE
    # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
-   # populate the disks array for potential installation targets
-   : '    
-   DISKS=()
-   for d in $(lsblk | grep disk | awk '{printf "%s\n%s\n",$1,$4}'); do
-        DISKS+=($d)
-   done
-
-   max=${#DISKS[@]}
-   for ((n=0;n<$max;n+=2)); do
-        printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]}
-   done
-   '
-
 ##  Set this
 use_lvm(){ return 0; }  # return 0 for true, 1 for false
 
