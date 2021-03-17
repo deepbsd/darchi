@@ -122,7 +122,7 @@ not_connected(){
 check_connect(){
     clear
     echo "Trying to ping google.com..."
-    $(ping -c 3 archlinux.org &>/dev/null) || (echo "Not Connected to Network!!!" && not_connected)
+    $(ping -c 3 archlinux.org &>/dev/null) ||  not_connected
     echo "Good!  We're connected!!!" && sleep 4
 }
 
