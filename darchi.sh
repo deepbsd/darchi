@@ -18,8 +18,6 @@
    # HOME_SIZE=     # ALL REMAINING SPACE
    # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
-##  Set this
-use_lvm(){ return 0; }  # return 0 for true, 1 for false
 
 ##  ** Do NOT edit these! They are updated programmatically **
 ##                        --- for non-lvm systems ---
@@ -277,7 +275,7 @@ get_install_device(){
 install_base(){
     clear
     # install lvm2 if we're using LVM
-    use_lvm && base_system+=( "lvm2" )
+    [[ USE_LVM == 'TRUE'  ]] && base_system+=( "lvm2" )
     pacstrap /mnt "${base_system[@]}"
     [[ -L /dev/mapper/arch_vg-ArchRoot ]] && lvm_hooks
     echo && echo "Base system installed.  Press any key to continue..."; read empty
@@ -477,6 +475,7 @@ lvm_hooks(){
 }
 
 lv_create(){
+    USE_LVM='TRUE'
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
     LV_HOME="ArchHome"
