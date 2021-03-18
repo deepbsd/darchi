@@ -275,7 +275,7 @@ get_install_device(){
 install_base(){
     clear
     # install lvm2 if we're using LVM
-    [[ USE_LVM == 'TRUE'  ]] && base_system+=( "lvm2" )
+    [[ $USE_LVM == 'TRUE'  ]] && base_system+=( "lvm2" )
     pacstrap /mnt "${base_system[@]}"
     [[ -L /dev/mapper/arch_vg-ArchRoot ]] && lvm_hooks
     echo && echo "Base system installed.  Press any key to continue..."; read empty
@@ -286,7 +286,7 @@ gen_fstab(){
     clear
     echo "Generating fstab..."
     genfstab -U /mnt >> /mnt/etc/fstab
-    sleep 5
+    sleep 3
 
     # EDIT FSTAB IF NECESSARY
     clear
