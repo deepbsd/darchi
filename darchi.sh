@@ -151,7 +151,7 @@ crypt_setup(){
     read -p "Encrypting a disk partition. Please enter a memorable passphrase: " -s passphrase
     echo "$passphrase" | cryptsetup -q luksFormat $1
 
-    cryptsetup open --type luks $1 lvm
+    cryptsetup open --type luks $1 arch_vg
 }
 
 # MOUNT PARTION
@@ -525,7 +525,6 @@ EOF
     
     # run cryptsetup on root device
     [[ "$USE_CRYPT" == 'YES' ]] && crypt_setup "$ROOT_DEVICE"
-
 
     # create the physical volumes
     pvcreate "$ROOT_DEVICE"
