@@ -489,7 +489,7 @@ lv_create(){
     echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
     ROOT_DEVICE=/dev/"$root_dev"
 
-    [[ $USE_CRYPT == 'TRUE' ]] && crypt_setup "$ROOT_DEVICE"
+    [[ "$USE_CRYPT" == 'TRUE' ]] && crypt_setup "$ROOT_DEVICE"
 
     echo "How big is your root partition? (12G, 50G, 100G, etc)"; read rootsize
     ROOT_SIZE="$rootsize"
