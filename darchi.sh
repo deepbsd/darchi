@@ -489,8 +489,6 @@ lv_create(){
     echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
     ROOT_DEVICE=/dev/"$root_dev"
 
-    [[ "$USE_CRYPT" == 'YES' ]] && crypt_setup "$ROOT_DEVICE"
-
     echo "How big is your root partition or volume? (12G, 50G, 100G, etc)"; read rootsize
     ROOT_SIZE="$rootsize"
     echo "How big is your Swap partition or volume? (2G, 4G, 8G, 16G, etc)"; read swap_size
@@ -524,6 +522,10 @@ EOF
     fi
 
     clear
+    
+    # run cryptsetup on root device
+    [[ "$USE_CRYPT" == 'YES' ]] && crypt_setup "$ROOT_DEVICE"
+
 
     # create the physical volumes
     pvcreate "$ROOT_DEVICE"
