@@ -582,7 +582,7 @@ diskmenu(){
     case $diskmenupick in
         1) get_install_device ;;
         2) lv_create ;;
-        3) USE_CRYPT='YES'; lv_create ;;
+        3) export USE_CRYPT='YES'; lv_create ;;
         4) startmenu ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
