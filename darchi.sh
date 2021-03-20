@@ -21,6 +21,7 @@
 
 ##  ** Do NOT edit these! They are updated programmatically **
 ##                        --- for non-lvm systems ---
+USE_CRYPT=''
 DISKTABLE=''
 IN_DEVICE=''
 EFI_SLICE=''
@@ -475,7 +476,6 @@ lvm_hooks(){
 }
 
 lv_create(){
-    USE_LVM='TRUE'
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
     LV_HOME="ArchHome"
@@ -488,6 +488,9 @@ lv_create(){
     IN_DEVICE=/dev/"$disk"
     echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
     ROOT_DEVICE=/dev/"$root_dev"
+
+    [[ $USE_CRYPT == 'TRUE' ]] && crypt_setup "$ROOT_DEVICE"
+
     echo "How big is your root partition? (12G, 50G, 100G, etc)"; read rootsize
     ROOT_SIZE="$rootsize"
     echo "How big is your Swap partition? (2G, 8G, 16G, etc)"; read swap_size
@@ -570,7 +573,8 @@ diskmenu(){
         echo -e "\n\n     Prepare Installation Disk (Choose One)" 
         echo -e "  1) Prepare Installation Disk with Normal Partitions"
         echo -e "  2) Prepare Installation Disk with LVM"
-        echo -e "  3) Return to previous menu"
+        echo -e "  3) Prepare Installation Disk Encryption and LVM"
+        echo -e "  4) Return to previous menu"
         echo -e "\n\n"
 
         echo -e "\n\n   Your choice?  "; read diskmenupick
@@ -578,7 +582,8 @@ diskmenu(){
     case $diskmenupick in
         1) get_install_device ;;
         2) lv_create ;;
-        3) startmenu ;;
+        3) USE_CRYPT='YES'; lv_create ;;
+        4) startmenu ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
     done
