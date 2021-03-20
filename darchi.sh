@@ -491,9 +491,9 @@ lv_create(){
 
     [[ "$USE_CRYPT" == 'TRUE' ]] && crypt_setup "$ROOT_DEVICE"
 
-    echo "How big is your root partition? (12G, 50G, 100G, etc)"; read rootsize
+    echo "How big is your root partition or volume? (12G, 50G, 100G, etc)"; read rootsize
     ROOT_SIZE="$rootsize"
-    echo "How big is your Swap partition? (2G, 8G, 16G, etc)"; read swap_size
+    echo "How big is your Swap partition or volume? (2G, 4G, 8G, 16G, etc)"; read swap_size
     SWAP_SIZE="$swap_size"
 
     if $(efi_boot_mode); then
@@ -582,7 +582,7 @@ diskmenu(){
     case $diskmenupick in
         1) get_install_device ;;
         2) lv_create ;;
-        3) export USE_CRYPT='YES'; lv_create ;;
+        3) USE_CRYPT='YES'; lv_create ;;
         4) startmenu ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
