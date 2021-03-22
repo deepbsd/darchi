@@ -20,7 +20,6 @@
 
 
 ##  ** Do NOT edit these! They are updated programmatically **
-##                        --- for non-lvm systems ---
 USE_CRYPT=''
 DISKTABLE=''
 IN_DEVICE=''
