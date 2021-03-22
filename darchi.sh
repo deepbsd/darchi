@@ -480,6 +480,7 @@ lvm_hooks(){
 }
 
 lv_create(){
+    USE_LVM='TRUE'
     VOL_GROUP=arch_vg
     LV_ROOT="ArchRoot"
     LV_HOME="ArchHome"
