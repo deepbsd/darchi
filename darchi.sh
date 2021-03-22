@@ -149,9 +149,13 @@ show_disks(){
 crypt_setup(){
     # Takes a disk partition as an argument
     read -p "Encrypting a disk partition. Please enter a memorable passphrase: " -s passphrase
-    echo "$passphrase" | cryptsetup -q luksFormat $1
+    #echo "$passphrase" | cryptsetup -q luksFormat $1
+    echo "$passphrase" | cryptsetup -q luksFormat --hash=sha512 --key-size=512 --cipher=aes-xts-plain64 --verify-passphrase $1
 
-    cryptsetup open --type luks $1 arch_vg
+    cryptsetup luksOpen  $1 sda_crypt
+    dd if=/dev/zero of=/dev/mapper/sda_crypt bs=1M
+    cryptsetup luksClose sda_crypt
+    dd if=/dev/urandom of="$1" bs=512 count=20480
 }
 
 # MOUNT PARTION
