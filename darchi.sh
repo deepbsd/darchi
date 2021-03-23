@@ -20,6 +20,9 @@
 
 
 ##  ** Do NOT edit these! They are updated programmatically **
+##
+## Note: these all of these variables must be in the global namespace
+##       so they can be updated from functions later on
 DISKTABLE=''
 IN_DEVICE=''
 EFI_SLICE=''
