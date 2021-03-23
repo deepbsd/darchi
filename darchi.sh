@@ -20,7 +20,6 @@
 
 
 ##  ** Do NOT edit these! They are updated programmatically **
-USE_CRYPT=''
 DISKTABLE=''
 IN_DEVICE=''
 EFI_SLICE=''
@@ -35,6 +34,7 @@ display_mgr=(lightdm)
 
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
+USE_CRYPT='' # gets set programmatically
 VOL_GROUP="arch_vg"
 LV_ROOT="ArchRoot"
 LV_HOME="ArchHome"
