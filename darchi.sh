@@ -152,7 +152,8 @@ show_disks(){
 crypt_setup(){
     cat <<<END_OF_MSG
 "You are about to encrypt a physical volume.  Your data will be stored in an encrypted
-state when powered off.  Your files will only be protected while the system is powered off."
+state when powered off.  Your files will only be protected while the system is powered off.
+This could be very useful if your laptop gets stolen, for example."
 
 END_OF_MSG
     read -p "Encrypting a disk partition. Please enter a memorable passphrase: " -s passphrase
