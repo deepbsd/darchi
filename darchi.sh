@@ -531,7 +531,7 @@ EOF
     clear
     
     # run cryptsetup on root device
-    [[ "$USE_CRYPT" == 'YES' ]] && crypt_setup "$ROOT_DEVICE"
+    [[ "$USE_CRYPT" == 'TRUE' ]] && crypt_setup "$ROOT_DEVICE"
 
     # create the physical volumes
     pvcreate "$ROOT_DEVICE"
@@ -574,6 +574,7 @@ EOF
     startmenu
 }
 
+
 diskmenu(){
     clear
     completed_tasks+=( 2 )
@@ -590,7 +591,7 @@ diskmenu(){
     case $diskmenupick in
         1) get_install_device ;;
         2) lv_create ;;
-        3) USE_CRYPT='YES'; lv_create ;;
+        3) USE_CRYPT='TRUE'; lv_create ;;
         4) startmenu ;;
         *) echo "Please make a valid pick from menu!" ;;
     esac
