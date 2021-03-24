@@ -136,6 +136,7 @@ time_date(){
 }
 
 show_disks(){
+   echo "Here are the available disks in your system: "
    DISKS=()
    for d in $(lsblk | grep disk | awk '{printf "%s\n%s\n",$1,$4}'); do
         DISKS+=($d)
@@ -145,13 +146,14 @@ show_disks(){
    for ((n=0;n<$max;n+=2)); do
         printf "%s\t\t%s\n" ${DISKS[$n]} ${DISKS[(($n+1))]}
    done
+   echo
 }
 
 # USE CRYPTSETUP
 # Takes a disk partition as an argument
 crypt_setup(){
     # Give msg to user about purpose of encrypted physical volume
-    cat <<<END_OF_MSG
+    cat <<END_OF_MSG
 "You are about to encrypt a physical volume.  Your data will be stored in an encrypted
 state when powered off.  Your files will only be protected while the system is powered off.
 This could be very useful if your laptop gets stolen, for example."
