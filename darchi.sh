@@ -150,9 +150,10 @@ show_disks(){
 # USE CRYPTSETUP
 # Takes a disk partition as an argument
 crypt_setup(){
-    echo <<<END_OF_MSG
+    cat <<<END_OF_MSG
 "You are about to encrypt a physical volume.  Your data will be stored in an encrypted
 state when powered off.  Your files will only be protected while the system is powered off."
+
 END_OF_MSG
     read -p "Encrypting a disk partition. Please enter a memorable passphrase: " -s passphrase
     #echo "$passphrase" | cryptsetup -q luksFormat $1
