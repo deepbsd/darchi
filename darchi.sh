@@ -160,8 +160,10 @@ END_OF_MSG
     echo "$passphrase" | cryptsetup -q luksFormat --hash=sha512 --key-size=512 --cipher=aes-xts-plain64 --verify-passphrase $1
 
     cryptsetup luksOpen  $1 sda_crypt
+    echo "Wiping every byte of device with zeros, could take a while..."
     dd if=/dev/zero of=/dev/mapper/sda_crypt bs=1M
     cryptsetup luksClose sda_crypt
+    echo "Filling device with random data..."
     dd if=/dev/urandom of="$1" bs=512 count=20480
 }
 
