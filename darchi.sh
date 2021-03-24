@@ -150,6 +150,7 @@ show_disks(){
 # USE CRYPTSETUP
 # Takes a disk partition as an argument
 crypt_setup(){
+    # Give msg to user about purpose of encrypted physical volume
     cat <<<END_OF_MSG
 "You are about to encrypt a physical volume.  Your data will be stored in an encrypted
 state when powered off.  Your files will only be protected while the system is powered off.
@@ -164,7 +165,7 @@ END_OF_MSG
     echo "Wiping every byte of device with zeros, could take a while..."
     dd if=/dev/zero of=/dev/mapper/sda_crypt bs=1M
     cryptsetup luksClose sda_crypt
-    echo "Filling device with random data..."
+    echo "Filling header of device with random data..."
     dd if=/dev/urandom of="$1" bs=512 count=20480
 }
 
