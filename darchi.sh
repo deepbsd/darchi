@@ -149,9 +149,9 @@ show_disks(){
    echo
 }
 
-# USE CRYPTSETUP
-# Takes a disk partition as an argument
+# ENCRYPT DISK WHEN POWER IS OFF
 crypt_setup(){
+    # Takes a disk partition as an argument
     # Give msg to user about purpose of encrypted physical volume
     cat <<END_OF_MSG
 "You are about to encrypt a physical volume.  Your data will be stored in an encrypted
@@ -273,7 +273,6 @@ EOF
 get_install_device(){
     clear
     echo "Available installation media: "  && echo
-    #lsblk | grep disk | cut -c1-5,30-40    # decided to use show_disks() instead
     show_disks
 
     echo && echo "Install to what device? (sda, nvme01, sdb, etc)" 
@@ -292,7 +291,7 @@ get_install_device(){
 # INSTALL ESSENTIAL PACKAGES
 install_base(){
     clear
-    # install lvm2 if we're using LVM
+    # install lvm2 hook if we're using LVM
     [[ $USE_LVM == 'TRUE'  ]] && base_system+=( "lvm2" )
     pacstrap /mnt "${base_system[@]}"
     [[ -L /dev/mapper/arch_vg-ArchRoot ]] && lvm_hooks
@@ -452,6 +451,7 @@ install_desktop(){
     # DRIVER FOR GRAPHICS CARD, DESKTOP, DISPLAY MGR
     arch-chroot /mnt pacman -S "${display_mgr[@]}"     
     arch-chroot /mnt pacman -S "${graphics_driver[@]}" 
+    ## Insert your default desktop here...
     arch-chroot /mnt pacman -S "${cinnamon_desktop[@]}"
 
     # ENABLE SERVICES
