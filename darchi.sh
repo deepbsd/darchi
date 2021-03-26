@@ -94,6 +94,8 @@ all_extras=( "${xfce_desktop[@]}" "${i3gaps_desktop[@]}" "${mate_desktop[@]}" "$
 
 ##  fonts_themes=()    #  in case I want to break these out from extra_x
 
+all_pkgs=( base_system base_essentials network_essentials my_services basic_x extra_x1 extra_x2 extra_x3 extra_x4 cinnamon_desktop xfce_desktop mate_desktop i3gaps_desktop devel_stuff printing_stuff multimedia_stuff )
+
 completed_tasks=()
 
 ##########################################
@@ -125,6 +127,19 @@ check_connect(){
     echo "Trying to ping google.com..."
     $(ping -c 3 archlinux.org &>/dev/null) ||  not_connected
     echo "Good!  We're connected!!!" && sleep 4
+}
+
+# VALIDATE PKG NAMES IN SCRIPT
+validate_pkgs(){
+    for pkg_arr in "${all_pkgs[@]}"; do
+        for pkg_name in "${pkg_arr[@]}"; do
+            if $( pacman -Q $pkg_name &>/dev/null ); then
+                continue
+            else 
+                echo "$pkg_name not in repos."
+            fi
+        done
+    done
 }
 
 # UPDATE SYSTEM CLOCK
@@ -625,7 +640,8 @@ startmenu(){
             echo -e "\n  7) Install more essentials    8) Add user + sudo account "
             echo -e "\n  9) Install Wifi Drivers      10) Install grub "
             echo -e "\n  11) Install Xorg + Desktop   12) Install Extra Window Mgrs "
-            echo -e "\n  13) Repopulate Variables     14) Exit Script "
+            echo -e "\n  13) Repopulate Variables     14) Check for pkg name changes "
+            echo -e "\n  15) Exit Script     "
             echo -e "\n  "
             echo -e "\n  Tasks completed:  ${completed_tasks[@]}"
 
@@ -649,7 +665,8 @@ startmenu(){
             11) install_desktop; completed_tasks+=( 11 ) ;;
             12) install_extra_stuff; completed_tasks+=( 12 ) ;;
             13) set_variables ;;
-            14) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+            14) validate_pkgs ;;
+            15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
                 exit 0 ;;
             *) echo "Please make a valid pick from menu!" ;;
         esac
