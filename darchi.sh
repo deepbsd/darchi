@@ -143,7 +143,7 @@ validate_pkgs(){
             fi
         done
     done
-    echo && read -p "Press any key to continue." empty
+    echo -e "\n" && read -p "Press any key to continue." empty
 }
 
 # UPDATE SYSTEM CLOCK
