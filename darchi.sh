@@ -131,7 +131,7 @@ check_connect(){
 
 # VALIDATE PKG NAMES IN SCRIPT
 validate_pkgs(){
-    echo -n "checking pkgs..."
+    echo && echo -n "validating pkg names..."
     for pkg_arr in "${all_pkgs[@]}"; do
         declare -n arr_name=$pkg_arr
         for pkg_name in "${arr_name[@]}"; do
