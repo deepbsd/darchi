@@ -9,12 +9,20 @@ video_driver='xf86-video-vmware'  # change if not using a virtual machine
 declare -A display_mgr=( [dm]='lightdm' [service]='lightdm' )
 
 ## These are packages required for a working Xorg desktop (My preferences anyway)
-basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock firefox )
+basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock firefox ${display_mgr[dm]} )
 
 ## These are your specific choices for fonts and wallpapers and X-related goodies
-extra_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts breeze-gtk breeze-icons oxygen-gtk2 gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan mate-icon-theme materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+extra_x=( lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan )
 
-goodies=( htop neofetch screenfetch powerline powerline-fonts powerline-vim )
+themes_x=( breeze-gtk oxygen-gtk2 gtk-engine-murrine xcursor-themes adapta-gtk-theme arc-gtk-theme materia-gtk-theme xcursor-bluecurve xcursor-premium )
+
+wallpapers_x=( archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+
+icons_x=( breeze-icons oxygen-icons elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme mate-icon-theme papirus-icon-theme )
+
+fonts_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts )
+
+goodies=( alacritty terminator htop neofetch screenfetch powerline powerline-fonts powerline-vim )
 
 ## -----------  Some of these are included, but it's all up to you...
 xfce_desktop=( xfce4 xfce4-goodies )
@@ -54,12 +62,16 @@ find_card(){
 if $(install_x); then
     clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
     arch-chroot /mnt pacman -S "${basic_x[@]}"
+    arch-chroot /mnt pacman -S "${themes_x[@]}"
+    arch-chroot /mnt pacman -S "${wallpapers_x[@]}"
+    arch-chroot /mnt pacman -S "${icons_x[@]}"
+    arch-chroot /mnt pacman -S "${fonts_x[@]}"
+    arch-chroot /mnt pacman -S "${goodies[@]}"
     arch-chroot /mnt pacman -S "${extra_x[@]}"
     your_card=$(find_card)
     echo "${your_card} and you're installing the $video_driver driver... (Type key to continue) "; read empty
     arch-chroot /mnt pacman -S "$video_driver"
     arch-chroot /mnt pacman -S "${extra_desktops[@]}"
-    arch-chroot /mnt pacman -S "${goodies[@]}"
 
     echo "Enabling display manager service..."
     arch-chroot /mnt systemctl enable ${display_mgr[service]}
