@@ -12,8 +12,6 @@ declare -A display_mgr=( [dm]='lightdm' [service]='lightdm' )
 basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xfce4-terminal xorg-xclock firefox ${display_mgr[dm]} )
 
 ## These are your specific choices for fonts and wallpapers and X-related goodies
-extra_x=( lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan )
-
 themes_x=( breeze-gtk oxygen-gtk2 gtk-engine-murrine xcursor-themes adapta-gtk-theme arc-gtk-theme materia-gtk-theme xcursor-bluecurve xcursor-premium )
 
 wallpapers_x=( archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
@@ -24,7 +22,11 @@ fonts_x=( adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts noto-fonts 
 
 goodies=( alacritty terminator htop neofetch screenfetch powerline powerline-fonts powerline-vim )
 
+extra_x=( lightdm-gtk-greeter-settings lightdm-webkit-theme-litarvan )
+
 ## -----------  Some of these are included, but it's all up to you...
+cinnamon_desktop=( cinnamon nemo-fileroller )
+
 xfce_desktop=( xfce4 xfce4-goodies )
 
 mate_desktop=( mate mate-extra )
@@ -62,6 +64,9 @@ find_card(){
 if $(install_x); then
     clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
     arch-chroot /mnt pacman -S "${basic_x[@]}"
+    # arch-chroot /mnt pacman -S "${display_mgr[dm]}"   # should be installed from line 12
+    arch-chroot /mnt pacman -S "$video_driver"
+    arch-chroot /mnt pacman -S "${cinnamon_desktop[@]}"
     arch-chroot /mnt pacman -S "${themes_x[@]}"
     arch-chroot /mnt pacman -S "${wallpapers_x[@]}"
     arch-chroot /mnt pacman -S "${icons_x[@]}"
@@ -70,7 +75,6 @@ if $(install_x); then
     arch-chroot /mnt pacman -S "${extra_x[@]}"
     your_card=$(find_card)
     echo "${your_card} and you're installing the $video_driver driver... (Type key to continue) "; read empty
-    arch-chroot /mnt pacman -S "$video_driver"
     arch-chroot /mnt pacman -S "${extra_desktops[@]}"
 
     echo "Enabling display manager service..."
