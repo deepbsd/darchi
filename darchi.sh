@@ -83,9 +83,9 @@ mate_desktop=( mate mate-extra )
 
 i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks nitrogen i3status ttf-font-awesome ttf-ionicons )
 
-kde_desktop=( lightdm-kde-greeter plasma plasma-wayland-session kde-applications )
-
 qtile_desktop=( qtile )
+
+kde_desktop=( lightdm-kde-greeter plasma plasma-wayland-session kde-applications )
 
 ## Python3 should be installed by default
 devel_stuff=( git nodejs npm npm-check-updates ruby )
