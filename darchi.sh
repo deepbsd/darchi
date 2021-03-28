@@ -134,6 +134,15 @@ check_connect(){
     echo "Good!  We're connected!!!" && sleep 4
 }
 
+# CHECK IF TASK IS COMPLETED
+check_tasks(){
+    # If task already exists in array return falsey
+    # Function takes a task number as an argument
+    [[ "${completed_tasks[@]}" =~ $1 ]] && return 1
+    completed_tasks+=( "$1" )
+    return 0
+}
+
 # VALIDATE PKG NAMES IN SCRIPT
 validate_pkgs(){
     echo && echo -n "    validating pkg names..."
@@ -614,7 +623,7 @@ EOF
 
 diskmenu(){
     clear
-    completed_tasks+=( 2 )
+    check_tasks 2
     while true ; do
         echo -e "\n\n     Prepare Installation Disk (Choose One)" 
         echo -e "  1) Prepare Installation Disk with Normal Partitions"
@@ -660,21 +669,21 @@ startmenu(){
             echo -ne "\n\n   Your choice?  "; read menupick
 
         case $menupick in
-            1) check_connect; time_date; completed_tasks+=( 1 );;
+            1) check_connect; time_date; check_tasks 1 ;;
             2) diskmenu;;
-            3) install_base; completed_tasks+=( 3 ) ;;
-            4) gen_fstab; set_tz; set_locale; completed_tasks+=( 4 ) ;;
-            5) set_hostname; completed_tasks+=( 5 ) ;;
+            3) install_base; check_tasks 3 ;;
+            4) gen_fstab; set_tz; set_locale; check_tasks 4 ;;
+            5) set_hostname; check_tasks 5 ;;
             6) echo "Setting ROOT password..."; 
                 arch-chroot /mnt passwd; 
-                completed_tasks+=( 6 )
+                check_tasks 6
                 echo "Any key to continue..."; read continue ;;
-            7) install_essential; completed_tasks+=( 7 ) ;;
-            8) add_user_acct; completed_tasks+=( 8 ) ;;
-            9) wl_wifi; completed_tasks+=( 9 ) ;;
-            10) install_grub; completed_tasks+=( 10 ) ;;
-            11) install_desktop; completed_tasks+=( 11 ) ;;
-            12) install_extra_stuff; completed_tasks+=( 12 ) ;;
+            7) install_essential; check_tasks 7 ;;
+            8) add_user_acct; check_tasks 8 ;;
+            9) wl_wifi; check_tasks 9 ;;
+            10) install_grub; check_tasks 10 ;;
+            11) install_desktop; check_tasks 11 ;;
+            12) install_extra_stuff; check_tasks 12 ;;
             13) set_variables ;;
             14) validate_pkgs ;;
             15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
