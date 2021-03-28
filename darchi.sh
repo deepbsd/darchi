@@ -62,7 +62,7 @@ base_essentials=(git mlocate pacman-contrib man-db man-pages)
 
 network_essentials=( iwd dhcpcd openssh networkmanager )
 
-my_services=( dhcpcd sshd NetworkManager lightdm systemd-homed )
+my_services=( dhcpcd sshd NetworkManager systemd-homed )
 
 basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
 
@@ -389,6 +389,11 @@ install_essential(){
     arch-chroot /mnt pacman -S "${base_essentials[@]}"
     arch-chroot /mnt pacman -S "${network_essentials[@]}"
 
+    # ENABLE SERVICES
+    for service in "${my_services[@]}"; do
+        arch-chroot /mnt systemctl enable "$service"
+    done
+
     echo && echo "Press any key to continue..."; read empty
 }
 
@@ -478,10 +483,7 @@ install_desktop(){
     ## Insert your default desktop here...
     arch-chroot /mnt pacman -S "${cinnamon_desktop[@]}"
 
-    # ENABLE SERVICES
-    for service in "${my_services[@]}"; do
-        arch-chroot /mnt systemctl enable "$service"
-    done
+    arch-chroot /mnt systemctl enable "${display_mgr[@]}"
 
     echo "Type any key to continue..."; read empty
 }
