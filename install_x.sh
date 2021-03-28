@@ -61,24 +61,27 @@ find_card(){
 ######       INSTALL X       #############
 ##########################################
 
+# Must run script as root
+[[ $(whoami) == 'root' ]] || (echo "Must run as root!" && exit 1)
+
 if $(install_x); then
     clear && echo "Installing X and X Extras and Video Driver. Type any key to continue"; read empty
-    arch-chroot /mnt pacman -S "${basic_x[@]}"
+    pacman -S "${basic_x[@]}"
     # arch-chroot /mnt pacman -S "${display_mgr[dm]}"   # should be installed from line 12
-    arch-chroot /mnt pacman -S "$video_driver"
-    arch-chroot /mnt pacman -S "${cinnamon_desktop[@]}"
-    arch-chroot /mnt pacman -S "${themes_x[@]}"
-    arch-chroot /mnt pacman -S "${wallpapers_x[@]}"
-    arch-chroot /mnt pacman -S "${icons_x[@]}"
-    arch-chroot /mnt pacman -S "${fonts_x[@]}"
-    arch-chroot /mnt pacman -S "${goodies[@]}"
-    arch-chroot /mnt pacman -S "${extra_x[@]}"
+    pacman -S "$video_driver"
+    pacman -S "${cinnamon_desktop[@]}"
+    pacman -S "${themes_x[@]}"
+    pacman -S "${wallpapers_x[@]}"
+    pacman -S "${icons_x[@]}"
+    pacman -S "${fonts_x[@]}"
+    pacman -S "${goodies[@]}"
+    pacman -S "${extra_x[@]}"
     your_card=$(find_card)
     echo "${your_card} and you're installing the $video_driver driver... (Type key to continue) "; read empty
-    arch-chroot /mnt pacman -S "${extra_desktops[@]}"
+    pacman -S "${extra_desktops[@]}"
 
     echo "Enabling display manager service..."
-    arch-chroot /mnt systemctl enable ${display_mgr[service]}
+    systemctl enable ${display_mgr[service]}
     echo && echo "Your desktop and display manager should now be installed..."
     sleep 5
 fi
