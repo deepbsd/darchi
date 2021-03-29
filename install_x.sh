@@ -81,7 +81,13 @@ if $(install_x); then
     pacman -S "${extra_desktops[@]}"
 
     echo "Enabling display manager service..."
+    sleep 2
     systemctl enable ${display_mgr[service]}
+    sleep 2
+    echo "Installing development, printing and multimedia packages..."
+    pacman -S "${devel_stuff[@]}"
+    pacman -S "${multimedia_stuff[@]}"
+    pacman -S "${printing_stuff[@]}"
     echo && echo "Your desktop and display manager should now be installed..."
     sleep 5
 fi
