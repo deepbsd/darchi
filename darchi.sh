@@ -41,6 +41,7 @@ USE_CRYPT='' # gets set programmatically
 VOL_GROUP="arch_vg"
 LV_ROOT="ArchRoot"
 LV_HOME="ArchHome"
+LV_SWAP="ArchSwap"
 
 # PARTITION SIZES  (You can edit these if desired)
 BOOT_SIZE=512M
@@ -484,7 +485,9 @@ install_desktop(){
     arch-chroot /mnt pacman -S "${extra_x1[@]}"
     arch-chroot /mnt pacman -S "${extra_x2[@]}"
     arch-chroot /mnt pacman -S "${extra_x3[@]}"
-    arch-chroot /mnt pacman -S "${extra_x4[@]}"
+    arch-chroot /mnt pacman -S "${devel_stuff[@]}"
+    arch-chroot /mnt pacman -S "${multimedia_stuff[@]}"
+    arch-chroot /mnt pacman -S "${printing_stuff[@]}"
 
     # DRIVER FOR GRAPHICS CARD, DESKTOP, DISPLAY MGR
     arch-chroot /mnt pacman -S "${display_mgr[@]}"     
