@@ -545,7 +545,7 @@ lv_create(){
     echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
     ROOT_DEVICE="/dev/$root_dev"
 
-    echo "How big is your root partition or volume? (12G, 50G, 100G, etc)"; read rootsize
+    echo "How big is your root partition or volume? (15G, 50G, 100G, etc)"; read rootsize
     ROOT_SIZE="$rootsize"
     echo "How big is your Swap partition or volume? (2G, 4G, 8G, 16G, etc)"; read swap_size
     SWAP_SIZE="$swap_size"
