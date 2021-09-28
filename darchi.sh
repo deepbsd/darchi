@@ -541,9 +541,9 @@ lv_create(){
     show_disks
 
     echo "What disk are you installing to? (nvme0n1, sda, sdb, etc)"; read disk
-    IN_DEVICE=/dev/"$disk"
+    IN_DEVICE="/dev/$disk"
     echo "What partition is your Physical Device for your Volume Group? (sda2, nvme0n1p2, sdb2, etc)"; read root_dev
-    ROOT_DEVICE=/dev/"$root_dev"
+    ROOT_DEVICE="/dev/$root_dev"
 
     echo "How big is your root partition or volume? (12G, 50G, 100G, etc)"; read rootsize
     ROOT_SIZE="$rootsize"
@@ -552,7 +552,7 @@ lv_create(){
 
     if $(efi_boot_mode); then
         echo "What partition is your EFI device? (nvme0n1p1, sda1, etc)"; read efi_dev
-        EFI_DEVICE=/dev/"$efi_dev"
+        EFI_DEVICE="/dev/$efi_dev"
         EFI_SIZE=512M
         # Create the physical partitions
         sgdisk -Z "$IN_DEVICE"
@@ -563,7 +563,7 @@ lv_create(){
         mkfs.fat -F32 "$EFI_DEVICE"
     else
         echo "What partition is your BOOT device? (nvme0n1p1, sda1, etc)"; read boot_dev
-        BOOT_DEVICE=/dev/"$boot_dev"
+        BOOT_DEVICE="/dev/$boot_dev"
         BOOT_SIZE=512M
 
 cat > /tmp/sfdisk.cmd << EOF
@@ -595,8 +595,8 @@ EOF
     lvcreate -l 100%FREE  "$VOL_GROUP" -n "$LV_HOME"
     
     # Format SWAP 
-    mkswap /dev/"$VOL_GROUP"/"$LV_SWAP"
-    swapon /dev/"$VOL_GROUP"/"$LV_SWAP"
+    mkswap "/dev/$VOL_GROUP/$LV_SWAP"
+    swapon "/dev/$VOL_GROUP/$LV_SWAP"
 
     # insert the vol group module
     modprobe dm_mod
@@ -604,12 +604,12 @@ EOF
     vgchange -ay
     ## format the volumes
     #mkfs.fat -F32 "$EFI_DEVICE"
-    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_ROOT"
-    mkfs.ext4 /dev/"$VOL_GROUP"/"$LV_HOME"
+    mkfs.ext4 "/dev/$VOL_GROUP/$LV_ROOT"
+    mkfs.ext4 "/dev/$VOL_GROUP/$LV_HOME"
     # mount the volumes
-    mount /dev/"$VOL_GROUP"/"$LV_ROOT" /mnt
+    mount "/dev/$VOL_GROUP/$LV_ROOT" /mnt
     mkdir /mnt/home
-    mount /dev/"$VOL_GROUP"/"$LV_HOME" /mnt/home
+    mount "/dev/$VOL_GROUP/$LV_HOME" /mnt/home
     if $(efi_boot_mode); then
         # mount the EFI partitions
         mkdir /mnt/boot && mkdir /mnt/boot/efi
