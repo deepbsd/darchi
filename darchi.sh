@@ -71,9 +71,9 @@ extra_x1=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro
 
 extra_x2=( noto-fonts breeze-gtk breeze-icons gtk-engine-murrine oxygen-icons xcursor-themes adapta-gtk-theme )
 
-extra_x3=( arc-gtk-theme elementary-icon-theme faenza-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme ) 
+extra_x3=( arc-gtk-theme elementary-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme ) 
 
-extra_x4=( materia-gtk-theme papirus-icon-theme xcursor-bluecurve xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+extra_x4=( materia-gtk-theme papirus-icon-theme xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
@@ -86,7 +86,7 @@ i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks nitrogen i3status ttf-
 
 qtile_desktop=( qtile )
 
-kde_desktop=( lightdm-kde-greeter plasma plasma-wayland-session kde-applications )
+kde_desktop=( plasma plasma-wayland-session kde-applications )
 
 ## Python3 should be installed by default
 devel_stuff=( git nodejs npm npm-check-updates ruby )
