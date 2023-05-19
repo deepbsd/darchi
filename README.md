@@ -24,6 +24,8 @@ By default you get:  1) 512M boot or efi partition
                      3) up to 2.5x your RAM size as swap
                      4) rest of the disk for your $HOME
 
+## Desktop Choices
+
 The script makes a number of assumptions and is not as flexible as other tools.  
 You can install Xorg or not, and it installs the cinnamon desktop by default.  You can 
 include other desktop environments if you want.  But it's BASH, so you can install
@@ -33,12 +35,15 @@ Please feel free to edit the script to install your desired desktop and utilitie
 The script is about 650 lines currently.  Feel free to use it and edit it to
 your taste.  
 
+## Post Install Process
+
 There is also a post\_install.sh file in the repo.  This will copy files
 and directories that you normally have in your home directory from a host
 on your network to your newly installed home directory. For example, you
 could put your Pictures and Music folders in the directories to be
-copied.  I include a lot fo desktop settings and everyday folders.  I
-copy my public\_html and bin and .vim and a bunch of directories and
+copied.  I include a lot fo desktop settings and everyday folders. I have 
+a separate repo just for all of my dotfiles (dot directories too), for example.  
+I copy my public\_html and bin and .vim and a bunch of directories and
 files into my new home directory.  It helps when setting up a new
 desktop.  I still have to configure cinnamon quite a bit by hand, apply
 themes and change icons, for example, but at least the themes and icons
@@ -49,10 +54,18 @@ image.
 
 ## The FARCHI Script
 
+Farchi has its own repo now.  The version of the Farchi script in this repo is
+probably not up to date.
+
 I also created a script called farchi.sh for "Fast ARCH Installer".  This was supposed
 to be a bone simple script that you could edit and get installed fast with.  It's longer
 now, since I tend to like LVM.  But I have a mix of both EFI and non-EFI machines, so 
 I've had to build some intelligence into the script at the expense of more lines of code!
+
+As time has gone by, I have fewer and fewer non-EFI machines.  I have given most of these
+away to friends or family.  I may have to set default to GPT disklabel by default.
+
+## Default Variable Values
 
 With this script you set the installation variables at the top of the script.
 You'll need to know things like the device names of your installation partitions and
