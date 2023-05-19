@@ -7,6 +7,8 @@ You can download the script to your booted archiso image like this:
 
 `curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/darchi.sh`
 
+## Disk Partitioning
+
 You could use *cfdisk* for editing the partition table.  *Cfdisk* seems to
 work just fine for me when editing GPT disks as well as MBR disks.  
 Or instead follow the on-screen promptings that ask how big you want the various
