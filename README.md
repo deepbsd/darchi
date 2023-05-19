@@ -1,11 +1,15 @@
 # DARCHI    Dave's Arch Linux Installer
 
+## Get the Script Here: 
+
+You can download it to your booted archiso image like this:
+
+`curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/farchi.sh`
+
+## Background
+
 This started as just a personal script, very very simple way to install 
 Arch Linux after booting the archiso ISO image.  
-
-You can download the script to your booted archiso image like this:
-
-`curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/darchi.sh`
 
 ## Disk Partitioning
 
@@ -74,25 +78,21 @@ include your desktop selections and preferences. Also, if you need wifi drivers,
 you'll need to edit that variable.  Also, the script can figure out whether you have an 
 EFI or system or not, but you need to decide whether you want to use LVM or not.
 
-You can download it to your booted archiso image like this:
+## My Next Steps
 
-`curl -O https://raw.githubusercontent.com/deepbsd/darchi/master/farchi.sh`
+With AWK, I can calculate disk and memory sizes from a running linux system.  With that data, I can
+programmatically create partitions based on whether someone wants the ability to hibernate a system
+(which I tend to like) by creating a swap partition that is 2.5 times the size of the available RAM.
+(Note:  As RAM sizes have swelled to 32G and larger, hibernation requires about 1.2X installed RAM.)
+Also, I tend to like a larger root partition so I don't have to keep cleaning out the package cache.
 
-## Next Steps
-
-I spent the last few days learning AWK. With that tool, I can calculate disk and memory sizes
-from a running linux system.  With that data, I can programmatically create partitions based on
-whether someone wants the ability to hibernate a system (which I tend to like) by creating a swap
-partition that is 2.5 times the size of the available RAM.  Also, I tend to like a larger root partition
-so I don't have to keep cleaning out the package cache.  Or if I accumulate a few extra kernels in 
-/boot, I don't have to worry about overflowing the root partition.  For that reason, I tend to like
-root partitions of around 100GBs, and home partitions that contain the rest of the system.  You can
-easily install a linux system on a 10GB root partition, and most distros create around a 20-50GB 
-root partition by default.  If you're using LVM you can easily resize the LVs inside the PV (Physical
-Volume), but these days, your disk will probably be at least a half terabyte.  My music and video libraries
-do not take up more than 400GB, so why not give the root partition all of 100GB?  400GB for my home
-partition is plenty.  And if I need more, I can add other physical volumes to the Volume Group
-and mount them as required.
+I tend to like root partitions of around 100GBs, and home partitions that contain the rest of the
+system.  You can easily install a linux system on a 10GB root partition, and most distros create around
+a 20-50GB root partition by default.  If you're using LVM you can easily resize the LVs inside the PV
+(Physical Volume), but these days, your disk will probably be at least a half terabyte.  My music and
+video libraries do not take up more than 400GB, so why not give the root partition all of 100GB?  400GB
+for my home partition is plenty.  And if I need more, I can add other physical volumes to the Volume
+Group and mount them as required.
 
 Anyway, I want to implement auto partitioning according to four schemes:
 
