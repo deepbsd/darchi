@@ -18,23 +18,6 @@
    # HOME_SIZE=     # ALL REMAINING SPACE
    # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
-
-##  ** Do NOT edit these! They are updated programmatically **
-##
-## Note: these all of these variables must be in the global namespace
-##       so they can be updated from functions later on
-DISKTABLE=''
-IN_DEVICE=''
-EFI_SLICE=''
-ROOT_SLICE=''
-HOME_SLICE=''
-SWAP_SLICE=''
-
-# GRAPHICS DRIVERS ETC   ---  change as needed ---
-wifi_drivers=(broadcom-wl-dkms iwd)
-graphics_driver=(xf86-video-vmware)
-display_mgr=(lightdm)
-
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
 USE_CRYPT='' # gets set programmatically
@@ -50,9 +33,27 @@ ROOT_SIZE=13G
 SWAP_SIZE=2G   # SWAP_SIZE="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
 HOME_SIZE=12G   # This is set automatically if using LVM
 
+# GRAPHICS DRIVERS ETC   ---  change as needed ---
+wifi_drivers=(broadcom-wl-dkms iwd)
+graphics_driver=(xf86-video-vmware)
+display_mgr=(lightdm)
+
 # You can edit this if you want
 TIMEZONE='America/New_York'
 LOCALE="en_US.UTF-8"
+
+
+
+##  ** Do NOT edit these! They are updated programmatically **
+##
+## Note: these all of these variables must be in the global namespace
+##       so they can be updated from functions later on
+DISKTABLE=''
+IN_DEVICE=''
+EFI_SLICE=''
+ROOT_SLICE=''
+HOME_SLICE=''
+SWAP_SLICE=''
 
 ###########  SOFTWARE SETS ###################
 
