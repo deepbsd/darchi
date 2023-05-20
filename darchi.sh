@@ -536,6 +536,10 @@ lvm_hooks(){
     #Add lvm2 to mkinitcpio.conf and remake the init image
     sed -i 's/^\(HOOKS=["(]base .*\) filesystems \(.*\)$/\1 lvm2 filesystems \2/g' /mnt/etc/mkinitcpio.conf
     arch-chroot /mnt mkinitcpio -P
+
+    echo "Going to page through your mkinitcpio.conf file; check your HOOKS for presence of lvm2 or not"
+    sleep 5
+    less /mnt/etc/mkinitcpio.conf
 }
 
 lv_create(){
