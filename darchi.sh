@@ -18,6 +18,9 @@
    # HOME_SIZE=     # ALL REMAINING SPACE
    # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
+# Pick and editor
+#EDITOR=vim    # I don't edit by hand anymore
+
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
 USE_CRYPT='' # gets set programmatically
@@ -525,9 +528,13 @@ check_reflector(){
 
 lvm_hooks(){
     clear
-    echo "add lvm2 to mkinitcpio hooks HOOKS=( base udev ... block lvm2 filesystems )"
-    sleep 4
-    vim /mnt/etc/mkinitcpio.conf
+    ### This was the old way of doing it... by hand with your editor...
+    #echo "add lvm2 to mkinitcpio hooks HOOKS=( base udev ... block lvm2 filesystems )"
+    #sleep 4
+    #vim /mnt/etc/mkinitcpio.conf
+
+    #Add lvm2 to mkinitcpio.conf and remake the init image
+    sed -i 's/^\(HOOKS=["(]base .*\) filesystems \(.*\)$/\1 lvm2 filesystems \2/g' /mnt/etc/mkinitcpio.conf
     arch-chroot /mnt mkinitcpio -P
 }
 
