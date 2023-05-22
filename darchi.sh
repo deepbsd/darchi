@@ -723,7 +723,7 @@ startmenu(){
             12) install_extra_stuff; check_tasks 12 ;;
             13) set_variables ;;
             14) validate_pkgs ;;
-            15) install_paru $sudo_user ;;
+            15) install_paru $sudo_user; check_tasks 15 ;;
             16) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
                 exit 0 ;;
             *) echo "Please make a valid pick from menu!" ;;
