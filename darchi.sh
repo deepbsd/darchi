@@ -721,8 +721,8 @@ startmenu(){
             10) install_grub; check_tasks 10 ;;
             11) install_desktop; check_tasks 11 ;;
             12) install_extra_stuff; check_tasks 12 ;;
-            13) set_variables ;;
-            14) validate_pkgs ;;
+            13) set_variables; check_tasks 13 ;;
+            14) validate_pkgs; check_tasks 14 ;;
             15) install_paru $sudo_user; check_tasks 15 ;;
             16) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
                 exit 0 ;;
