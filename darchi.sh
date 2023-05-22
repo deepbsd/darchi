@@ -20,7 +20,7 @@
 
 # Pick an editor
 #EDITOR=vim    # I don't edit by hand anymore
-sudo_user=""   #  gets added programmatically; needs to be in global space
+sudo_user="dsj"   #  gets added programmatically; needs to be in global space
 
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
