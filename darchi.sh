@@ -18,8 +18,9 @@
    # HOME_SIZE=     # ALL REMAINING SPACE
    # SWAP_SIZE=32G  # TO BE ABLE TO HYBERNATE
 
-# Pick and editor
+# Pick an editor
 #EDITOR=vim    # I don't edit by hand anymore
+sudo_user=""   #  gets added programmatically; needs to be in global space
 
 # VOL GROUP VARIABLES
 USE_LVM=''   # gets set programmatically
@@ -635,6 +636,26 @@ EOF
     startmenu
 }
 
+## INSTALL PARU (ROOT as SUDO USER)
+install_paru(){
+    # check if paru is already installed
+    if $( pacman -Qi paru ); then
+        echo "paru already installed! returning now to menu..." 
+        sleep 5
+        return 0
+    fi
+
+    # $1 will be the sudo user in question
+    cd /mnt/home/$1
+    [ -d $HOME/build ] || su -c "mkdir $HOME/build" $1
+    cd $HOME/build
+    su -c "git clone https://aur.archlinux.org/paru.git" $1
+    cd paru
+    su -c "makepkg -si" $1
+    ( [ "$?" == 0 ] && echo "Paru build successful!!" ) || echo "Problem building Paru!!!"
+    sleep 4
+    pacman -Qi paru
+}
 
 diskmenu(){
     clear
@@ -676,7 +697,8 @@ startmenu(){
             echo -e "\n  9) Install Wifi Drivers      10) Install grub "
             echo -e "\n  11) Install Xorg + Desktop   12) Install Extra Window Mgrs "
             echo -e "\n  13) Repopulate Variables     14) Check for pkg name changes "
-            echo -e "\n  15) Exit Script     "
+            echo -e "\n  15) Install paru for sudo user added in 8)     "
+            echo -e "\n  16) Exit Script     "
             echo -e "\n  "
             echo -e "\n  Tasks completed:  ${completed_tasks[@]}"
 
@@ -701,7 +723,8 @@ startmenu(){
             12) install_extra_stuff; check_tasks 12 ;;
             13) set_variables ;;
             14) validate_pkgs ;;
-            15) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
+            15) install_paru $sudo_user ;;
+            16) echo -e "\n  Type 'shutdown -h now' and then remove USB/DVD, then reboot"
                 exit 0 ;;
             *) echo "Please make a valid pick from menu!" ;;
         esac
