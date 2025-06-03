@@ -33,9 +33,11 @@ LV_SWAP="ArchSwap"
 # PARTITION SIZES  (You can edit these if desired)
 BOOT_SIZE=512M
 EFI_SIZE=512M
-ROOT_SIZE=13G
-SWAP_SIZE=2G   # SWAP_SIZE="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
-HOME_SIZE=12G   # This is set automatically if using LVM
+#ROOT_SIZE=13G   # For VM
+ROOT_SIZE=100G
+#SWAP_SIZE=2G   # SWAP_SIZE="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
+SWAP_SIZE=64G   # SWAP_SIZE="$(free | awk '/^Mem/ {mem=$2/1000000; print int(2.2*mem)}')G"
+#HOME_SIZE=13G   # This is set automatically if using LVM
 
 # GRAPHICS DRIVERS ETC   ---  change as needed ---
 wifi_drivers=(broadcom-wl-dkms iwd)
@@ -70,7 +72,7 @@ network_essentials=( iwd dhcpcd openssh networkmanager )
 
 my_services=( dhcpcd sshd NetworkManager systemd-homed )
 
-basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch screenfetch lightdm-gtk-greeter )
+basic_x=( xorg-server xorg-xinit mesa xorg-twm xterm gnome-terminal xorg-xclock xfce4-terminal firefox neofetch fastfetch screenfetch lightdm-gtk-greeter )
 
 extra_x1=( gkrellm powerline powerline-fonts powerline-vim adobe-source-code-pro-fonts cantarell-fonts gnu-free-fonts ) 
 
@@ -78,7 +80,7 @@ extra_x2=( noto-fonts breeze-gtk breeze-icons gtk-engine-murrine oxygen-icons xc
 
 extra_x3=( arc-gtk-theme elementary-icon-theme gnome-icon-theme-extras arc-icon-theme lightdm-webkit-theme-litarvan mate-icon-theme ) 
 
-extra_x4=( materia-gtk-theme papirus-icon-theme xcursor-premium archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
+extra_x4=( materia-gtk-theme papirus-icon-theme archlinux-wallpaper deepin-community-wallpapers deepin-wallpapers elementary-wallpapers )
 
 cinnamon_desktop=( cinnamon nemo-fileroller )
 
@@ -89,7 +91,7 @@ mate_desktop=( mate mate-extra )
 
 i3gaps_desktop=( i3-gaps dmenu feh rofi i3status i3blocks nitrogen i3status ttf-font-awesome ttf-ionicons )
 
-qtile_desktop=( qtile )
+qtile_desktop=( qtile dmenu feh rofi rofi nitrogen ttf-font-awesome ttf-ionicons  )
 
 kde_desktop=( plasma plasma-wayland-session kde-applications )
 
